@@ -263,7 +263,7 @@ const router= new Router({
                     component:AddrSel,
                     meta: {
                         requireAuth: false,
-                        keepAlive: true,
+                        keepAlive: false,
                     },
                 },{
                     mode: 'history',

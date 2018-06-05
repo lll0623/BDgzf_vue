@@ -55,10 +55,12 @@ export default {
   beforeRouteEnter (to,from,next) {
       next(vm =>{
           vm.$store.commit('SET_HEADTOGGLE',1)
+          document.body.style.backgroundColor = '#eee'
       })
   },
   beforeRouteLeave(to,from,next){
       this.$store.commit('SET_HEADTOGGLE',0)
+      document.body.style.backgroundColor = '#fff'
       next()
   },
   head() {

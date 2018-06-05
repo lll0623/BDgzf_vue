@@ -306,7 +306,7 @@ methods: {
                 default:
                     this.$message({
                         type: 'error',
-                        message: '提交申请失败！'
+                        message: '退租申请失败！'
                     });
             }
         })

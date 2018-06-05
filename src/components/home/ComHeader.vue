@@ -312,7 +312,10 @@
                             this.$message.error(response.Info)
                     }
                 }).catch(error => {
-                    this.$message.error(error)
+                    this.$message({
+                        type:'error',
+                        message:error
+                    })
                 })
             },
             //登出

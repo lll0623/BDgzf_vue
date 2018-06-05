@@ -108,10 +108,17 @@
                   无
                 </td>
                 <td style="width: 15%;">
-                  续租日期：
+                  意向续租结束日期：
                 </td>
                 <td style="width: 35%;">
-                    {{ reletDate }}
+                    <el-date-picker
+                      v-model="ReLeaseDate"
+                      :default-value="timeDefaultShow"
+                      type="date"
+                      :picker-options="pickerOptions0"
+                      format="yyyy-MM-dd"
+                      placeholder="选择日期">
+                    </el-date-picker>
                 </td>
               </tr>
               <tr>
@@ -152,11 +159,29 @@ export default {
 name: 'retreat-apply',
 data() {
     return {
+        pickerOptions0: {
+          disabledDate(time) {
+                var date_s = new Date(Date.parse(reletStartTime.replace(/-/g,   "/")));
+                var date_e = new Date(Date.parse(reletEndTime.replace(/-/g,   "/")));
+                var iMonths = parseInt(Math.abs(date_e.getTime()- date_s.getTime()) /1000/60/60/24/30); //相距多少个月数
+
+                let startDate = (new Date(date_s)).getTime();
+
+                let monthRange_s = 30 * 24 * 3600 * 1000;
+                let numMonths_s = startDate + monthRange_s;
+
+                let monthRange_e = iMonths * 30 * 24 * 3600 * 1000;
+                let numMonths_e = startDate + monthRange_e;
+                return time.getTime() < numMonths_s || time.getTime() > numMonths_e;
+          }
+        },
         // zanqu:false,
         // dialogVisible1:false,
         // dialogVisible2:false,
         // relet_s:'',
         // relet_e:'',
+        timeDefaultShow:'',
+        ReLeaseDate:'',
         bodyView:false,
         dialogInfo_cdw:'',
         dialogInfo_cpi:'',
@@ -221,6 +246,10 @@ methods: {
                 this.dialogInfo_cpi = JSON.parse(response.Data).cpi;
                 this.dialogInfo_member = JSON.parse(response.Data).member;
 
+                reletStartTime = this.dialogInfo_cdw.BeginDate;
+                reletEndTime = this.dialogInfo_cdw.EndDate;
+                //日期控件默认聚焦时间
+                this.timeDefaultShow = moment(new Date(JSON.parse(response.Data).cdw.BeginDate)).add(1, 'months');
                 this.ContractId = this.dialogInfo_cdw.Id; //合同id
                 //续租日期
                 this.reletDate = moment(new Date(this.dialogInfo_cdw.EndDate)).add(1, 'days').format("YYYY-MM-DD");
@@ -257,7 +286,36 @@ methods: {
         return iMonths;
     },
     reletSubmit() {
+        let params = {
+            ContractId:this.ContractId,
+            ReLeaseDate: this.ReLeaseDate,
+            Description:this.Description
+        }
+        getRenewleaseApplication(params).then((response) => {
+            var errorText = response.Info;
+            switch (response.StatusCode) {
+                case 200:
+                    this.$alert('续租申请成功，等待审核！', '提示', {
+                        confirmButtonText: '确定',
+                        callback: action => {
+                        this.$router.push({path:'/'})
+                      }
+                    });
+                    break;
+                    case 500:
+                        this.$message({
+                            type: 'error',
+                            message: errorText
+                        });
+                        break;
+                    default:
+                        this.$message({
+                            type: 'error',
+                            message: '续租申请失败！'
+                        });
 
+            }
+        })
     }
 },
 filters:{

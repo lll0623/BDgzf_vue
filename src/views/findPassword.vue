@@ -23,6 +23,10 @@
 					<el-form-item label="手机号码：" prop="inputTel">
 						<el-input type="text" v-model="twoForm.inputTel" auto-complete="off"></el-input>
 					</el-form-item>
+					<el-form-item label="手机验证码：" prop="ValidateCode">
+						<el-input style="width:125px;" type="text" v-model="twoForm.ValidateCode" auto-complete="off"></el-input>
+						<el-button style="margin-left:20px;" v-loading="load_p" :disabled="disabled" @click="sendcode">{{ getBtnTxt }}</el-button>
+					</el-form-item>
 					<el-form-item label="新密码：" prop="Password">
 						<el-input :type="this.ispassword" v-model="twoForm.Password" auto-complete="off"></el-input>
 						<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
@@ -35,10 +39,6 @@
 						<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="twoForm.yzm" auto-complete="off"></el-input>
 						<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
 					</el-form-item>
-					<el-form-item label="手机验证码：" prop="ValidateCode">
-						<el-input style="width:125px;" type="text" v-model="twoForm.ValidateCode" auto-complete="off"></el-input>
-						<el-button style="margin-left:20px;" :disabled="disabled" @click="sendcode">{{ getBtnTxt }}</el-button>
-					</el-form-item>
 					<el-button class="nextBtn tc" @click="submitForm2('twoForm')">提交</el-button>
 				</el-form>
 			</el-tab-pane>
@@ -47,6 +47,10 @@
 				<el-form :model="threeForm" label-position="right" :rules="threeRules" ref="threeForm" label-width="120px">
 					<el-form-item label="邮箱：" prop="email">
 						<el-input type="text" v-model="threeForm.email" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="邮箱验证码：" prop="ValidateCode_E">
+						<el-input style="width:125px;" type="text" v-model="threeForm.ValidateCode_E" auto-complete="off"></el-input>
+						<el-button style="margin-left:20px;" v-loading="load_e" :disabled="disabled2" @click="sendcode_E">{{ getBtnTxt_E }}</el-button>
 					</el-form-item>
 					<el-form-item label="新密码：" prop="Password2">
 						<el-input :type="this.ispassword3" v-model="threeForm.Password2" auto-complete="off"></el-input>
@@ -86,10 +90,7 @@
 </template>
 
 <script>
-import {
-	getSMSHelper,
-	getFindPassword
-} from '../api/api.js'
+import { getSMSHelper,getFindPassword,getEmailUtil } from '../api/api.js'
 import md5 from 'js-md5';
 var code; //在全局定义验证码
 export default {
@@ -177,6 +178,19 @@ export default {
 				callback();
 			}
 		};
+		var validateValidateCode_E = (rule, value, callback) => {
+			let EmailNum = this.threeForm.email
+			let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			if (value === '') {
+				callback(new Error('邮箱验证码不能为空'));
+			} else if (!reg.test(EmailNum)) {
+				callback(new Error('请输入正确的邮箱号'));
+			} else if (md5(value) != this.SMCode_email) {
+				callback(new Error('邮箱验证码不正确'));
+			} else {
+				callback();
+			}
+		};
 		var validatePassword2 = (rule, value, callback) => {
 			if (value === '') {
 				callback(new Error('请输入密码'));
@@ -215,9 +229,15 @@ export default {
 			activeName: 'first',
 			checkCode: '', //验证码value值
 			disabled: false,
+			disabled2: false,
 			time: 0,
+			time2: 0,
 			getBtnTxt: "免费获取验证码",
+			getBtnTxt_E: "免费获取验证码",
 			SMCode_phone: '', //短信接口返回的验证码
+			SMCode_email: '', //短信接口返回的验证码
+			load_p:false,
+			load_eL:false,
 			ispassword: "password",
 			fa_eyes: 'fa fa-eye-slash',
 			ispassword2: "password",
@@ -280,6 +300,7 @@ export default {
 			threeForm: {
 				yzm2: '',
 				email: '',
+				ValidateCode_E:'',
 				Password2: '',
 				confirm_pass2: ''
 			},
@@ -290,6 +311,10 @@ export default {
 				}],
 				email: [{
 					validator: validateEmail,
+					trigger: 'blur'
+				}],
+				ValidateCode_E: [{
+					validator: validateValidateCode_E,
 					trigger: 'blur'
 				}],
 				Password2: [{
@@ -329,6 +354,14 @@ export default {
 			this.checkCode = code; //把code值赋给验证码
 		},
 		sendcode() {
+			if(this.twoForm.inputTel == ''){
+				this.$message({
+					type: 'error',
+					message: '请输入手机号！'
+				});
+				retur;
+			}
+			this.load_p = true;
 			let params = {
 				Type: 2, //找回密码
 				PhoneNum: this.twoForm.inputTel
@@ -344,6 +377,7 @@ export default {
 							message: '短信验证码发送成功，请注意查收！'
 						});
 						this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
+						this.load_p = false;
 						this.time = 60;
 						this.disabled = true;
 						this.timer();
@@ -353,6 +387,7 @@ export default {
 							type: 'error',
 							message: errorText
 						});
+						this.load_p = false;
 						this.time = 0;
 						this.getBtnTxt = "免费获取验证码";
 						this.disabled = false;
@@ -362,9 +397,59 @@ export default {
 							type: 'error',
 							message: '短信验证码发送失败！'
 						});
+						this.load_p = false;
 						this.time = 0;
 						this.getBtnTxt = "免费获取验证码";
 						this.disabled = false;
+				}
+			})
+		},
+		sendcode_E() {
+			if(this.threeForm.email == ''){
+				this.$message({
+					type: 'error',
+					message: '请输入邮箱！'
+				});
+				retur;
+			}
+			this.load_e = true;
+			let params = {
+				Type: 2, //找回密码
+				Email: this.threeForm.email
+			}
+			console.log(params)
+			getEmailUtil(params).then((response) => {
+				console.log(response.Data)
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						this.$message({
+							type: 'success',
+							message: '邮箱验证码发送成功，请注意查收！'
+						});
+						this.SMCode_email = response.Data.RegisterCode.toLowerCase();
+						this.load_e = false;
+						this.time2 = 60;
+						this.disabled2 = true;
+						this.timer2();
+						break;
+					case 500:
+						this.$message({
+							type: 'error',
+							message: errorText
+						});
+						this.time2 = 0;
+						this.getBtnTxt_E = "免费获取验证码";
+						this.disabled2 = false;
+						break;
+					default:
+						this.$message({
+							type: 'error',
+							message: '邮箱验证码发送失败！'
+						});
+						this.time2 = 0;
+						this.getBtnTxt_E = "免费获取验证码";
+						this.disabled2 = false;
 				}
 			})
 		},
@@ -377,6 +462,17 @@ export default {
 				this.time = 0;
 				this.getBtnTxt = "免费获取验证码";
 				this.disabled = false;
+			}
+		},
+		timer2() {
+			if (this.time2 > 0) {
+				this.time2--;
+				this.getBtnTxt_E = this.time2 + "s后重新获取";
+				setTimeout(this.timer2, 1000);
+			} else {
+				this.time2 = 0;
+				this.getBtnTxt_E = "免费获取验证码";
+				this.disabled2 = false;
 			}
 		},
 		changeType() {

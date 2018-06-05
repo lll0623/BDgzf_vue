@@ -233,15 +233,28 @@ export default{
         })
     },
     computed:{
-        ...mapGetters(['isReadOrNot','stepTip','userInfo'])
+        ...mapGetters(['isReadOrNot','stepTip','userInfo']),
+        setIsreadOrNot() {
+            return this.$store.getters.isReadOrNot
+        },
     },
     watch:{
         stepTip(val){
             return val
+        },
+        setIsreadOrNot(val){
+            return val
         }
     },
     mounted() {
-
+        if(this.$store.getters.userInfo){
+            this.$store.dispatch('SET_ISREADORNOT', {
+                QueryJson:{
+                AccountId:this.$store.getters.userInfo.AccountId,
+                IsRead: 1
+                }
+            })
+        }
     },
     methods:{
         //快速入口
@@ -364,16 +377,20 @@ export default{
                     this.$message.error('房源数据请求失败'+response.Info)
                 break;
                 case 200 :
-                    if(response.Data == null || response.Data.Rows.length == 0){
+                    if(response.Data == null || response.Data.length == 0){
                         this.showHotHouseLists = false
                     }else{
-                        this.swiperLists =response.Data.Rows
+                        this.showHotHouseLists = true
+                        this.swiperLists =response.Data
                     }
 
                 break;
             }
         }).catch(error =>{
-            this.$message.error(error)
+            this.$message({
+                type:'error',
+                message:error
+            })
         })
         //获取新闻
         getNews({QueryJson:{"Type":1},Rows: 3,page:1,}).then(response => {

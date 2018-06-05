@@ -244,3 +244,7 @@ export const getSMSHelper = params => {
 export const getFindPassword = params => {
 return axios.post('/api/Member/FindPassword',params).then(response => response.data)
 }
+//邮箱接口
+export const getEmailUtil = params => {
+return axios.post('/api/Common/EmailUtil',params).then(response => response.data)
+}
