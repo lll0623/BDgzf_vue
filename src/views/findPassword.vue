@@ -1,18 +1,26 @@
 <template>
 <div class="findPassWordBackground" ref='loginBox'>
-	<!-- 第一个card -->
-	<!-- <el-card class="box-card" v-show="card1" style="height:230px">
-    <div slot="header" class="clearfix">
-      <span style="font-size:28px">找回密码</span>
-    </div>
-    <el-form :model="oneForm" label-position="right" :rules="oneRules" ref="oneForm" label-width="120px" class="demo-ruleForm">
-      <el-form-item label="身份证号码：" prop="IDCard">
-        <el-input type="text" v-model="oneForm.IDCard" auto-complete="off"></el-input>
-      </el-form-item>
-
-      <el-button class="nextBtn" @click="submitForm('oneForm')">下一步</el-button>
-    </el-form>
-  </el-card> -->
+	<!-- 手机验证方式 -->
+	<el-card class="box-card" v-show="card5">
+		<div slot="header" class="clearfix">
+			<span style="font-size:28px">填写新密码（手机验证方式）</span>
+		</div>
+		<el-form :model="fiveForm" label-position="right" :rules="fiveRules" ref="fiveForm" label-width="120px" class="demo-ruleForm">
+			<el-form-item label="新密码：" prop="Password">
+				<el-input :type="this.ispassword" v-model="fiveForm.Password" auto-complete="off"></el-input>
+				<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
+			</el-form-item>
+			<el-form-item label="确定密码：" prop="confirm_pass">
+				<el-input :type="this.ispassword2" v-model="fiveForm.confirm_pass" auto-complete="off"></el-input>
+				<i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
+			</el-form-item>
+			<el-form-item label="图形验证码：" prop="yzm">
+				<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="fiveForm.yzm" auto-complete="off"></el-input>
+				<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
+			</el-form-item>
+			<el-button class="nextBtn tc" @click="submitForm5('fiveForm')">提交</el-button>
+		</el-form>
+	</el-card>
 
 	<!-- 第二个card -->
 	<el-card class="box-card" v-show="card2">
@@ -27,19 +35,7 @@
 						<el-input style="width:125px;" type="text" v-model="twoForm.ValidateCode" auto-complete="off"></el-input>
 						<el-button style="margin-left:20px;" v-loading="load_p" :disabled="disabled" @click="sendcode">{{ getBtnTxt }}</el-button>
 					</el-form-item>
-					<el-form-item label="新密码：" prop="Password">
-						<el-input :type="this.ispassword" v-model="twoForm.Password" auto-complete="off"></el-input>
-						<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
-					</el-form-item>
-					<el-form-item label="确定密码：" prop="confirm_pass">
-						<el-input :type="this.ispassword2" v-model="twoForm.confirm_pass" auto-complete="off"></el-input>
-						<i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
-					</el-form-item>
-					<el-form-item label="图形验证码：" prop="yzm">
-						<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="twoForm.yzm" auto-complete="off"></el-input>
-						<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
-					</el-form-item>
-					<el-button class="nextBtn tc" @click="submitForm2('twoForm')">提交</el-button>
+					<el-button class="nextBtn tc" @click="submitForm2('twoForm')">下一步</el-button>
 				</el-form>
 			</el-tab-pane>
 			<el-tab-pane name="second">
@@ -52,23 +48,31 @@
 						<el-input style="width:125px;" type="text" v-model="threeForm.ValidateCode_E" auto-complete="off"></el-input>
 						<el-button style="margin-left:20px;" v-loading="load_e" :disabled="disabled2" @click="sendcode_E">{{ getBtnTxt_E }}</el-button>
 					</el-form-item>
-					<el-form-item label="新密码：" prop="Password2">
-						<el-input :type="this.ispassword3" v-model="threeForm.Password2" auto-complete="off"></el-input>
-						<i :class="fa_eyes3" aria-hidden="true" @click="changeType3()" class="open_close"></i>
-					</el-form-item>
-					<el-form-item label="确定密码：" prop="confirm_pass2">
-						<el-input :type="this.ispassword4" v-model="threeForm.confirm_pass2" auto-complete="off"></el-input>
-						<i :class="fa_eyes4" aria-hidden="true" @click="changeType4()" class="open_close"></i>
-					</el-form-item>
-					<el-form-item label="图形验证码：" prop="yzm2">
-						<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="threeForm.yzm2" auto-complete="off"></el-input>
-						<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
-					</el-form-item>
-					<el-button class="nextBtn tc" @click="submitForm3('threeForm')">提交</el-button>
+					<el-button class="nextBtn tc" @click="submitForm3('threeForm')">下一步</el-button>
 				</el-form>
 			</el-tab-pane>
 		</el-tabs>
-
+	</el-card>
+	<!-- 邮箱验证方式 -->
+	<el-card class="box-card" v-show="card6">
+		<div slot="header" class="clearfix">
+			<span style="font-size:28px">填写新密码（邮箱验证方式）</span>
+		</div>
+		<el-form :model="sixForm" label-position="right" :rules="sixRules" ref="sixForm" label-width="120px" class="demo-ruleForm">
+			<el-form-item label="新密码：" prop="Password2">
+				<el-input :type="this.ispassword3" v-model="sixForm.Password2" auto-complete="off"></el-input>
+				<i :class="fa_eyes3" aria-hidden="true" @click="changeType3()" class="open_close"></i>
+			</el-form-item>
+			<el-form-item label="确定密码：" prop="confirm_pass2">
+				<el-input :type="this.ispassword4" v-model="sixForm.confirm_pass2" auto-complete="off"></el-input>
+				<i :class="fa_eyes4" aria-hidden="true" @click="changeType4()" class="open_close"></i>
+			</el-form-item>
+			<el-form-item label="图形验证码：" prop="yzm2">
+				<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="sixForm.yzm2" auto-complete="off"></el-input>
+				<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
+			</el-form-item>
+			<el-button class="nextBtn tc" @click="submitForm6('sixForm')">提交</el-button>
+		</el-form>
 	</el-card>
 
 	<!-- 通过手机号修改成功 -->
@@ -90,36 +94,22 @@
 </template>
 
 <script>
-import { getSMSHelper,getFindPassword,getEmailUtil } from '../api/api.js'
+import {
+	getSMSHelper,
+	getFindPassword,
+	getEmailUtil
+} from '../api/api.js'
 import md5 from 'js-md5';
 var code; //在全局定义验证码
 export default {
 	data() {
-		// var validateIDCard = (rule, value, callback) => {
-		//   let yes = false;
-		//   for (let i = 0; i < this.IdcardArr.length; i++) {
-		//     let obj = this.IdcardArr[i];
-		//     if (obj.CardNum.indexOf(value) != -1) {
-		//       yes = true;
-		//       break;
-		//     }
-		//   }
-		//   let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-		//   if (value === '') {
-		//     callback(new Error('请输入身份证号码'));
-		//   } else if (!reg.test(value)) {
-		//     callback(new Error('请输入正确的身份证号'));
-		//   } else if (!yes) {
-		//     callback(new Error('该身份证不存在,请输入正确的身份证'));
-		//   } else {
-		//     callback();
-		//   }
-		// };
 		var validatePhoneNum = (rule, value, callback) => {
 			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
 			if (value === '') {
 				callback(new Error('手机号码不能为空'));
 			} else if (!reg.test(value)) {
+				callback(new Error('请输入正确的手机号码'));
+			} else if (this.sidePhone != '' && value != this.sidePhone) {
 				callback(new Error('请输入正确的手机号码'));
 			} else {
 				callback();
@@ -137,7 +127,7 @@ export default {
 		var validateConfirm_pass = (rule, value, callback) => {
 			if (value === '') {
 				callback(new Error('请输入确认密码'));
-			} else if (value !== this.twoForm.Password) {
+			} else if (value !== this.fiveForm.Password) {
 				callback(new Error('两次输入密码不一致!'))
 			} else {
 				callback()
@@ -174,6 +164,8 @@ export default {
 				callback(new Error('邮箱不能为空'));
 			} else if (!reg.test(value)) {
 				callback(new Error('请输入正确格式的邮箱'));
+			} else if (this.sideEmail != '' && value != this.sideEmail) {
+				callback(new Error('请输入正确格式的邮箱'));
 			} else {
 				callback();
 			}
@@ -203,7 +195,7 @@ export default {
 		var validateConfirm_pass2 = (rule, value, callback) => {
 			if (value === '') {
 				callback(new Error('请输入确认密码'));
-			} else if (value !== this.threeForm.Password2) {
+			} else if (value !== this.sixForm.Password2) {
 				callback(new Error('两次输入密码不一致!'))
 			} else {
 				callback()
@@ -226,6 +218,8 @@ export default {
 			card2: true,
 			card3: false,
 			card4: false,
+			card5: false,
+			card6: false,
 			activeName: 'first',
 			checkCode: '', //验证码value值
 			disabled: false,
@@ -236,8 +230,10 @@ export default {
 			getBtnTxt_E: "免费获取验证码",
 			SMCode_phone: '', //短信接口返回的验证码
 			SMCode_email: '', //短信接口返回的验证码
-			load_p:false,
-			load_eL:false,
+			load_p: false,
+			load_e: false,
+			sidePhone: '',
+			sideEmail: '',
 			ispassword: "password",
 			fa_eyes: 'fa fa-eye-slash',
 			ispassword2: "password",
@@ -270,9 +266,6 @@ export default {
 			// },
 			twoForm: {
 				inputTel: '',
-				Password: '',
-				confirm_pass: '',
-				yzm: '',
 				ValidateCode: ''
 			},
 			twoRules: {
@@ -280,6 +273,17 @@ export default {
 					validator: validatePhoneNum,
 					trigger: 'blur'
 				}],
+				ValidateCode: [{
+					validator: validateValidateCode,
+					trigger: 'blur'
+				}]
+			},
+			fiveForm: {
+				Password: '',
+				confirm_pass: '',
+				yzm: ''
+			},
+			fiveRules: {
 				yzm: [{
 					validator: validateYzm,
 					trigger: 'blur'
@@ -291,30 +295,32 @@ export default {
 				confirm_pass: [{
 					validator: validateConfirm_pass,
 					trigger: 'blur'
-				}],
-				ValidateCode: [{
-					validator: validateValidateCode,
-					trigger: 'blur'
 				}]
 			},
 			threeForm: {
 				yzm2: '',
 				email: '',
-				ValidateCode_E:'',
+				ValidateCode_E: '',
 				Password2: '',
 				confirm_pass2: ''
 			},
 			threeRules: {
-				yzm2: [{
-					validator: validateYzm2,
-					trigger: 'blur'
-				}],
 				email: [{
 					validator: validateEmail,
 					trigger: 'blur'
 				}],
 				ValidateCode_E: [{
 					validator: validateValidateCode_E,
+					trigger: 'blur'
+				}],
+			},
+			sixForm: {
+				email: '',
+				ValidateCode_E: ''
+			},
+			sixRules: {
+				yzm2: [{
+					validator: validateYzm2,
 					trigger: 'blur'
 				}],
 				Password2: [{
@@ -354,7 +360,7 @@ export default {
 			this.checkCode = code; //把code值赋给验证码
 		},
 		sendcode() {
-			if(this.twoForm.inputTel == ''){
+			if (this.twoForm.inputTel == '') {
 				this.$message({
 					type: 'error',
 					message: '请输入手机号！'
@@ -366,9 +372,7 @@ export default {
 				Type: 2, //找回密码
 				PhoneNum: this.twoForm.inputTel
 			}
-			console.log(params)
 			getSMSHelper(params).then((response) => {
-				console.log(response.Data)
 				var errorText = response.Info;
 				switch (response.StatusCode) {
 					case 200:
@@ -377,6 +381,7 @@ export default {
 							message: '短信验证码发送成功，请注意查收！'
 						});
 						this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
+						this.sidePhone = response.Data.PhoneNum;
 						this.load_p = false;
 						this.time = 60;
 						this.disabled = true;
@@ -405,7 +410,7 @@ export default {
 			})
 		},
 		sendcode_E() {
-			if(this.threeForm.email == ''){
+			if (this.threeForm.email == '') {
 				this.$message({
 					type: 'error',
 					message: '请输入邮箱！'
@@ -417,9 +422,7 @@ export default {
 				Type: 2, //找回密码
 				Email: this.threeForm.email
 			}
-			console.log(params)
 			getEmailUtil(params).then((response) => {
-				console.log(response.Data)
 				var errorText = response.Info;
 				switch (response.StatusCode) {
 					case 200:
@@ -428,6 +431,7 @@ export default {
 							message: '邮箱验证码发送成功，请注意查收！'
 						});
 						this.SMCode_email = response.Data.RegisterCode.toLowerCase();
+						this.sideEmail = response.Data.Email;
 						this.load_e = false;
 						this.time2 = 60;
 						this.disabled2 = true;
@@ -441,6 +445,7 @@ export default {
 						this.time2 = 0;
 						this.getBtnTxt_E = "免费获取验证码";
 						this.disabled2 = false;
+						this.load_e = false;
 						break;
 					default:
 						this.$message({
@@ -450,6 +455,7 @@ export default {
 						this.time2 = 0;
 						this.getBtnTxt_E = "免费获取验证码";
 						this.disabled2 = false;
+						this.load_e = false;
 				}
 			})
 		},
@@ -491,34 +497,32 @@ export default {
 			this.ispassword4 = this.ispassword4 === 'password' ? 'text' : 'password';
 			this.fa_eyes4 = this.fa_eyes4 == "fa fa-eye-slash" ? "fa fa-eye" : "fa fa-eye-slash";
 		},
-		// submitForm(formName) {
-		//   this.$refs[formName].validate((valid) => {
-		//     if (valid) {
-		//       alert('submit!');
-		//       this.card1 = false;
-		//       this.card2 = true;
-		//     } else {
-		//       return false;
-		//     }
-		//   });
-		// },
 		submitForm2(formName) {
+			this.$refs[formName].validate((valid) => {
+				if (valid) {
+					this.card2 = false;
+					this.card5 = true;
+				} else {
+					return false;
+				}
+			});
+		},
+		submitForm5(formName) {
 			this.$refs[formName].validate((valid) => {
 				if (valid) {
 					let params = {
 						Type: 1,
 						PhoneNum: this.twoForm.inputTel,
 						Email: '',
-						Password: md5(this.twoForm.Password)
+						Password: md5(this.fiveForm.Password)
 					}
 					getFindPassword(params).then((response) => {
-						console.log(response.Data)
 						var errorText = response.Info;
 						switch (response.StatusCode) {
 							case 200:
 								this.card2 = false;
 								this.card3 = true;
-								this.card4 = false;
+								this.card5 = false;
 								break;
 							case 500:
 								this.$message({
@@ -540,21 +544,21 @@ export default {
 				}
 			});
 		},
-		submitForm3(formName) {
+		submitForm6(formName) {
 			this.$refs[formName].validate((valid) => {
 				if (valid) {
 					let params = {
 						Type: 2,
 						Email: this.threeForm.email,
-						Password: md5(this.threeForm.Password2)
+						Password: md5(this.sixForm.Password2)
 					}
 					getFindPassword(params).then((response) => {
-						console.log(response.Data)
 						var errorText = response.Info;
 						switch (response.StatusCode) {
 							case 200:
 								this.card2 = false;
 								this.card3 = false;
+								this.card6 = false;
 								this.card4 = true;
 								break;
 							case 500:
@@ -580,23 +584,22 @@ export default {
 				}
 			});
 		},
-		// 隐藏手机号操作
-		// inputTelHide() {
-		//   return this.inputTel = this.twoForm.inputTel.substring(0, 3) + "****" + this.twoForm.inputTel.substring(7, 11);
-		// },
-		// 隐藏邮箱号操作
-		// emailHide() {
-		//   let length = this.threeForm.email.length;
-		//   return this.email = this.threeForm.email.substring(0, 3) + "****" + this.threeForm.email.substring(7, length);
-		// }
+		submitForm3(formName) {
+			this.$refs[formName].validate((valid) => {
+				if (valid) {
+					this.card2 = false;
+					this.card6 = true;
+				} else {
+					return false;
+				}
+			});
+		},
 	},
 	mounted() {
 		this.$refs.loginBox.style.minHeight = (document.documentElement.clientHeight - document.getElementById('header').offsetHeight) + 'px'
 	},
 	created() {
 		this.createCode();
-		// this.inputTelHide();
-		// this.emailHide();
 	}
 }
 </script>

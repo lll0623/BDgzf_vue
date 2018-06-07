@@ -124,7 +124,9 @@
         },
         watch:{
             getApplyForCode:function(val){
-                this.getApplyForInfoFunc(val)
+                if(val !=''){
+                    this.getApplyForInfoFunc(val)
+                }
             }
         },
         beforeRouteEnter (to,from,next) {

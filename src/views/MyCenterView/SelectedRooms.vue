@@ -57,6 +57,19 @@
                 vm.$store.commit('SET_MYCENTERNAV',3)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         methods: {
             //格式化时间
             resetData(row,column){

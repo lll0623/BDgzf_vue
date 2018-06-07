@@ -50,6 +50,19 @@
                 vm.$store.commit('SET_MYCENTERNAV',6)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         methods: {
             //格式化时间
             resetData(row,column){
@@ -73,13 +86,13 @@
                        type: 'warning'
                 }).then(() => {
                     //取消代码
-                    console.log(row)
+                    // console.log(row)
                     var params = {
        					AccountId:this.$store.getters.userInfo.AccountId,
        					ObjectId:row.ObjectId,
        				}
                     this.loading = true
-                    console.log(params)
+                    // console.log(params)
                     cancelCollect(params).then(response => {
                        switch(response.StatusCode){
                            case 200:

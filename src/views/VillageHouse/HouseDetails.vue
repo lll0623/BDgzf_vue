@@ -87,8 +87,6 @@
 	<div class="villageCircum-wrap marT30 pad15" id="#anchor-1">
 		<h2 class="site-title">房源周边</h2>
 		<div class="DetailsFilter__Map">
-			<!-- <input type="hidden" name="name" value="121.5259780000" id="lng">
-                    <input type="hidden" name="name" value="31.1859440000" id="lat"> -->
 			<div class="DetailsFilter__Map__Media fl" id="mapcontainer"></div>
 			<div class="DetailsFilter__Map__Panel fr">
 				<el-tabs v-model="villageArea" @tab-click="handleClick">
@@ -98,7 +96,7 @@
 			              <div :class="{villageAreaViewLi:true,active: ites.title==viactive}" v-for="(ites,index3) in ite.list" :key="index3" @mouseenter="mapChangeOver(ites.point, ite.cateList + (index3 + 1) )" @mouseleave="mapChangeOut(ites.point, ite.cateList + (index3 + 1) )"  @click="addClickHandler(ites.address,ites.point,ites.title);toggleClick(ites.title)">
 			                <i class="pull-left">{{ ite.cateList }}{{ index3 + 1 }}</i>
 			                <span>{{ites.title}}</span>
-			                <span class="fr">{{ ites.point | pointDistence }}米</span>
+			                <span class="fr">{{ ites.point | pointDistence(lng,lat) }}米</span>
 			              </div>
 			            </div>
 
@@ -208,7 +206,6 @@ export default {
 			complementDialogVisible:false,
 			btnLoading:false,
 			input_IDCard:'',
-
 			defaultImg,
 			step:{   //此数据是控制动画快慢的
 	            type:Number,
@@ -312,6 +309,8 @@ export default {
 			tabIndex: "",
 			viactive:"", //周边列表选则
 		 	activeMap:false,
+			lat: '',
+			lng: '',
 			distenceList: [{
 				distence: 500,
 				label: "0.5km",
@@ -361,16 +360,24 @@ export default {
 			}
 		},
 		// 根据金纬度距离计算
-        pointDistence: function(point) {
-          var radLat1 = 31.325405 * Math.PI / 180.0;
-          var radLat2 = point.lat * Math.PI / 180.0;
-          var a = radLat1 - radLat2;
-          var b = 121.380186 * Math.PI / 180.0 - point.lng * Math.PI / 180.0;
-          var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
-          s = s * 6378.137;
-          s = (Math.round(s * 10000) / 10).toFixed(0);
-          return s
-        }
+		pointDistence: function(point,lng,lat) {
+            let mPoint_lat,mPoint_lng;
+			if (lat == '' || lat == null || lat == 0 || lng == '' || lng == null || lng == 0) {
+				mPoint_lng = 121.5505840120, 31.2274065041
+				mPoint_lat = 31.2274065041
+			} else {
+                mPoint_lng = lng
+				mPoint_lat = lat
+			}
+			var radLat1 = mPoint_lat * Math.PI / 180.0;
+			var radLat2 = point.lat * Math.PI / 180.0;
+			var a = radLat1 - radLat2;
+			var b = mPoint_lng * Math.PI / 180.0 - point.lng * Math.PI / 180.0;
+			var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+			s = s * 6378.137;
+			s = (Math.round(s * 10000) / 10).toFixed(0);
+			return s
+		}
 	},
 	mounted() {
 		this.$nextTick(() => {
@@ -407,68 +414,11 @@ export default {
 			});
 			this.$refs.box.style.minHeight = (document.documentElement.clientHeight - document.getElementById('footer').offsetHeight - document.getElementById('header').offsetHeight -30) +'px'
 		})
-		this.initMap();
+		setTimeout(() => {
+			this.creatChangeMap(0);
+		}, 100)
 	},
 	methods: {
-		initMap() {
-			var _this = this;
-			// MP(_this.ak).then(BMap => {
-				// console.log(BMap);
-				// 百度地图API功能
-				// 创建Map实例
-				var map = new BMap.Map("mapcontainer", {
-					enableMapClick: true
-				});
-				// 初始化地图,用城市名设置地图中心点
-				map.centerAndZoom(new BMap.Point(121.391727, 31.116627), 15);
-				// 添加地图类型控件
-				map.addControl(new BMap.MapTypeControl());
-				// 添加工具条、比例尺控件
-				map.addControl(new BMap.ScaleControl({
-					anchor: BMAP_ANCHOR_TOP_LEFT
-				}));
-				map.addControl(new BMap.NavigationControl());
-				map.addControl(new BMap.NavigationControl({
-					anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
-					type: BMAP_NAVIGATION_CONTROL_SMALL
-				}));
-				// 开启鼠标滚轮缩放
-				map.enableScrollWheelZoom(true);
-
-				/************************************************
-				给地图添加右键菜单
-				*************************************************/
-				var menu = new BMap.ContextMenu();
-
-				var txtMenuItem = [{
-						text: '放大',
-						callback: function() {
-							map.zoomIn()
-						}
-					},
-					{
-						text: '缩小',
-						callback: function() {
-							map.zoomOut()
-						}
-					}
-				];
-				for (var i = 0; i < txtMenuItem.length; i++) {
-					menu.addItem(new BMap.MenuItem(txtMenuItem[i].text, txtMenuItem[i].callback, 100));
-				}
-				map.addContextMenu(menu);
-				this.creatChangeMap('0');
-			// })
-		},
-		// handler({
-		// 	BMap,
-		// 	map
-		// }) {
-		// 	// console.log(BMap, map)
-		// 	this.center.lng = 121.380186
-		// 	this.center.lat = 31.325405
-		// 	this.zoom = 15
-		// },
 		reloadFunc(id){
 			this.$router.push({
 				path: `/houseDetails/${id}`,
@@ -513,8 +463,6 @@ export default {
 	      var map = new BMap.Map("mapcontainer", {
 	        enableMapClick: true
 	      });
-		  // 初始化地图,用城市名设置地图中心点
- 		 map.centerAndZoom(new BMap.Point(121.391727, 31.116627), 15);
  		 // 添加地图类型控件
  		 map.addControl(new BMap.MapTypeControl());
  		 // 添加工具条、比例尺控件
@@ -531,15 +479,19 @@ export default {
 	      map.clearOverlays();
 	      mapVillage = map;
 	      this.tabIndex = tab_index;
-	      var mPoint = new BMap.Point(121.380186, 31.325405);
-	      // 初始化地图,用城市名设置地图中心点 121.391727,31.116627
-	      map.centerAndZoom(new BMap.Point(mPoint), 15);
-	      // var tubiao=require("../../assets/images/bk.jpg")
-	      var myIcon = new BMap.Icon(dwImg, new BMap.Size(35, 35));
-	      var marker = new BMap.Marker(mPoint, {
-	        icon: myIcon
-	      }); // 创建标注
-	      map.addOverlay(marker); // 将标注添加到地图中
+
+		  let mPoint;
+ 		 if (this.lat == '' || this.lat == null || this.lat == 0 || this.lng == '' || this.lng == null || this.lng == 0) {
+ 			 mPoint = new BMap.Point(121.5505840120, 31.2274065041);  // 默认浦东新区的经纬度
+ 		 } else {
+ 			 mPoint = new BMap.Point(this.lng, this.lat);
+ 		 }
+
+ 		 var myIcon = new BMap.Icon(dwImg, new BMap.Size(35, 35));
+ 		 var marker = new BMap.Marker(mPoint, {
+ 			 icon: myIcon
+ 		 }); // 创建标注
+ 		 map.addOverlay(marker); // 将标注添加到地图中
 
 	      map.centerAndZoom(mPoint, 15);
 	      var circle = new BMap.Circle(mPoint, this.distence, {
@@ -553,15 +505,6 @@ export default {
 	      var _this = this,
 	        arryList = [];
 	      for (var i = 0; i < this.villageAreaList[this.tabIndex].keyWOrd.length; i++) {
-	        //  var local = new BMap.LocalSearch(map, {
-	        // 	renderOptions: {
-	        // 		map: map,
-	        // 		// panel: this.tabIndex + '_' + i,
-	        // 		autoViewport: false
-	        // 	},
-	        // 	pageCapacity:100
-	        // });
-	        // local.searchNearby(this.villageAreaList[this.tabIndex].keyWOrd[i], mPoint, this.distence);
 	        var result, index = 0;;
 	        var options = {
 	          onSearchComplete: function(results) {
@@ -574,23 +517,7 @@ export default {
 				  var myIcon = new BMap.Icon(aroundPos, new BMap.Size(40, 40));
 	              var marker = new BMap.Marker(point, {
 			        icon: myIcon
-			      }); // 创建标注
-				  // var label = new BMap.Label(""+_this.cateList[index - 1]+"" + (m+1) +"");
-				  // label.setStyle({
-	              //               color: "#fff",
-	              //               letterSpacing: '-2px',
-	              //               fontSize: "12px",
-	              //               border: "0",
-	              //               background: "transparent",
-	              //               textAlign: "center",
-	              //               width: "26px",
-	              //               height: "29px",
-	              //               marginLeft: "-3px",
-	              //               paddingTop: "5px"
-	              //           });
-				  //
-				  // marker.setLabel(label);
-	              // map.addOverlay(marker);
+			      });
 				  marker.addEventListener('mouseover', function (e) {//气泡mouseenter事件
 					  if (this.activeMap == true) return false;
 				  	//当前气泡高亮、置顶
@@ -681,7 +608,6 @@ export default {
 	      map.openInfoWindow(infoWindow, point); //开启信息窗口
 	    },
 		handleClick(tab, event) {
-			// console.log(tab.index);
 			this.creatChangeMap(tab.index); //检索的函数 this.creatChangeMap()
 		},
 		//收藏
@@ -780,7 +706,7 @@ export default {
 				if(this.$store.getters.userInfo.State == 1001 || this.$store.getters.userInfo.State == 1002){
 					this.$router.push({path:'/applyFor'})
 				}else if(this.$store.getters.userInfo.State == 1007){
-					this.getChooseRoomFunc(this.$store.getters.userInfo.MemberId,this.roomId)
+					this.getChooseRoomFunc(this.$store.getters.userInfo.AccountId,this.roomId)
 				}else if(this.$store.getters.userInfo.State == 0 || this.$store.getters.userInfo.State == ''){
 					this.complementDialogVisible = true
 				}
@@ -789,8 +715,9 @@ export default {
 			}
 		},
 		//用户选房
-		getChooseRoomFunc(MemberId,RoomId){
-			getChooseRoom({MemberId:MemberId,RoomId:RoomId}).then(response => {
+		getChooseRoomFunc(AccountId,RoomId){
+			console.log(AccountId);
+			getChooseRoom({AccountId:AccountId,RoomId:RoomId}).then(response => {
 				switch(response.StatusCode){
 					case 200 :
 						//选房之后刷新页面
@@ -820,7 +747,16 @@ export default {
 				if(nowTime>=selTime){
 					this.$message.error('请选择预约看房的时间')
 				}else{
-					getApplyForLookRoom({AccountId:this.$store.getters.userInfo.AccountId,RoomId:this.roomId,Category:'1',ExpectTime:formatDate(new Date(this.lookRoomTime),"yyyy-MM-dd hh:mm:ss"),Description:this.description}).then(response => {
+					getApplyForLookRoom(
+						{
+							AccountId:this.$store.getters.userInfo.AccountId,
+							RoomId:this.roomId,
+							Category:'1',
+							ContactName:this.$store.getters.userInfo.Name,
+							ContactPhone:this.applyForLookRoom_info.phone,
+							ExpectTime:formatDate(new Date(this.lookRoomTime),"yyyy-MM-dd hh:mm:ss"),
+							Description:this.description
+						}).then(response => {
 						switch(response.StatusCode){
 							case 200 :
 								// console.log(response.Data)
@@ -857,7 +793,7 @@ export default {
 					//更新个人数据
 					var userInfo = JSON.parse(getCookie('userInfo'))
 					userInfo.State = response.Data.State
-					this.$store.dispatch('SET_USERINFO',userInfo)
+					this.$store.commit('SET_USERINFO',userInfo)
 					setCookie('userInfo',JSON.stringify(userInfo))
 					if(RoomState == 1){
 						//判断看房申请按钮
@@ -1064,6 +1000,8 @@ export default {
 						this.houseType = data.BaseInfo.RoomTypeName //户型
 						this.houseArea = data.BaseInfo.Acreage //房屋面积
 						this.houseMark = data.BaseInfo.Code //房号
+						this.lat = data.BaseInfo.LAT //经度
+						this.lng = data.BaseInfo.LNG //纬度
 						this.startRentDate = data.BaseInfo.EMoveInDate //起租日期
 						this.FloorName=data.BaseInfo.FloorName//楼层
 						this.ProjectName=data.BaseInfo.PropertyName//所属小区

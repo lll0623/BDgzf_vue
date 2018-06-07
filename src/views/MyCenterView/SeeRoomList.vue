@@ -11,9 +11,9 @@
                 tooltip-effect="dark"
                 style="width: 100%"
                 >
-                <el-table-column prop="allname" header-align="center" align="center" label="小区" width="200"></el-table-column>
-                <el-table-column prop="allname" header-align="center" align="center" label="房间地址" width="200"></el-table-column>
-                <el-table-column prop="expecttime" header-align="center" align="center" label="申请时间" width="180" :formatter="resetData"></el-table-column>
+                <el-table-column prop="AllName" header-align="center" align="center" label="小区" width="200"></el-table-column>
+                <el-table-column prop="AllName" header-align="center" align="center" label="房间地址" width="200"></el-table-column>
+                <el-table-column prop="ExpectTime" header-align="center" align="center" label="申请时间" width="180" :formatter="resetData"></el-table-column>
                 <el-table-column prop="ApproveTypeText" header-align="center" align="center" width="100" label="审批状态">
                     <template slot-scope="props">
                         <el-tag type="success" v-if="props.row.state  == 0">未完成</el-tag>
@@ -102,10 +102,23 @@ import { formatDate } from '../../util/index.js'
                 vm.$store.commit('SET_MYCENTERNAV',4)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         methods: {
             //格式化时间
             resetData(row,column){
-                return formatDate(new Date(row.expecttime),"yyyy-MM-dd hh:mm:ss")
+                return formatDate(new Date(row.ExpectTime),"yyyy-MM-dd hh:mm:ss")
             },
             //查看
            SeeRoomListBtn(index,row) {
@@ -113,9 +126,9 @@ import { formatDate } from '../../util/index.js'
                 this.SeeRoomListViewForm.name = this.$store.getters.userInfoForm.Name
                 this.SeeRoomListViewForm.phone = this.$store.getters.userInfoForm.Phone
                 this.SeeRoomListViewForm.IDCard = this.$store.getters.userInfoForm.IDCard
-                this.SeeRoomListViewForm.VillageAddress = row.allname
-                this.SeeRoomListViewForm.ExpectTime =formatDate(new Date(row.expecttime),"yyyy-MM-dd hh:mm:ss")
-                this.SeeRoomListViewForm.OtherDesc = row.description
+                this.SeeRoomListViewForm.VillageAddress = row.AllName
+                this.SeeRoomListViewForm.ExpectTime =formatDate(new Date(row.ExpectTime),"yyyy-MM-dd hh:mm:ss")
+                this.SeeRoomListViewForm.OtherDesc = row.Description
                 this.SeeRoomListViewForm.state = row.state
                 this.dialogSeeRoomList = true;
            },
@@ -134,24 +147,26 @@ import { formatDate } from '../../util/index.js'
                        AccountId:this.$store.getters.userInfo.AccountId
                    }
                }
-               getApplyForLookRoomLists(params).then(response => {
-                   switch(response.StatusCode){
-                       case 200 :
-                           this.listsTotal = response.Data.Records
-                           this.SeeRoomList = response.Data.Rows
-                           setTimeout(()=>{
-                               this.loading = false
-                           },1000)
-                       break;
-                       case 500 :
-                           this.$message.error(response.Info)
-                       break;
-                       default:
-                           this.$message.error(response.Info)
-                   }
-               }).catch(error => {
-                   this.$message.error(error)
-               })
+               if(this.$store.getters.userInfo){
+                    getApplyForLookRoomLists(params).then(response => {
+                       switch(response.StatusCode){
+                           case 200 :
+                               this.listsTotal = response.Data.Records
+                               this.SeeRoomList = response.Data.Rows
+                               setTimeout(()=>{
+                                   this.loading = false
+                               },1000)
+                           break;
+                           case 500 :
+                               this.$message.error(response.Info)
+                           break;
+                           default:
+                               this.$message.error(response.Info)
+                       }
+                   }).catch(error => {
+                       this.$message.error(error)
+                   })
+               }
            }
         },
         created(){

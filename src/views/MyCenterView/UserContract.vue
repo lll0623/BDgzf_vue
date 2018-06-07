@@ -436,6 +436,19 @@ import moment from 'moment'
                 vm.$store.commit('SET_MYCENTERNAV',7)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         methods:{
             //获取合同列表
             getUserContractList() {

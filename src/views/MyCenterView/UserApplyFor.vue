@@ -724,6 +724,19 @@
                 vm.$store.commit('SET_MYCENTERNAV',2)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         filters:{
             filterIDCard(val){
                 var arr = []

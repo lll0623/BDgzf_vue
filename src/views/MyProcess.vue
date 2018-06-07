@@ -148,8 +148,6 @@ export default {
 					}
 				}
 				this.loading = false
-				console.log(this.processLists1)
-				console.log(this.processLists2)
 			})
 		},
 		checkTab(val){

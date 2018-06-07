@@ -1,6 +1,6 @@
 <template>
 <div class="registerBackground" ref='loginBox'>
-	<el-card class="box-card" style="height:655px;">
+	<el-card class="box-card" v-show="card1">
 		<div slot="header" class="clearfix">
 			<span style="font-size:28px">注册账号</span>
 			<router-link :to="`/login`">
@@ -8,32 +8,37 @@
 			</router-link>
 		</div>
 		<el-form :model="registerForm" label-position="right" :rules="rules" ref="registerForm" label-width="120px" class="demo-registerForm">
-			<el-form-item label="真实姓名：" prop="RealName">
-				<el-input type="text" v-model="registerForm.RealName" auto-complete="off"></el-input>
-			</el-form-item>
-			<!-- <el-form-item label="身份证号码：" prop="IDCard">
-        <el-input type="text" v-model="registerForm.IDCard" auto-complete="off"></el-input>
-      </el-form-item> -->
 			<el-form-item label="手机号码：" prop="PhoneNum">
-				<el-input type="text" v-model="registerForm.PhoneNum" auto-complete="off"></el-input>
+				<el-input type="text" v-model="registerForm.PhoneNum" auto-complete="off" placeholder="请输入您的手机号码"></el-input>
 			</el-form-item>
 			<el-form-item label="手机验证码：" prop="ValidateCode">
-				<el-input style="width:120px;" type="text" v-model="registerForm.ValidateCode" auto-complete="off"></el-input>
+				<el-input style="width:120px;" type="text" v-model="registerForm.ValidateCode" auto-complete="off" placeholder="请输入验证码"></el-input>
 				<el-button style="margin-left:20px;" :disabled="disabled" @click="sendcode">{{ getBtnTxt }}</el-button>
 			</el-form-item>
+			<el-button class="loginBtn" @click="submitForm('registerForm')">下一步</el-button>
+		</el-form>
+	</el-card>
+	<el-card class="box-card" v-show="card2">
+		<div slot="header" class="clearfix">
+			<span style="font-size:28px">注册账号</span>
+		</div>
+		<el-form :model="registerForm2" label-position="right" :rules="rules2" ref="registerForm2" label-width="120px" class="demo-registerForm">
+			<el-form-item label="真实姓名：" prop="RealName">
+				<el-input type="text" v-model="registerForm2.RealName" auto-complete="off" placeholder="请输入您的真实姓名"></el-input>
+			</el-form-item>
 			<el-form-item label="邮箱" prop="Email">
-				<el-input type="text" v-model="registerForm.Email" auto-complete="off"></el-input>
+				<el-input type="text" v-model="registerForm2.Email" auto-complete="off" placeholder="请输您的邮箱"></el-input>
 			</el-form-item>
 			<el-form-item label="密码：" prop="Password">
-				<el-input :type="this.ispassword" v-model="registerForm.Password" auto-complete="off"></el-input>
+				<el-input :type="this.ispassword" v-model="registerForm2.Password" auto-complete="off" placeholder="请输入您的密码"></el-input>
 				<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
 			</el-form-item>
 			<el-form-item label="确定密码：" prop="confirm_pass">
-				<el-input :type="this.ispassword2" v-model="registerForm.confirm_pass" auto-complete="off"></el-input>
+				<el-input :type="this.ispassword2" v-model="registerForm2.confirm_pass" auto-complete="off" placeholder="请确认密码"></el-input>
 				<i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
 			</el-form-item>
 			<el-form-item prop="agree" label-width="40px">
-				<el-checkbox v-model="registerForm.type" label="agree" @change="handType()">
+				<el-checkbox v-model="registerForm2.type" label="agree" @change="handType()">
 					我已经阅读并同意
 					<router-link :to="`/terms`">
 						<el-button class="linkBtn" type="text">《公租房注册用户条款与声明》</el-button>
@@ -42,10 +47,9 @@
 				<div class="tishixiaoxi" v-show="this.showCheckbox">请接受我们的声明</div>
 			</el-form-item>
 
-			<el-button class="loginBtn" @click="submitForm('registerForm')">注册</el-button>
+			<el-button class="loginBtn" @click="submitForm2('registerForm2')">注册</el-button>
 		</el-form>
 	</el-card>
-
 </div>
 </template>
 
@@ -81,6 +85,8 @@ export default {
 			if (value === '') {
 				callback(new Error('手机号码不能为空'));
 			} else if (!reg.test(value)) {
+				callback(new Error('请输入正确的手机号码'));
+			}else if (this.sidePhone!= ''&& value!= this.sidePhone) {
 				callback(new Error('请输入正确的手机号码'));
 			} else {
 				callback();
@@ -123,13 +129,15 @@ export default {
 		var validateConfirm_pass = (rule, value, callback) => {
 			if (value === '') {
 				callback(new Error('请输入确认密码'));
-			} else if (value !== this.registerForm.Password) {
+			} else if (value !== this.registerForm2.Password) {
 				callback(new Error('两次输入密码不一致!'))
 			} else {
 				callback()
 			}
 		};
 		return {
+			card1: true,
+			card2: false,
 			disabled: false,
 			time: 0,
 			getBtnTxt: "免费获取验证码",
@@ -139,32 +147,31 @@ export default {
 			fa_eyes: 'fa fa-eye-slash',
 			ispassword2: "password",
 			fa_eyes2: 'fa fa-eye-slash',
+			sidePhone:'',
 			registerForm: {
-				RealName: '',
-				// IDCard: '',
 				PhoneNum: '',
 				ValidateCode: '',
-				Email: '',
-				Password: '',
-				confirm_pass: '',
-				type: []
 			},
-			showCheckbox: false,
 			rules: {
-				RealName: [{
-					validator: validateRealName,
-					trigger: 'blur'
-				}],
-				// IDCard: [{
-				//   validator: validateIDCard,
-				//   trigger: 'blur'
-				// }],
 				PhoneNum: [{
 					validator: validatePhoneNum,
 					trigger: 'blur'
 				}],
 				ValidateCode: [{
 					validator: validateValidateCode,
+					trigger: 'blur'
+				}],
+			},
+			registerForm2: {
+				RealName: '',
+				Email: '',
+				Password: '',
+				confirm_pass: '',
+				type: []
+			},
+			rules2: {
+				RealName: [{
+					validator: validateRealName,
 					trigger: 'blur'
 				}],
 				Email: [{
@@ -179,7 +186,9 @@ export default {
 					validator: validateConfirm_pass,
 					trigger: 'blur'
 				}]
-			}
+			},
+			showCheckbox: false,
+
 		};
 	},
 	beforeRouteEnter(to, from, next) {
@@ -216,7 +225,6 @@ export default {
 					PhoneNum: this.registerForm.PhoneNum
 				}
 				getSMSHelper(params).then((response) => {
-					console.log(response.Data)
 					var errorText = response.Info;
 					switch (response.StatusCode) {
 						case 200:
@@ -225,6 +233,7 @@ export default {
 								message: '短信验证码发送成功，请注意查收！'
 							});
 							this.SMCode = response.Data.RegisterCode.toLowerCase();
+							this.sidePhone = response.Data.PhoneNum;
 							this.time = 60;
 							this.disabled = true;
 							this.timer();
@@ -262,8 +271,19 @@ export default {
 			}
 		},
 		submitForm(formName) {
+				this.$refs[formName].validate((valid) => {
+					if (valid) {
+						this.card1 = false;
+						this.card2 = true;
+					} else {
+						return false;
+					}
+				});
 
-			let checkBoxLength = this.registerForm.type.length;
+		},
+		submitForm2(formName) {
+
+			let checkBoxLength = this.registerForm2.type.length;
 			if (checkBoxLength < 1) {
 				this.showCheckbox = true;
 			} else {
@@ -271,13 +291,11 @@ export default {
 					// console.log(valid);
 					if (valid) {
 						let dataArry = {
-							"RealName": this.registerForm.RealName,
-							// "IDCard": this.registerForm.IDCard,
+							"RealName": this.registerForm2.RealName,
 							"PhoneNum": this.registerForm.PhoneNum,
-							"Email": this.registerForm.Email,
-							"Password": md5(this.registerForm.Password)
+							"Email": this.registerForm2.Email,
+							"Password": md5(this.registerForm2.Password)
 						}
-                        console.log(dataArry)
 						getRegister(dataArry)
 							.then((response) => {
 								var errorText = response.Info;
@@ -296,12 +314,20 @@ export default {
 											type: 'error',
 											message: errorText
 										});
+										setTimeout(() => {
+											this.$router.push({
+												path: `/login`,
+											})
+										}, 1000)
 										break;
 									default:
 										this.$message({
 											type: 'error',
 											message: '注册失败！'
 										});
+										setTimeout(() => {
+											this.$router.push("/login");
+										}, 1000)
 								}
 							})
 					} else {
@@ -334,6 +360,7 @@ export default {
 .box-card {
     width: 480px;
     margin: 60px auto;
+    display: inline-table;
 }
 .verification {
     vertical-align: middle;

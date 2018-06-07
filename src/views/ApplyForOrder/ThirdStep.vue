@@ -202,7 +202,9 @@
         },
         watch:{
             getApplyForCode:function(val){
-                this.getApplyForInfoFunc(val)
+                if(val !=''){
+                    this.getApplyForInfoFunc(val)
+                }
             }
         },
         beforeRouteEnter (to,from,next) {
@@ -285,7 +287,6 @@
             },
             getApplyForInfoFunc(val){
                 this.loading = true
-                console.log(111)
                 getApplyForInfo({Id:val}).then((response) =>{
                     switch (response.StatusCode) {
                         case 200:
@@ -377,7 +378,6 @@
             }
         },
         created(){
-            console.log(this.$store.getters.applyForCode)
             if(this.$store.getters.applyForCode){
                 this.getApplyForInfoFunc(this.$store.getters.applyForCode)
             }

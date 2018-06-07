@@ -39,8 +39,8 @@ export default {
     SET_ISREADORNOT(context,params){
         return new Promise((resolve) => {
             getMemberMSGList(params).then((response) => {
-                response.Data = (response.Data == null) ? [] : response.Data;
-                context.commit('SET_ISREADORNOT', response.Data.Records);
+                response.Data = (response.Data == null) ? [] : response.Data.Rows;
+                context.commit('SET_ISREADORNOT', response.Data.length);
                 resolve();
             });
         });

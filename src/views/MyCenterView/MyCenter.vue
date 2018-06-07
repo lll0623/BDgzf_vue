@@ -178,12 +178,12 @@
                           trigger: 'blur'
                         }]
                     },
-        }
+                }
         },
 
-        middleware: 'auth',
+        
         computed:{
-            ...mapGetters(['myCenterNav'])
+            ...mapGetters(['myCenterNav','userInfo'])
         },
         methods:{
             //手机-修改密码-提交

@@ -91,7 +91,7 @@
 					<span>暂无房源</span>
 				</div>
 
-				<div class="areaCountList" v-show="bareaCountDiv" @click="bareaCountListBtn(item.Id,item.Name)" v-for="(item,index) in bAreaList">
+				<div class="areaCountList" v-show="bareaCountDiv" @click="bareaCountListBtn(item.Id,item.Name,item.LNG,item.LAT)" v-for="(item,index) in bAreaList">
 					<span>{{ item.Name }}</span><span class="fr">{{ item.num }}套></span>
 				</div>
 				<div class="areaCountList" v-show="bAreaList.length == 0 && bareaCountDiv" style="text-align:center;">
@@ -160,17 +160,9 @@
 </template>
 <!-- <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak="></script> -->
 <script>
-import {
-	MP
-} from '../../static/map.js'
-import {
-	mapGetters
-} from 'vuex'
-import {
-	getVillageMap,
-	getVillageHouseLists,
-	getVillageDetails
-} from '../api/api.js'
+import { MP } from '../../static/map.js'
+import { mapGetters } from 'vuex'
+import { getVillageMap,getVillageHouseLists,getVillageDetails } from '../api/api.js'
 import BMap from 'BMap'
 export default {
 	name: '',
@@ -471,8 +463,10 @@ export default {
 			//地图选房接口
 			getVillageMap(params).then((response) => {
 				var AData = response.Data;
+				console.log(AData)
 				// 三级json数据
-				var jsonDataTree = this.transData(AData.Lst, 'Id', 'Parentid', 'children', 'num');
+				var jsonDataTree = this.transData(AData.Lst, 'Id', 'Parentid', 'children');
+				console.log(jsonDataTree)
 				this.AAreaCount = AData.AreaCount; //区域数
 				this.aStatistics = AData.RoomCount; // 总房间域数
 				// 第一级
@@ -499,19 +493,17 @@ export default {
 
 				}
 				this.aAreaList = jsonDataTree;
-
 				this.getBoundary();
 				this.loading = false;
 			})
 
 		},
-		transData(a, idStr, pidStr, chindrenStr, nums) {
+		transData(a, idStr, pidStr, chindrenStr) {
 			var r = [],
 				hash = {},
 				id = idStr,
 				pid = pidStr,
 				children = chindrenStr,
-				num = nums,
 				i = 0,
 				j = 0,
 				len = a.length;
@@ -532,6 +524,8 @@ export default {
 		},
 		// 一级区域点击事件##############
 		aareaCountListBtn(id, name) {
+			this.backId = id;
+			this.backName = name;
 			this.loading = true;
 			this.aareaCountDiv = false; //区域列表
 			this.bareaCountDiv = true; //小区
@@ -543,12 +537,17 @@ export default {
 			for (var i = 0; i < this.aAreaList.length; i++) {
 				if (this.aAreaList[i].Id == id) {
 					this.bAreaList = this.aAreaList[i].children;
+					for (var j = 0; j < this.bAreaList.length; j++) {
+						this.bStatistics += this.bAreaList[j].num
+					}
+					console.log(this.bAreaList);
 				}
+
 			}
 			this.loading = false;
 		},
 		// 二级区域点击事件##############
-		bareaCountListBtn(id, name) {
+		bareaCountListBtn(id, name,Lng,lat) {
 			this.loading = true;
 			this.aareaCountDiv = false; //区域列表
 			this.bareaCountDiv = false; //小区
@@ -562,6 +561,7 @@ export default {
 				}
 			}
 			this.loading = false;
+			this.getBoundaryThree(Lng,lat,name);
 		},
 		//返回上一级
 		backlevelBtn(id, name) {
@@ -591,18 +591,6 @@ export default {
 			this.bareaCountDiv = false; //小区列表
 			this.backlevel = false;
 		},
-		inintMap() {
-			var _this = this;
-			var map = new BMap.Map("XSDFXPage", {
-				enableMapClick: true
-			});
-
-			map.centerAndZoom("上海", 15); // 初始化地图,用城市名设置地图中心点
-			map.setCurrentCity("上海");
-			// 开启鼠标滚轮缩放
-			map.enableScrollWheelZoom(true);
-
-		},
 		getBoundary() {
 			var _this = this;
 			var map = new BMap.Map("XSDFXPage", {
@@ -614,7 +602,6 @@ export default {
 			// 开启鼠标滚轮缩放
 			map.enableScrollWheelZoom(true);
 			var bdary = new BMap.Boundary();
-			// this.aAreaList.forEach((res) => {
 			bdary.get("浦东", function(rs) { //获取行政区域
 				// map.clearOverlays(false);       //清除地图覆盖物
 				var count = rs.boundaries.length; //行政区域的点有多少个
@@ -665,72 +652,12 @@ export default {
 				});
 				map.setViewport(pointArray); //调整视野
 			});
-			// })
-
-
 		},
-		// getBoundaryTwo() {
-		// 	var _this = this;
-		// 	var map = new BMap.Map("XSDFXPage", {
-		// 		enableMapClick: true
-		// 	});
-		// 	var bdary = new BMap.Boundary();
-		// 	bdary.get(_this.BAreaData[_this.BAreaDataIndex].AreaName, function(rs) { //获取行政区域
-		// 		// map.clearOverlays(false);       //清除地图覆盖物
-		// 		var count = rs.boundaries.length; //行政区域的点有多少个
-		// 		if (count === 0) {
-		// 			alert('未能获取当前输入行政区域');
-		// 			return;
-		// 		}
-		// 		var pointArray = [];
-		// 		var ply;
-		// 		for (var i = 0; i < count; i++) {
-		// 			ply = new BMap.Polygon(rs.boundaries[i], {
-		// 				strokeWeight: 2,
-		// 				strokeColor: "#ff0000",
-		// 				fillColor: ""
-		// 			}); //建立多边形覆盖物  fillColor:"" 去掉遮罩的作用
-		// 			map.addOverlay(ply); //添加覆盖物
-		// 			console.log(ply.getPath());
-		// 			pointArray = pointArray.concat(ply.getPath());
-		// 		}
-		// 		ply.hide();
-		// 		console.log(_this.AreaData.Lat);
-		// 		var pointPD = new BMap.Point(_this.BAreaData[_this.BAreaDataIndex].Lng, _this.BAreaData[_this.BAreaDataIndex].Lat); //定位经纬度
-		// 		var marker_title = new BMap.Marker(pointPD);
-		// 		//将标注放大地图上
-		// 		map.addOverlay(marker_title);
-		// 		//文字提示
-		// 		// var html = '<div class="district-overlay">浦东<p class="map-overlay__total">8套</p></div>'
-		// 		var label = new BMap.Label('<div class="district-overlay two">' + _this.BAreaData[_this.BAreaDataIndex].AreaName + '<p class="map-overlay__total">' + _this.BAreaData[_this.BAreaDataIndex].Num + '套</p></div>', {
-		// 			offset: new BMap.Size(0, 0)
-		// 		});
-		// 		label.setStyle({
-		// 			border: "none",
-		// 			height: "50px",
-		// 			width: "50px",
-		// 			background: "none",
-		// 		});
-		// 		marker_title.setLabel(label);
-		// 		label.addEventListener("onmouseover", function(e) {
-		// 			label.setStyle({
-		// 				lineHeight: "20px",
-		// 				border: "none",
-		// 				background: "none",
-		// 			});
-		// 			ply.show();
-		// 		});
-		//
-		// 		label.addEventListener("onmouseout", function(e) {
-		// 			ply.hide();
-		// 		});
-		// 		label.addEventListener('click', function() {
-		// 			_this.getBoundaryThree(BMap, map, _this);
-		// 		});
-		// 		map.setViewport(pointArray); //调整视野
-		// 	});
-		// },
-		getBoundaryThree(Lat, Lng, roomLength, name) {
+		getBoundaryThree(Lng, Lat,name) {
+			if(Lng == '' || Lng == null || Lat == '' || Lat == null){
+				Lng = 121.5505840120,
+				Lat = 31.2274065041
+			}
 			var _this = this;
 			var map = new BMap.Map("XSDFXPage", {
 				enableMapClick: true
@@ -753,8 +680,9 @@ export default {
 				div.style.border = "1px solid #BC3B3A";
 				div.style.color = "white";
 				div.style.height = "18px";
-				div.style.padding = "2px";
+				div.style.padding = "6px";
 				div.style.lineHeight = "18px";
+				div.style.borderRadius = "4px";
 				div.style.whiteSpace = "nowrap";
 				div.style.MozUserSelect = "none";
 				div.style.fontSize = "12px"
@@ -768,7 +696,7 @@ export default {
 				arrow.style.position = "absolute";
 				arrow.style.width = "11px";
 				arrow.style.height = "10px";
-				arrow.style.top = "22px";
+				arrow.style.top = "30px";
 				arrow.style.left = "10px";
 				arrow.style.overflow = "hidden";
 				div.appendChild(arrow);
@@ -797,17 +725,15 @@ export default {
 				this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
 				this._div.style.top = pixel.y - 30 + "px";
 			}
-			var txt = " " + roomLength + "套",
+			var txt = " " + this.cAreaList.length + "套",
 				mouseoverTxt = txt + name;
 
-			var myCompOverlay = new ComplexCustomOverlay(new BMap.Point(Lng, Lat), " " + roomLength + "套", mouseoverTxt);
+			var myCompOverlay = new ComplexCustomOverlay(new BMap.Point(Lng, Lat), " " + this.cAreaList.length + "套", mouseoverTxt);
 
 			map.addOverlay(myCompOverlay);
 		}
 	},
 	mounted() {
-		this.inintMap();
-		// this.initAreaList();
 		this.$nextTick(() => {
 			this.mapHeight = (document.documentElement.clientHeight - 120) + 'px'
 		});
@@ -1058,5 +984,25 @@ export default {
     border: 1px solid #e4e7ed;
     height: 35px;
     margin: 0 5px;
+}
+.estate-overlay {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    height: 30px;
+    line-height: 30px;
+}
+.estate-overlay__count {
+    position: relative;
+    width: 50px;
+    box-sizing: border-box;
+    padding: 0 6px;
+    white-space: nowrap;
+    background: rgba(57, 172, 106, 0.98);
+    color: #fff;
+    text-align: center;
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.24);
+    border-radius: 2px;
 }
 </style>

@@ -82,7 +82,7 @@
                 <el-upload class="upload-demo"
                     :class="{disabled:uploadDisabled}"
                     ref="upload"
-                    action="/api/api/Common/UploadFiles"
+                    action="api/api/Common/UploadFiles"
                     :limit="2"
                     list-type="picture-card"
                     :on-remove="handleRemove"
@@ -102,7 +102,7 @@
                 <el-upload class="upload-demo"
                     :class="{disabled:uploadDisabled2}"
                     ref="upload"
-                    action="/api/api/Common/UploadFiles"
+                    action="api/api/Common/UploadFiles"
                     list-type="picture-card"
                     :on-remove="handleRemove"
                     :file-list="step01_Form.dwellImg"
@@ -181,13 +181,14 @@
         data(){
             var validateTel = (rule, value, callback) => {
                 let regPhoneNum = /^([0-9]{3,4}-)?[0-9]{7,8}$/;
-                if (value === '') {
-                    callback(new Error('请输入固定电话'));
-                }else if (!regPhoneNum.test(value)) {
+                // if (value === '') {
+                    // callback(new Error('请输入固定电话'));
+                // }else
+                if (!regPhoneNum.test(value)) {
                     callback(new Error('请输入正确格式的固定电话'));
-                  } else {
+                } else {
                     callback();
-                  }
+                }
             };
             return{
                 uploadDisabled:false,
@@ -238,7 +239,7 @@
                         { required: true, message: '请输入户籍地址', trigger: 'blur' },
                     ],
                     fixTel:[
-                        { required: true,validator: validateTel, trigger: 'blur' },
+                        { required: false,validator: validateTel, trigger: 'blur' },
                     ],
                     telAddr:[
                         { required: true, message: '请输入通讯地址', trigger: 'blur' },
@@ -291,7 +292,9 @@
         },
         watch:{
             getApplyForCode:function(val){
-                this.getApplyForInfoFunc(val)
+                if(val != ''){
+                    this.getApplyForInfoFunc(val)
+                }
             }
         },
         beforeRouteEnter (to,from,next) {
@@ -358,9 +361,8 @@
             nextStep_fir(formName){
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        if(!this.step01_Form.agree){
-                            this.$message.error('必须先同意申请须知')
-                        }else{
+
+
                             //新增判断条件
                             if((this.step01_Form.socialInfo.length == 0&&this.step01_Form.isOneYear != '') || (this.step01_Form.socialInfo.length != 0 && this.step01_Form.isOneYear == '')){
                                 this.$message.error('请完善社保信息')
@@ -394,8 +396,12 @@
                                 this.$message.error('请上传居住证！')
                                 return false
                             }
+                            if(!this.step01_Form.agree){
+                                this.$message.error('必须先同意申请须知')
+                                return false
+                            }
                             this.dialogVisible = true
-                        }
+
                     } else {
                         this.$message.error('表单请填写完整！！！');
                         return false;
@@ -529,7 +535,7 @@
             }
         },
         created(){
-            
+
             if(this.$store.getters.applyForCode){
                 this.getApplyForInfoFunc(this.$store.getters.applyForCode)
             }

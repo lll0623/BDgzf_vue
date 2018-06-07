@@ -76,6 +76,19 @@ import moment from 'moment'
                 vm.$store.commit('SET_MYCENTERNAV',1)
             })
         },
+        beforeRouteLeave(to, from, next) {
+            if(this.$store.getters.userInfo){
+                if(!from.meta.keepAlive){
+                    from.meta.keepAlive = true
+                }
+                next()
+            }else{
+                from.meta.keepAlive = false
+                to.meta.keepAlive = false
+                next()
+            }
+
+        },
         created(){
             this.screenMessage(1);
         },
@@ -154,7 +167,7 @@ import moment from 'moment'
                         case 200:
                             this.messageLists = (response.Data == null) ? [] : response.Data.Rows;
                             // this.checked(this.messageLists)
-                            this.listsTotal = (response.Data == null) ? 0 : response.Data.Records;
+                            this.listsTotal = (response.Data == null) ? 0 : response.Data.Rows.length;
                             if( this.filterCheck == 1 ){
                                 this.$store.commit('SET_ISREADORNOT',this.listsTotal); // 未读消息条数
                             }

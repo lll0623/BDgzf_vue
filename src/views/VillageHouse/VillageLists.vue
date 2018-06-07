@@ -55,7 +55,7 @@
                         </div>
                     </router-link>
                     <router-link :to="{name:'条件选房',query:{id:item.PropertyId}}" class="abs fs18 lookForhouse c-6">
-                        <span class="green">{{item.RoomCount}}</span>
+                        <span class="green">{{item.RoomCount | filterRoomCount}}</span>
                         套房源，点击查看房源
                     </router-link>
                 </li>
@@ -115,6 +115,15 @@
             this.$nextTick(() => {
                 this.$refs.box.style.minHeight = (document.documentElement.clientHeight - document.getElementById('footer').offsetHeight - document.getElementById('header').offsetHeight -30) +'px'
             })
+        },
+        filters:{
+            filterRoomCount(val){
+                if(val == null || val == ""){
+                    return '0'
+                }else{
+                    return val
+                }
+            }
         },
         methods:{
 
@@ -217,7 +226,10 @@
             },
             //获取区域筛选条件
             getScreenAreaFunc(){
-                getScreenArea().then(response => {
+                getScreenArea({
+                    CityCode:"310100",
+                    AreaCode:"310115"
+                }).then(response => {
                     var data = [{
                         AreaName:'不限',
                         AreaId:null,

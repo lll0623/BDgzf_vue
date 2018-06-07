@@ -10,32 +10,34 @@
 				<span class="span">{{ PersonalInformation.Name }}</span>
 			</el-form-item>
 			<el-form-item label="身份证号码：" prop="IDCard" class="fl50">
-				<span class="span">{{ PersonalInformation.IDCard }}</span>
+				<span class="span">{{ (PersonalInformation.IDCard == '' || PersonalInformation.IDCard == null) ? "-" : PersonalInformation.IDCard }}</span>
 			</el-form-item>
 			<el-form-item label="手机号码：" prop="Phone" class="fl50">
-				<span class="span">{{ PersonalInformation.Phone }}</span>
+				<span class="span">{{ (PersonalInformation.Phone == '' || PersonalInformation.Phone == null) ? "-" : PersonalInformation.Phone }}</span>
 				<a class="text-primary xiugai" @click="updatePhone('updatePhone')">修改</a>
 			</el-form-item>
 			<el-form-item label="电子邮箱：" prop="EMail" class="fl50">
-				<span class="span">{{ PersonalInformation.EMail }}</span>
+				<span class="span">{{ (PersonalInformation.EMail == '' || PersonalInformation.EMail == null) ? "-" : PersonalInformation.EMail }}</span>
 				<a class="text-primary xiugai" @click="updateEmail('updateEmail')">修改</a>
 			</el-form-item>
 			<el-form-item label="" style="margin: 15px 15px 20px -85px;clear: both;">
-				<el-button v-show="isShowView" type="primary" @click="isShowEditBtn()">修改</el-button>
+				<el-button v-show="isShowView" :disabled="this.$store.getters.stepTip == 0" type="primary" @click="isShowEditBtn()">修改</el-button>
 				<el-button v-show="isShowEdit" type="primary" @click="isShowViewBtn()">保存</el-button>
-				<span style="color:#f44336;">（点击修改以下内容）</span>
+				<span style="color:#f44336;" v-if="this.$store.getters.stepTip == 0">身份证信息未补全，不能修改</span>
+				<span style="color:#f44336;" v-else>（点击修改以下内容）</span>
 			</el-form-item>
 			<div class="boder999" v-loading = "mostMessage" style="display:inline-block">
 				<el-form-item label="性别：" prop="Sex" class="fl50">
 					<span v-show="isShowView" v-if="PersonalInformation.Sex == 1" class="span">男</span>
-					<span v-show="isShowView" v-else="PersonalInformation.Sex == 2" class="span">女</span>
+					<span v-show="isShowView" v-else-if="PersonalInformation.Sex == 2" class="span">女</span>
+					<span v-show="isShowView" v-else class="span">-</span>
 					<el-select v-show="isShowEdit" v-model="valueSex" @change="choosenSex()" placeholder="请选择">
 						<el-option v-for="item in Sexs" :label="item.label" :value="item.value" :key="item.value">
 						</el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item label="名族：" prop="Nation" class="fl50">
-					<span v-show="isShowView" class="span">{{ PersonalInformation.Nation }}</span>
+					<span v-show="isShowView" class="span">{{ (PersonalInformation.Nation == '' || PersonalInformation.Nation == null) ? "-" : PersonalInformation.Nation }}</span>
 					<el-input v-show="isShowEdit" type="text" v-model="PersonalInformation.Nation" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="学历：" prop="Cultural" class="fl50">
@@ -46,7 +48,8 @@
 					<span v-show="isShowView" v-else-if="PersonalInformation.Cultural == 4" class="span">高中</span>
 					<span v-show="isShowView" v-else-if="PersonalInformation.Cultural == 5" class="span">中专、职校</span>
 					<span v-show="isShowView" v-else-if="PersonalInformation.Cultural == 6" class="span">初中</span>
-					<span v-show="isShowView" v-else="PersonalInformation.Cultural == 7" class="span">小学</span>
+					<span v-show="isShowView" v-else-if="PersonalInformation.Cultural == 7" class="span">小学</span>
+					<span v-show="isShowView" v-else class="span">-</span>
 					<el-select v-show="isShowEdit" v-model="valueCultural" @change="choosenCultural()" placeholder="请选择">
 						<el-option v-for="item in Culturals" :label="item.label" :value="item.value" :key="item.value">
 						</el-option>
@@ -56,26 +59,27 @@
 					<span v-show="isShowView" v-if="PersonalInformation.MarryInfo == 1" class="span">未婚</span>
 					<span v-show="isShowView" v-else-if="PersonalInformation.MarryInfo == 2" class="span">已婚</span>
 					<span v-show="isShowView" v-else-if="PersonalInformation.MarryInfo == 3" class="span">离婚、离异</span>
-					<span v-show="isShowView" v-else="PersonalInformation.MarryInfo == 4" class="span">丧偶</span>
+					<span v-show="isShowView" v-else-if="PersonalInformation.MarryInfo == 4" class="span">丧偶</span>
+					<span v-show="isShowView" v-else class="span">-</span>
 					<el-select v-show="isShowEdit" v-model="valueMarryInfo" @change="choosenMarryInfo()" placeholder="请选择">
 						<el-option v-for="item in MarryInfos" :label="item.label" :value="item.value" :key="item.value">
 						</el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item label="联系人：" prop="LinkMan" class="fl50">
-					<span v-show="isShowView" class="span">{{ PersonalInformation.LinkMan }}</span>
+					<span v-show="isShowView" class="span">{{ (PersonalInformation.LinkMan == '' || PersonalInformation.LinkMan == null) ? "-" : PersonalInformation.LinkMan }}</span>
 					<el-input v-show="isShowEdit" type="text" v-model="PersonalInformation.LinkMan" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="联系人电话：" prop="LinkPhone" class="fl50">
-					<span v-show="isShowView" class="span">{{ PersonalInformation.LinkPhone }}</span>
+					<span v-show="isShowView" class="span">{{ (PersonalInformation.LinkPhone == '' || PersonalInformation.LinkPhone == null) ? "-" : PersonalInformation.LinkPhone }}</span>
 					<el-input v-show="isShowEdit" type="text" v-model="PersonalInformation.LinkPhone" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="户籍地址：" prop="HouseholdAddress" class="fl50">
-					<span v-show="isShowView" class="span">{{ PersonalInformation.HouseholdAddress }}</span>
+					<span v-show="isShowView" class="span">{{ (PersonalInformation.HouseholdAddress == '' || PersonalInformation.HouseholdAddress == null) ? "-" : PersonalInformation.HouseholdAddress }}</span>
 					<el-input v-show="isShowEdit" type="text" v-model="PersonalInformation.HouseholdAddress" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="户籍邮编：" prop="HouseholdPostalCode" class="fl50">
-					<span v-show="isShowView" class="span">{{ PersonalInformation.HouseholdPostalCode }}</span>
+					<span v-show="isShowView" class="span">{{ (PersonalInformation.HouseholdPostalCode == '' || PersonalInformation.HouseholdPostalCode == null) ? "-" : PersonalInformation.HouseholdPostalCode }}</span>
 					<el-input v-show="isShowEdit" type="text" v-model="PersonalInformation.HouseholdPostalCode" auto-complete="off"></el-input>
 				</el-form-item>
 			</div>
@@ -200,15 +204,8 @@
 </section>
 </template>
 <script>
-import {
-	getUserInfo,
-	getUpdatePwd,
-	getUserCenterUpdate,
-	getSMSHelper
-} from '../../api/api.js'
-import {
-	mapGetters
-} from 'vuex'
+import { getUserInfo,getUpdatePwd,getUserCenterUpdate,getSMSHelper } from '../../api/api.js'
+import { mapGetters } from 'vuex'
 import md5 from 'js-md5';
 var code; //在全局定义验证码
 export default {
@@ -519,7 +516,19 @@ export default {
 
 		}
 	},
+	beforeRouteLeave(to, from, next) {
+		if(this.$store.getters.userInfo){
+			if(!from.meta.keepAlive){
+				from.meta.keepAlive = true
+			}
+			next()
+		}else{
+			from.meta.keepAlive = false
+			to.meta.keepAlive = false
+			next()
+		}
 
+	},
 	methods: {
 		//密码修改按钮
 		updatePwd(type) {
@@ -570,7 +579,6 @@ export default {
 		updatePhone_phoneSub(formName) {
 			this.$refs[formName].validate((valid) => {
 				if (valid) {
-					console.log(this.$store.getters.userInfo.AccountId)
 					let params = {
 						AccountId: this.$store.getters.userInfo.AccountId,
 						Name: this.PersonalInformation.Name,
@@ -796,9 +804,7 @@ export default {
 				Type: 4, //修改手机号
 				PhoneNum: this.PersonalInformation.Phone
 			}
-			console.log(params)
 			getSMSHelper(params).then((response) => {
-				console.log(response.Data)
 				var errorText = response.Info;
 				switch (response.StatusCode) {
 					case 200:
@@ -944,12 +950,14 @@ export default {
 							type: 'error',
 							message: errorText
 						});
+						this.mostMessage = false;
 						break;
 					default:
 						this.$message({
 							type: 'error',
 							message: '修改失败！'
 						});
+						this.mostMessage = false;
 				}
 			})
 		},
@@ -957,7 +965,6 @@ export default {
 			this.allMessage = true;
 			//个人信息显示接口
 			getUserInfo(params).then((response) => {
-				console.log(response.Data);
 				this.PersonalInformation = response.Data;
 				this.allMessage = false;
 			})

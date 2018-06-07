@@ -7,10 +7,10 @@
     </el-breadcrumb>
     <div class="main-content" v-loading="loading">
         <h2 class="title is-2" :style="{color:'#'+item.FullheadColor,cursor:'inherit'}">{{ item.FullHead }}</h2>
-        <div class="viewImg" v-show="item.MainPic">
+        <!-- <div class="viewImg" v-show="item.MainPic">
           <img :src="item.MainPic" :alt="item.FullHead" width="300" height="300">
-        </div>
-        <div style="margin-top: 15px;" v-html="item.NewsContent"></div>
+        </div> -->
+        <div style="margin-top: 15px;" class="guideContent" v-html="item.NewsContent"></div>
     </div>
     </section>
 </template>
@@ -93,5 +93,8 @@ export default {
 
 .title:hover {
   color: #333 !important;
+}
+.guideContent p{
+    padding: 15px 0;
 }
 </style>

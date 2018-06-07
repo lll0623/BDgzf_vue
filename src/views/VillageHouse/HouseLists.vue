@@ -481,7 +481,6 @@
                         isActive   : false
                     })
                 }
-                console.log(data)
                 this.screenVillageLists = data
                 this.initScreen()
             }).catch( error=> {
@@ -495,8 +494,8 @@
 <style lang="scss">
 .lookForhouseLists{
     top:10px;
-    border:none;
-    background: none;
+    border:none!important;
+    background: none!important;
     text-align: center;
 }
 @media screen and (max-width: 450px) {

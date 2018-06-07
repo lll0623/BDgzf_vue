@@ -113,6 +113,7 @@ const ContractPdf= resolve => {
 }
 
 const router= new Router({
+    // mode:'history',
     base: __dirname,
     routes: [
         {
@@ -305,20 +306,20 @@ const router= new Router({
                 },
             ]
         },{
-            mode: 'history',
+
             path: '/login',
             routerName: 'login',
             component:Login,
             name: '登录',
             iconCls : 'icon i-login',
-            hidden:false
+            hidden:false,
         },{
-            mode: 'history',
+
             path: '/register',
             routerName: 'register',
             component:Register,
             name: '注册',
-            hidden:false
+            hidden:false,
         },{
             path:'/server',
             leaf:true,
@@ -328,7 +329,7 @@ const router= new Router({
             iconCls:'',
             hidden:true,
             meta: {
-                requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                requireAuth: true,
                 keepAlive: false,
             },
             children:[
@@ -361,6 +362,7 @@ const router= new Router({
                             name: '我的消息',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -370,6 +372,7 @@ const router= new Router({
                             name: '我的申请',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -379,6 +382,7 @@ const router= new Router({
                             name: '已选定房间列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -388,6 +392,7 @@ const router= new Router({
                             name: '看房申请列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -397,6 +402,7 @@ const router= new Router({
                             name: '已签约房间列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -405,8 +411,8 @@ const router= new Router({
                             component: FavourRooms,
                             name: '已关注房间列表',
                             meta: {
-                	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: false,
+                	            requireAuth: true,
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -416,6 +422,7 @@ const router= new Router({
                             name: '我的合同',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         },{
                             mode: 'history',
@@ -425,6 +432,7 @@ const router= new Router({
                             name: '个人信息管理',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                                keepAlive: true,
                 	        },
                         }
                     ]
@@ -446,7 +454,7 @@ const router= new Router({
             name: '忘记密码',
             component:FindPassword,
             iconCls:'',
-            hidden:true
+            hidden:true,
         },{
             mode: 'history',
             path: '/terms',
@@ -454,7 +462,10 @@ const router= new Router({
             name: '服务条款',
             component:Terms,
             iconCls:'',
-            hidden:true
+            hidden:true,
+            meta: {
+                keepAlive: true,
+            },
         },{
             mode: 'history',
             path: '/villageDetails/:id',

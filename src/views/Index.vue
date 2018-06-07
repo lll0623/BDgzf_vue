@@ -7,11 +7,6 @@
                 <div class="swiper-button-next" slot="button-next"></div>
                 <div class="swiper-pagination" slot="pagination"></div>
             </swiper>
-            <!-- <el-carousel :interval="8000" arrow="always">
-                <el-carousel-item v-for="(item,index) in indexBanner" :key="index">
-                    <img :src="item.Image">
-                </el-carousel-item>
-            </el-carousel> -->
             <div class="index_search_wrap clearfix">
                 <div class="clearfix abs" style="top:30px;left:50%;margin-left:-470px;">
                     <el-input placeholder="请输入区域或小区名开始找房" v-model="search_text" clearable class="fl"></el-input>
@@ -168,7 +163,6 @@ import { isNull } from '../util/index.js'
 export default{
     data(){
         return {
-
             inputIDCard:'',
             messageLists:[],
             defaultImg,
@@ -519,8 +513,10 @@ export default{
         background-color: #d3dce6;
     }
     .indexBanner{
-        height: 500px;
+        height: 100%;
+        min-hieght:500px;
         width:100%;
+        min-height:500px;
         img{
             width:100%;
             height:100%;
@@ -718,7 +714,7 @@ export default{
                 background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 95%);
             }
             img{
-                height:100%;
+                width:100%;
             }
             >div{
                 z-index: 6;
@@ -759,6 +755,7 @@ export default{
                 &:nth-of-type(1){
                     height:175px;
                     img{
+                        width:100%;
                         height:100%;
                     }
                 }
@@ -766,6 +763,7 @@ export default{
                     height:204px;
                     img{
                         width:100%;
+                        height:100%;
                     }
                 }
                 >div{
