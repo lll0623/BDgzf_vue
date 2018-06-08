@@ -9,7 +9,7 @@
 			</router-link>
 			<form class="MapSearchRoom—__navbar-form navbar-left">
 				<div class="form-group pr">
-					<input type="text" class="searchkey" @blur="InputChange()" v-model="keyword" placeholder="请输入区域、板块或小区名开始找房">
+					<input type="text" class="searchkey" @blur="InputChange(0,777)" v-model="keyword" placeholder="请输入区域、板块或小区名开始找房">
 					<i class="fa fa-search material-icons" aria-hidden="true"></i>
 				</div>
 			</form>
@@ -21,7 +21,7 @@
 					<el-dropdown-item v-for="(item,index) in pricesList" :key="index">
 						<el-checkbox v-model="item.checked" @change="plaChange(item.checked,item.value,item.label,1,item.index)">{{ item.label }}</el-checkbox>
 					</el-dropdown-item>
-					<input type="text" class="changeInput" @blur="InputChange()" v-model="prices" placeholder="具体租金">
+					<input type="number" class="changeInput" @blur="InputChange(1,888)" v-model="prices" placeholder="具体租金">
 				</el-dropdown-menu>
 			</el-dropdown>
 			<el-dropdown :hide-on-click="false">
@@ -42,7 +42,7 @@
 					<el-dropdown-item v-for="(item,index) in acreList" :key="index">
 						<el-checkbox v-model="item.checked" @change="plaChange(item.checked,item.value,item.label,3,item.index)">{{ item.label }}</el-checkbox>
 					</el-dropdown-item>
-					<input type="text" class="changeInput" @blur="InputChange()" v-model="acre" placeholder="具体面积">
+					<input type="number" class="changeInput" @blur="InputChange(3,999)" v-model="acre" placeholder="具体面积">
 				</el-dropdown-menu>
 			</el-dropdown>
 			<router-link to="/" class="fr block marR20">
@@ -138,6 +138,9 @@
 		<div class="MapSearchRoom__Main__Filter clearfix">
 			<span class="MapSearchRoom__Main__Filter__Title pull-left">条件：</span>
 			<div class="pull-left MapSearchRoom__Main__Filter__Content filter-content">
+				<div class="alert alert-dismissible pull-left" v-for="(item,index) in KeyWordList">
+					<button type="button" class="close" @click="deleteChecked(item.index,item.value,item.type)">×</button> {{ item.label }}
+				</div>
 				<div class="alert alert-dismissible pull-left" v-for="(item,index) in checkedPrices">
 					<button type="button" class="close" @click="deleteChecked(item.index,item.value,item.type)">×</button> {{ item.label }}
 				</div>
@@ -297,6 +300,7 @@ export default {
 			}],
 			acre:'',
 			prices:'',
+			KeyWordList:[],//关键字数组
 			checkedPrices: [],
 			checkedLays: [],
 			checkedAcres: [],
@@ -361,7 +365,32 @@ export default {
 	methods: {
 		handleSelect(key, keyPath) {
 		},
-		InputChange(){
+		InputChange(type,index){
+			if(type == 0){
+				this.KeyWordList = this.KeyWordList.filter(item => item.index !== 777)
+				this.KeyWordList.push({
+					type: type,
+					value:this.keyword,
+					label: this.keyword,
+					index: index
+				})
+			}else if (type == 1) {
+				this.checkedPrices = this.checkedPrices.filter(item => item.index !== 888)
+				this.checkedPrices.push({
+					value: this.prices,
+					type: type,
+					label: this.prices,
+					index: index
+				})
+			}else if (type == 3) {
+				this.checkedAcres = this.checkedAcres.filter(item => item.index !== 999)
+				this.checkedAcres.push({
+					value: this.acre,
+					type: type,
+					label: this.acre,
+					index: index
+				})
+			}
 			this.initAreaList();
 		},
 		//添加选房条件
@@ -408,15 +437,30 @@ export default {
 		},
 		//删除选房条件
 		deleteChecked(index, val, type) {
-			if (type == 1) {
-				this.pricesList[index].checked = false;
-				this.checkedPrices = this.checkedPrices.filter(item => item.value !== val)
+			console.log(type);
+			if(type == 0){
+				this.KeyWordList = [];
+				this.keyword = '';
+			}
+			else if (type == 1) {
+				if(index == 888){
+					this.prices = '';
+					this.checkedPrices = this.checkedPrices.filter(item => item.value !== val)
+				}else{
+					this.pricesList[index].checked = false;
+					this.checkedPrices = this.checkedPrices.filter(item => item.value !== val)
+				}
 			} else if (type == 2) {
 				this.laysList[index].checked = false;
 				this.checkedLays = this.checkedLays.filter(item => item.value !== val)
 			} else if (type == 3) {
-				this.acreList[index].checked = false;
-				this.checkedAcres = this.checkedAcres.filter(item => item.value !== val)
+				if(index == 999){
+					this.acre = '';
+					this.checkedAcres = this.checkedPrices.filter(item => item.value !== val)
+				}else{
+					this.acreList[index].checked = false;
+					this.checkedAcres = this.checkedAcres.filter(item => item.value !== val)
+				}
 			}
 			this.initAreaList();
 			this.aareaCountDiv = true; //区域列表
@@ -454,21 +498,21 @@ export default {
 			}if(this.acre !== "" && this.checkedAcres.map(item => item.value).toString() !== ""){
 				Area = this.checkedAcres.map(item => item.value).toString() +','+ this.acre;
  			}
+			console.log(Rental);
 			var params = {
 				Area: Area,
 				HouseTypeName: this.checkedLays.map(item => item.value).toString(),
 				Rental: Rental,
 				keyword: this.keyword
 			}
+			console.log(params);
 			//地图选房接口
 			getVillageMap(params).then((response) => {
 				var AData = response.Data;
-				console.log(AData)
 				// 三级json数据
 				var jsonDataTree = this.transData(AData.Lst, 'Id', 'Parentid', 'children');
-				console.log(jsonDataTree)
 				this.AAreaCount = AData.AreaCount; //区域数
-				this.aStatistics = AData.RoomCount; // 总房间域数
+				// this.aStatistics = AData.RoomCount; // 总房间域数
 				// 第一级
 				let aAreaData = AData.Lst.filter(res => {
 					return res.Type == 0;
@@ -493,6 +537,12 @@ export default {
 
 				}
 				this.aAreaList = jsonDataTree;
+
+				if(this.aAreaList.length !== 0){
+					for (var i= 0; i < this.aAreaList.length;i++) {
+						this.aStatistics += this.aAreaList[i].num //总房间域数
+					}
+				}
 				this.getBoundary();
 				this.loading = false;
 			})
@@ -535,14 +585,15 @@ export default {
 			this.aName = name;
 			this.aAreaList["Id"] = id
 			for (var i = 0; i < this.aAreaList.length; i++) {
-				if (this.aAreaList[i].Id == id) {
-					this.bAreaList = this.aAreaList[i].children;
-					for (var j = 0; j < this.bAreaList.length; j++) {
-						this.bStatistics += this.bAreaList[j].num
+				if(this.aAreaList[i].num !==0){
+					if (this.aAreaList[i].Id == id) {
+						this.bAreaList = (this.aAreaList[i].children == []) ? [] : this.aAreaList[i].children;
+						for (var j = 0; j < this.bAreaList.length; j++) {
+							this.bStatistics += this.bAreaList[j].num
+						}
+						console.log(this.bAreaList);
 					}
-					console.log(this.bAreaList);
 				}
-
 			}
 			this.loading = false;
 		},

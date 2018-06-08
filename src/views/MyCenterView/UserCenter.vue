@@ -516,19 +516,7 @@ export default {
 
 		}
 	},
-	beforeRouteLeave(to, from, next) {
-		if(this.$store.getters.userInfo){
-			if(!from.meta.keepAlive){
-				from.meta.keepAlive = true
-			}
-			next()
-		}else{
-			from.meta.keepAlive = false
-			to.meta.keepAlive = false
-			next()
-		}
 
-	},
 	methods: {
 		//密码修改按钮
 		updatePwd(type) {
@@ -977,10 +965,12 @@ export default {
 	},
 	created() {
 		this.createCode();
-		var params = {
-			AccountId: this.$store.getters.userInfo.AccountId
+		if(this.$store.getters.userInfo){
+			var params = {
+				AccountId: this.$store.getters.userInfo.AccountId
+			}
+			this.getUserInfoMessage(params);
 		}
-		this.getUserInfoMessage(params);
 	}
 }
 </script>

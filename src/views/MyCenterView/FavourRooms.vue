@@ -33,7 +33,7 @@
 </template>
 <script>
     import { getCollectedLists,cancelCollect } from '../../api/api.js'
-    import { formatDate } from '../../util/index.js'
+    import { formatDate,getCookie } from '../../util/index.js'
     export default{
         middleware: 'auth',
         data(){
@@ -49,19 +49,6 @@
             next(vm =>{
                 vm.$store.commit('SET_MYCENTERNAV',6)
             })
-        },
-        beforeRouteLeave(to, from, next) {
-            if(this.$store.getters.userInfo){
-                if(!from.meta.keepAlive){
-                    from.meta.keepAlive = true
-                }
-                next()
-            }else{
-                from.meta.keepAlive = false
-                to.meta.keepAlive = false
-                next()
-            }
-
         },
         methods: {
             //格式化时间
@@ -94,58 +81,60 @@
                     this.loading = true
                     // console.log(params)
                     cancelCollect(params).then(response => {
-                       switch(response.StatusCode){
-                           case 200:
+                        switch(response.StatusCode){
+                            case 200:
                                 this.getCollectedListFunc()
                                 this.loading =false
-                               this.$message({
-                                   type: 'success',
-                                   message: '取消成功'
-                               });
-                           break;
-                           case 500:
-                               this.$message({
-                                   type: 'error',
-                                   message: response.Info
-                               });
-                               break;
-                           default:
-                               this.$message({
-                                   type: 'error',
-                                   message: response.Info
-                               });
-                       }
-                   }).catch(error => {
-                       this.$message.error(error)
-                   })
-               }).catch(() => {});
-           },
-           //获取关注房源列表
-           getCollectedListFunc(){
-               this.loading = true
-               var params = {
-                   QueryJson:{
-                       AccountId : this.$store.getters.userInfo.AccountId,
-                   },
-                   Page:this.page,
-                   Rows:this.pageSize
-               }
-                getCollectedLists(params).then(response => {
-                    switch(response.StatusCode){
-                        case 200 :
-                            this.listsTotal = response.Data.Records
-                            this.FavourRooms = response.Data.Rows
-                            setTimeout(()=>{
-                                this.loading = false
-                            },1000)
-                        break;
-                        default:
-                            this.$message.error(response.Info)
+                                this.$message({
+                                    type: 'success',
+                                    message: '取消成功'
+                                });
+                            break;
+                            case 500:
+                                this.$message({
+                                    type: 'error',
+                                    message: response.Info
+                                });
+                                break;
+                            default:
+                                this.$message({
+                                    type: 'error',
+                                    message: response.Info
+                                });
+                        }
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                }).catch(() => {});
+            },
+            //获取关注房源列表
+            getCollectedListFunc(){
+                this.loading = true
+                if(this.$store.getters.userInfo){
+                    var params = {
+                        QueryJson:{
+                            AccountId : this.$store.getters.userInfo.AccountId,
+                        },
+                        Page:this.page,
+                        Rows:this.pageSize
                     }
-                }).catch(error => {
-                   this.$message.error(error)
-                })
-           },
+                    getCollectedLists(params).then(response => {
+                        switch(response.StatusCode){
+                            case 200 :
+                                this.listsTotal = response.Data.Records
+                                this.FavourRooms = response.Data.Rows
+                                setTimeout(()=>{
+                                    this.loading = false
+                                },1000)
+                            break;
+                            default:
+                                this.$message.error(response.Info)
+                        }
+                    }).catch(error => {
+                       this.$message.error(error)
+                    })
+                }
+            },
         },
         created(){
             this.getCollectedListFunc()

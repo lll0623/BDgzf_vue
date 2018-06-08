@@ -184,7 +184,7 @@
                 // if (value === '') {
                     // callback(new Error('请输入固定电话'));
                 // }else
-                if (!regPhoneNum.test(value)) {
+                if (!regPhoneNum.test(value) && value != '') {
                     callback(new Error('请输入正确格式的固定电话'));
                 } else {
                     callback();
@@ -547,7 +547,7 @@
         display: none;
     }
     .applyFor-wapper .applyFor-content ul.el-upload-list{
-        display: inline-block;
+        display: block;
         background: #fff;
     }
     .applyFor-wapper .applyFor-content ul.el-upload-list:after{

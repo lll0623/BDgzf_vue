@@ -180,8 +180,6 @@
                     },
                 }
         },
-
-        
         computed:{
             ...mapGetters(['myCenterNav','userInfo'])
         },
@@ -287,12 +285,14 @@
             })
         },
         created(){
-            this.Name = JSON.parse(getCookie('userInfo')).Name
-            this.createCode();
-            var params = {
-                AccountId:this.$store.getters.userInfo.AccountId
+            if(this.$store.getters.userInfo){
+                this.Name = JSON.parse(getCookie('userInfo')).Name
+                this.createCode();
+                var params = {
+                    AccountId:this.$store.getters.userInfo.AccountId
+                }
+    			this.getUserInfoMessage(params);
             }
-			this.getUserInfoMessage(params);
         }
     }
 </script>

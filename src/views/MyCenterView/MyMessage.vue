@@ -76,19 +76,6 @@ import moment from 'moment'
                 vm.$store.commit('SET_MYCENTERNAV',1)
             })
         },
-        beforeRouteLeave(to, from, next) {
-            if(this.$store.getters.userInfo){
-                if(!from.meta.keepAlive){
-                    from.meta.keepAlive = true
-                }
-                next()
-            }else{
-                from.meta.keepAlive = false
-                to.meta.keepAlive = false
-                next()
-            }
-
-        },
         created(){
             this.screenMessage(1);
         },
@@ -152,16 +139,17 @@ import moment from 'moment'
             // 获取消息列表
             getMessageList() {
                 this.loading = true
-                let params = {
-                    Page:this.page,
-                    Rows:this.pageSize,
-                    QueryJson:{
-                        AccountId:this.$store.getters.userInfo.AccountId,
-                        IsRead: this.filterCheck
+                if(this.$store.getters.userInfo){
+                    let params = {
+                        Page:this.page,
+                        Rows:this.pageSize,
+                        QueryJson:{
+                            AccountId:this.$store.getters.userInfo.AccountId,
+                            IsRead: this.filterCheck
+                        }
                     }
-                }
-                // 获取消息列表接口
-                getMemberMSGList(params).then((response) => {
+                    // 获取消息列表接口
+                    getMemberMSGList(params).then((response) => {
                     var errorText = response.Info;
                     switch (response.StatusCode) {
                         case 200:
@@ -185,8 +173,8 @@ import moment from 'moment'
                                 message: '获取列表失败！'
                             });
                     }
-
-            })
+                    })
+                }
             },
             screenMessage(type){
                 if(type == 1){

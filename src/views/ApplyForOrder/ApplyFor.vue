@@ -107,6 +107,7 @@
                 this.$message.error(error)
             })
             if(!this.$cookie.get('applyForCode')){
+                debugger
                 getApplyForCurrentCode({QueryJson:{AccountId:this.$store.getters.userInfo.AccountId}}).then(response =>{
                     switch(response.StatusCode){
                         case 500 :

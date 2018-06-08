@@ -140,34 +140,34 @@ import { formatDate } from '../../util/index.js'
            },
            //获取选房列表数据
            getApplyForLookRoomListsFunc(){
-               var params = {
-                   Rows:this.pageSize,
-                   Page:this.page,
-                   QueryJson:{
-                       AccountId:this.$store.getters.userInfo.AccountId
-                   }
-               }
-               if(this.$store.getters.userInfo){
+                if(this.$store.getters.userInfo){
+                    var params = {
+                        Rows:this.pageSize,
+                        Page:this.page,
+                        QueryJson:{
+                            AccountId:this.$store.getters.userInfo.AccountId
+                        }
+                    }
                     getApplyForLookRoomLists(params).then(response => {
-                       switch(response.StatusCode){
-                           case 200 :
-                               this.listsTotal = response.Data.Records
-                               this.SeeRoomList = response.Data.Rows
-                               setTimeout(()=>{
-                                   this.loading = false
-                               },1000)
-                           break;
-                           case 500 :
+                        switch(response.StatusCode){
+                            case 200 :
+                                this.listsTotal = response.Data.Records
+                                this.SeeRoomList = response.Data.Rows
+                                setTimeout(()=>{
+                                    this.loading = false
+                                },1000)
+                            break;
+                            case 500 :
                                this.$message.error(response.Info)
-                           break;
-                           default:
+                            break;
+                            default:
                                this.$message.error(response.Info)
-                       }
-                   }).catch(error => {
-                       this.$message.error(error)
-                   })
-               }
-           }
+                        }
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
+                }
+            }
         },
         created(){
             this.getApplyForLookRoomListsFunc()

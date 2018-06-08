@@ -1,5 +1,15 @@
 <template>
     <div class="myCenter-breadcrumb user-contract">
+        <el-dialog
+            title="提示"
+            :visible.sync="UploadDialogVisible"
+            width="30%">
+            <span>ie浏览器下无法下载，请使用其他浏览器进行下载（推荐使用谷歌浏览器）</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="UploadDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="uploadOther">确 定</el-button>
+            </span>
+        </el-dialog>
         <el-breadcrumb separator="/">
             <el-breadcrumb-item>个人中心</el-breadcrumb-item>
             <el-breadcrumb-item>我的合同</el-breadcrumb-item>
@@ -80,7 +90,7 @@
 
         <!-- 下载pdf -->
         <div class="download_pdf_wrapper">
-            <div class="download_pdf " id="pdfDom">
+            <div class="download_pdf" id="pdfDom">
                 <div class="page_wrapper">
                     <div class="head_page_one">
                         <p class="tc fs40 colorBlack">上海市浦东新区公共租赁住房</p>
@@ -400,11 +410,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getContractList,getContractDetail } from '../../api/api.js'
+import { IEVersion } from '../../util'
 import moment from 'moment'
     export default{
-        middleware: 'auth',
         data(){
             return {
+                UploadDialogVisible:false,
                 btn_loading: '-1',
                 htmlTitle: '租赁合同-个人',
                 page:1,
@@ -420,14 +431,6 @@ import moment from 'moment'
                 dialogInfo_member:''
             }
         },
-        head() {
-            return {
-                title: '我的合同-个人中心-上海浦东新区公租房网上业务平台',
-                meta:[
-                    { hid: 'description', name: 'description', content: '我的合同-个人中心-上海浦东新区公租房网上业务平台' }
-                ]
-            }
-        },
         created() {
             this.getUserContractList();
         },
@@ -436,55 +439,45 @@ import moment from 'moment'
                 vm.$store.commit('SET_MYCENTERNAV',7)
             })
         },
-        beforeRouteLeave(to, from, next) {
-            if(this.$store.getters.userInfo){
-                if(!from.meta.keepAlive){
-                    from.meta.keepAlive = true
-                }
-                next()
-            }else{
-                from.meta.keepAlive = false
-                to.meta.keepAlive = false
-                next()
-            }
 
-        },
         methods:{
             //获取合同列表
             getUserContractList() {
-                this.loading =true
-                let params = {
-                    Page:this.page,
-                    Rows:this.pageSize,
-                    QueryJson:{
-                        AccountId:this.$store.getters.userInfo.AccountId,
-                        State: this.contractState
+                if(this.$store.getters.userInfo){
+                    this.loading =true
+                    let params = {
+                        Page:this.page,
+                        Rows:this.pageSize,
+                        QueryJson:{
+                            AccountId:this.$store.getters.userInfo.AccountId,
+                            State: this.contractState
+                        }
                     }
+                    // 获取合同列表接口
+                    getContractList(params).then((response) => {
+                        var errorText = response.Info;
+                        switch (response.StatusCode) {
+                            case 200:
+                                this.ContractLists = (response.Data == null) ? [] : response.Data.Rows;
+                                this.listsTotal = (response.Data == null) ? 0 :response.Data.Records;
+                                setTimeout(()=>{
+                                    this.loading =false
+                                },1000)
+                                break;
+                            case 500:
+                                this.$message({
+                                    type: 'error',
+                                    message: errorText
+                                });
+                                break;
+                            default:
+                                this.$message({
+                                    type: 'error',
+                                    message: '获取列表失败！'
+                                });
+                        }
+                    })
                 }
-                // 获取合同列表接口
-                getContractList(params).then((response) => {
-                    var errorText = response.Info;
-                    switch (response.StatusCode) {
-                        case 200:
-                            this.ContractLists = (response.Data == null) ? [] : response.Data.Rows;
-                            this.listsTotal = (response.Data == null) ? 0 :response.Data.Records;
-                            setTimeout(()=>{
-                                this.loading =false
-                            },1000)
-                            break;
-                        case 500:
-                            this.$message({
-                                type: 'error',
-                                message: errorText
-                            });
-                            break;
-                        default:
-                            this.$message({
-                                type: 'error',
-                                message: '获取列表失败！'
-                            });
-                    }
-                })
             },
             //获取合同详情
             getUserContractDetail(id) {
@@ -530,12 +523,21 @@ import moment from 'moment'
                 this.getUserContractList();
             },
             downloadContract (index,row){
-                this.btn_loading= index
-                setTimeout(()=>{
-                    this.getPdf()
-                    this.btn_loading ='-1'
-                },1000)
-            }
+                console.log(IEVersion())
+                if(IEVersion() == -1){
+                    this.btn_loading= index
+                    setTimeout(()=>{
+                        this.getPdf()
+                        this.btn_loading ='-1'
+                    },1000)
+                }else{
+                    this.UploadDialogVisible = true
+                }
+            },
+            //下载其他浏览器
+            uploadOther(){
+                window.open("http://browsehappy.osfipin.com/")
+            },
         },
         filters:{
             //时间格式化

@@ -53,13 +53,13 @@ router.beforeEach((to,from,next) => {
             if(!isEmptyObject(store.getters.userInfo)){
                 next()
             }else{
+                store.commit('SET_HEADTOGGLE', 1)
                 router.push({path:'/login'});
             }
         }else{
             next();
         }
     }else {
-        console.log(to.matched,to.matched.length)
         from.name ? next({ name:from.name }) : next('/');                                                                             //如果匹配到正确跳转
     }
 })

@@ -416,7 +416,7 @@ export default {
 		})
 		setTimeout(() => {
 			this.creatChangeMap(0);
-		}, 100)
+		}, 1000)
 	},
 	methods: {
 		reloadFunc(id){

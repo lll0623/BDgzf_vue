@@ -161,7 +161,7 @@ export default {
 									type: 'success',
 									message: '登录成功！'
 								});
-								console.log(response.Data)
+								// console.log(response.Data)
 								this.dialogVisible = true;
 								setCookie('userInfo',JSON.stringify(response.Data))
 								// this.$cookie.set('userInfo', JSON.stringify(response.Data))

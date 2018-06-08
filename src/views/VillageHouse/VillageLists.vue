@@ -106,7 +106,7 @@
                 ],
                 villageLists:[],
                 loading: false,
-                listsTotal:null,
+                listsTotal:0,
                 page : 1,
                 pageSize : 10
             }
@@ -216,7 +216,7 @@
                             break;
                         case 200:
                             this.villageLists = response.Data.Rows
-                            this.listsTotal = response.Data.Total
+                            this.listsTotal = response.Data.Records
 
                     }
                     this.loading = false

@@ -352,6 +352,7 @@ const router= new Router({
                     hidden : false,
                     meta: {
         	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                        keepAlive: false,
         	        },
                     children:[
                         {
@@ -362,7 +363,7 @@ const router= new Router({
                             name: '我的消息',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -372,7 +373,7 @@ const router= new Router({
                             name: '我的申请',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -382,7 +383,7 @@ const router= new Router({
                             name: '已选定房间列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -392,7 +393,7 @@ const router= new Router({
                             name: '看房申请列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -402,7 +403,7 @@ const router= new Router({
                             name: '已签约房间列表',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -412,7 +413,7 @@ const router= new Router({
                             name: '已关注房间列表',
                             meta: {
                 	            requireAuth: true,
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -422,7 +423,7 @@ const router= new Router({
                             name: '我的合同',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         },{
                             mode: 'history',
@@ -432,7 +433,7 @@ const router= new Router({
                             name: '个人信息管理',
                             meta: {
                 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-                                keepAlive: true,
+                                keepAlive: false,
                 	        },
                         }
                     ]

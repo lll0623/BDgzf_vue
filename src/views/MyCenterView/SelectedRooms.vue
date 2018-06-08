@@ -57,19 +57,7 @@
                 vm.$store.commit('SET_MYCENTERNAV',3)
             })
         },
-        beforeRouteLeave(to, from, next) {
-            if(this.$store.getters.userInfo){
-                if(!from.meta.keepAlive){
-                    from.meta.keepAlive = true
-                }
-                next()
-            }else{
-                from.meta.keepAlive = false
-                to.meta.keepAlive = false
-                next()
-            }
 
-        },
         methods: {
             //格式化时间
             resetData(row,column){
@@ -87,32 +75,34 @@
             },
             //获取选房列表数据
             getChooseRoomListsFunc(){
-                this.loading = true
-                var params = {
-                    Rows:this.pageSize,
-                    Page:this.page,
-                    QueryJson:{
-                        AccountId:this.$store.getters.userInfo.AccountId,
+                if(this.$store.getters.userInfo){
+                    this.loading = true
+                    var params = {
+                        Rows:this.pageSize,
+                        Page:this.page,
+                        QueryJson:{
+                            AccountId:this.$store.getters.userInfo.AccountId,
+                        }
                     }
+                    getChooseRoomLists(params).then(response => {
+                        switch(response.StatusCode){
+                            case 200 :
+                                this.listsTotal = response.Data.Records
+                                this.SelectedRooms = response.Data.Rows
+                                setTimeout(()=>{
+                                    this.loading = false
+                                },1000)
+                            break;
+                            case 500 :
+                                this.$message.error(response.Info)
+                            break;
+                            default:
+                                this.$message.error(response.Info)
+                        }
+                    }).catch(error => {
+                        this.$message.error(error)
+                    })
                 }
-                getChooseRoomLists(params).then(response => {
-                    switch(response.StatusCode){
-                        case 200 :
-                            this.listsTotal = response.Data.Records
-                            this.SelectedRooms = response.Data.Rows
-                            setTimeout(()=>{
-                                this.loading = false
-                            },1000)
-                        break;
-                        case 500 :
-                            this.$message.error(response.Info)
-                        break;
-                        default:
-                            this.$message.error(response.Info)
-                    }
-                }).catch(error => {
-                    this.$message.error(error)
-                })
             },
             //取消选房
             getCancelRoomFunc(index,row){

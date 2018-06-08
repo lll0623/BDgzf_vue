@@ -7,7 +7,7 @@ export default{
             var title = this.htmlTitle
             html2Canvas(document.querySelector('#pdfDom'), {
                 // allowTaint: true,
-                scale:1,
+                scale:1.411,
             }).then(function (canvas) {
                 let contentWidth = canvas.width
                 let contentHeight = canvas.height
@@ -16,18 +16,22 @@ export default{
                 let position = 0
                 let imgWidth = 595.28
                 let imgHeight = 595.28 / contentWidth * contentHeight
-                console.log('contentWidth:'+contentWidth)
-                console.log('contentHeight:'+contentHeight)
-                console.log('pageHeight:'+pageHeight)
-                console.log('leftHeight:'+leftHeight)
-                console.log('imgWidth:'+imgWidth)
-                console.log('imgHeight:'+imgHeight)
-                console.log(canvas)
-                console.log('canvas.width:'+canvas.width)
-                console.log('canvas.height:'+canvas.height)
+                // console.log('contentWidth:'+contentWidth)
+                // console.log('contentHeight:'+contentHeight)
+                // console.log('pageHeight:'+pageHeight)
+                // console.log('leftHeight:'+leftHeight)
+                // console.log('imgWidth:'+imgWidth)
+                // console.log('imgHeight:'+imgHeight)
+                // console.log(canvas)
+                // console.log('canvas.width:'+canvas.width)
+                // console.log('canvas.height:'+canvas.height)
+                // document.body.appendChild(canvas)
                 let pageData = canvas.toDataURL('image/jpeg', 1)
+
                 let PDF = new JsPDF('', 'pt', 'a4')
-                console.log(pageData)
+                // var newImg = document.createElement('img')
+                // newImg.src= pageData
+                // document.body.appendChild(newImg)
                 if (leftHeight < pageHeight) {
                     PDF.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight)
                 } else {

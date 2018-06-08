@@ -11,7 +11,7 @@
                 <el-input v-model="step04_Form.CompanyName" placeholder="请填写营业执照上的单位名称全称" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
             </el-form-item>
             <el-form-item label="单位电话" prop="CompanyPhone">
-                <el-input v-model="step04_Form.CompanyPhone" placeholder="请填写营业执照上的单位名称全称" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyPhone" placeholder="请输入单位电话" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
             </el-form-item>
             <el-form-item label="单位地址" prop="CompanyAddress">
                 <el-input v-model="step04_Form.CompanyAddress" placeholder="请填写营业执照上的注册地址" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
