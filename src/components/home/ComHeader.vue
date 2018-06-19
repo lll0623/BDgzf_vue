@@ -29,7 +29,7 @@
                                 <i :class="item.iconCls"></i>
                                 <span slot="title">{{item.name}}</span>
                             </template>
-                            <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path" v-if="child.path != '' && child.name !='提交申请' && child.name !='续租申请' && child.name !='退租申请'">
+                            <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path" v-if="child.path != '' && child.name !='提交申请' && child.name !='续租申请' && child.name !='退租申请'&& child.name !='个人中心' && child.name !='我的进度'">
                                 <router-link :to="child.path">
                                     <i :class="child.iconCls"></i>
                                     <span>{{child.name}}</span>
@@ -47,6 +47,11 @@
                             </el-menu-item>
                             <el-menu-item :index="child.path" :key="child.path" v-else-if="child.path != '' && child.name =='提交申请'">
                                 <a href="javascript:;" class='block' @click="hasIDCard('/applyFor')">
+                                    <span>{{child.name}}</span>
+                                </a>
+                            </el-menu-item>
+                            <el-menu-item :index="child.path" :key="child.path" v-else-if="child.path != '' && child.name =='我的进度'">
+                                <a href="javascript:;" class='block' @click="hasIDCard('/myProcess')">
                                     <span>{{child.name}}</span>
                                 </a>
                             </el-menu-item>
@@ -309,6 +314,7 @@
                             this.$router.push({path:'/applyFor'})
                         break;
                         default:
+                            this.btnLoading =false
                             this.$message.error(response.Info)
                     }
                 }).catch(error => {

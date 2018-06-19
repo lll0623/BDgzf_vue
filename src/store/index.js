@@ -14,7 +14,7 @@ const state = {
     userInfoForm : '', //获取个人信息
     applyForTab : 1,//
     applyForCode: getCookie('applyForCode')== null ? '' : getCookie('applyForCode'),
-    applyForData: getCookie('applyForData')== null ? '' : getCookie('applyForData'),//所填写的表单数据本地保存
+    applyForData: getCookie('applyForData')== null ? '' : JSON.parse(getCookie('applyForData')),//所填写的表单数据本地保存
     myCenterNav: '1',//1.我的消息、2.我的申请、3.我的房间、4.我的合同、5、个人信息管理
     isReadOrNot: '0', //个人未读消息条数
     isUserEnter:getCookie('isUserEnter') == null ? '0' : '1',//是否从个人中心进入提交申请页面

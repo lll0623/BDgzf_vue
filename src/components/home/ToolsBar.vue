@@ -2,7 +2,7 @@
     <div class="tool_bar fix" v-if="head.toggle == 0">
         <ul>
             <li>
-                <span class="baged abs white fs12 block tc" v-if="userInfo">
+                <span class="baged abs white fs12 block tc" v-if="userInfo && this.$store.getters.isReadOrNot > 0">
                     {{ this.$store.getters.isReadOrNot }}
                 </span>
                 <router-link to="/myCenter">

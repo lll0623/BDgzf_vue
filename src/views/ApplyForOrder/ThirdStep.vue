@@ -142,6 +142,7 @@
     import { mapGetters } from 'vuex'
     import { houseType,propertyTypeLists } from '../../../static/dataJson/dataJson'
     import { getApplyFor,getApplyForInfo} from '../../api/api.js'
+    import { getCookie,setCookie } from '../../util/index.js'
     export default{
         data(){
             return {
@@ -242,7 +243,9 @@
                     step : 3,
                     bill: {
                         SignType: '1',
-                        code:this.$store.getters.applyForCode
+                        code:this.$store.getters.applyForCode,
+                        TelAddr:this.$store.getters.applyForData.bill.TelAddr,
+                        PostCode:this.$store.getters.applyForData.bill.PostCode,
                     },
                     member:this.$store.getters.applyForData.member,
                     filelist:this.$store.getters.applyForData.filelist,
@@ -250,6 +253,7 @@
                     roomlist:paramsRoomlist
                 }
                 var applyForData = {
+                    bill:params.bill,
                     member:params.member,
                     filelist:params.filelist,
                     residentlist:params.residentlist,
@@ -261,7 +265,7 @@
                         case 200:
                             this.loading = false
                             this.$store.dispatch('SET_APPLYFORDATA',applyForData)
-                            this.$cookie.set('applyForData',JSON.stringify(applyForData))
+                            setCookie('applyForData',JSON.stringify(applyForData))
                             this.$router.push({path:'/applyFor/FourthStep'})
                         break;
                         case 500:

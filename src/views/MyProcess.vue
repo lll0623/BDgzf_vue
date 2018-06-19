@@ -23,7 +23,7 @@
 				<li class="fl" :class="isActive == 2?'active':''" @click="checkTab('2')">续租</li>
 			</ul>
 			<div class="" v-show="isActive == 1">
-				<p class="tc error_text"  v-if="processLists1.length == 0">没有数据，-__-!!!</p>
+				<p class="tc error_text"  v-if="processLists1.length == 0">暂无数据!</p>
 				<ul class="myProcessCont"  v-if="processLists1.length != 0"><!-- 1非续租、2续租 -->
 					<li v-for="(item,index) in processLists1" :key="index" class="clearfix">
 						<i></i>
@@ -46,7 +46,7 @@
 				</ul>
 			</div>
 			<div class="" v-show="isActive == 2">
-				<p class="tc error_text" v-if="processLists2.length == 0">没有数据，-__-!!!</p>
+				<p class="tc error_text" v-if="processLists2.length == 0">暂无数据!</p>
 				<ul class="myProcessCont" v-if="processLists2.length != 0"><!-- 1非续租、2续租 -->
 					<li v-for="(item,index) in processLists2" :key="index" class="clearfix">
 						<i></i>

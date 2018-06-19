@@ -4,7 +4,7 @@
             title="提示"
             :visible.sync="UploadDialogVisible"
             width="30%">
-            <span>ie浏览器下无法下载，请使用其他浏览器进行下载（推荐使用谷歌浏览器）</span>
+            <span>ie浏览器下无法下载，请使用其他浏览器进行下载（为保证打印质量推荐使用谷歌浏览器）</span>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="UploadDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="uploadOther">确 定</el-button>
@@ -60,7 +60,7 @@
         <el-dialog
             title="网签合同（查看）"
             :visible.sync="dialogVisible"
-            width="60%"
+            width="855px"
             >
             <div class="ContractCont-wrap" v-loading="loadingModel">
                 <p class="tr">
@@ -555,10 +555,11 @@ import moment from 'moment'
 <style lang="scss">
     .ContractCont-wrap{
         ul{
+            padding:8px 15px;
             border:1px solid #009f95;
             li{
                 float: left;
-                width:308px;
+                width:250px;
                 height:40px;
                 padding-left: 10px;
                 line-height: 40px;

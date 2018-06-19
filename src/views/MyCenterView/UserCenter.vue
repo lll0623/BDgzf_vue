@@ -358,6 +358,9 @@ export default {
 			}],
 			valueCultural: '',
 			MarryInfos: [{
+				value: 0,
+				label: '请选择'
+			},{
 				value: 1,
 				label: '未婚'
 			}, {
@@ -887,8 +890,9 @@ export default {
 			this.isShowView = false;
 			this.isShowEdit = true;
 			this.valueSex = this.PersonalInformation.Sex; //性别多选框 特殊处理
-			this.valueCultural = parseInt(this.PersonalInformation.Cultural);
-			this.valueMarryInfo = parseInt(this.PersonalInformation.MarryInfo);
+			this.valueCultural = parseInt((this.PersonalInformation.Cultural == '' || this.PersonalInformation.Cultural == 0) ? 0 : this.PersonalInformation.Cultural);
+			console.log(parseInt(this.PersonalInformation.MarryInfo));
+			this.valueMarryInfo = parseInt((this.PersonalInformation.MarryInfo == '' || this.PersonalInformation.MarryInfo == 0) ? 0 : this.PersonalInformation.MarryInfo);
 		},
 		choosenSex() {
 			this.PersonalInformation.Sex = this.valueSex;

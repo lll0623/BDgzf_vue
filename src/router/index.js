@@ -349,7 +349,6 @@ const router= new Router({
                     routerName: 'my_center',
                     component: MyCenter,
                     name: '个人中心',
-                    hidden : false,
                     meta: {
         	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
                         keepAlive: false,

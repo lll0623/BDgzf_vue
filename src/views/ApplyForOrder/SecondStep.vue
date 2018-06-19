@@ -171,6 +171,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import { getApplyFor,getApplyForInfo } from '../../api/api.js'
+    import { getCookie,setCookie } from '../../util/index.js'
     export default{
         data(){
             var validateIDCard = (rule, value, callback) => {
@@ -305,13 +306,16 @@
                     step : 2,
                     bill: {
                         SignType: '1',
-                        code:this.$store.getters.applyForCode
+                        code:this.$store.getters.applyForCode,
+                        TelAddr:this.$store.getters.applyForData.bill.TelAddr,
+                        PostCode:this.$store.getters.applyForData.bill.PostCode,
                     },
                     member:this.$store.getters.applyForData.member,
                     filelist:this.$store.getters.applyForData.filelist,
                     residentlist:this.residentlist,
                 }
                 var applyForData = {
+                    bill:params.bill,
                     member:params.member,
                     filelist:params.filelist,
                     residentlist:params.residentlist,
@@ -321,7 +325,7 @@
                         case 200:
                             this.loading = false
                             this.$store.dispatch('SET_APPLYFORDATA',applyForData)
-                            this.$cookie.set('applyForData',JSON.stringify(applyForData))
+                            setCookie('applyForData',JSON.stringify(applyForData))
                             this.$router.push({path:'/applyFor/ThirdStep'})
                         break;
                         case 500:

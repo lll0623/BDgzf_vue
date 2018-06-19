@@ -8,14 +8,14 @@
 			</router-link>
 		</div>
 		<el-form :model="ruleForm" label-position="right" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
-			<el-form-item label="账户：" prop="Account">
+			<el-form-item label="账户" prop="Account">
 				<el-input type="text" placeholder="请输入手机号或邮箱号" v-model="ruleForm.Account" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
 			</el-form-item>
-			<el-form-item label="密码：" prop="Password">
+			<el-form-item label="密码" prop="Password">
 				<el-input :type="this.ispassword" placeholder="请输入密码" v-model="ruleForm.Password" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
 				<i :class="fa_eyes" aria-hidden="true" @keyup.enter.native="submitForm('ruleForm')" @click="changeType()" class="open_close"></i>
 			</el-form-item>
-			<el-form-item label="验证码：" prop="VerifyCode" class="clearfix">
+			<el-form-item label="验证码" prop="VerifyCode" class="clearfix">
 				<el-input style="width:190px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="ruleForm.VerifyCode" auto-complete="off"></el-input>
 				<input type="button" id="code" @click="createCode" class="verification fr" v-model="checkCode" />
 			</el-form-item>

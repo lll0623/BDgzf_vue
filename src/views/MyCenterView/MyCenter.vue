@@ -8,7 +8,7 @@
             </div>
             <ul class="myCenter-nav marT30">
                 <li class="rel" :class="myCenterNav==1?'active':''">
-                    <span class="baged abs white fs12 block tc">{{ this.$store.getters.isReadOrNot }}</span>
+                    <span class="baged abs white fs12 block tc" v-if="userInfo && this.$store.getters.isReadOrNot > 0">{{ this.$store.getters.isReadOrNot }}</span>
                     <router-link to="/myCenter">我的消息</router-link>
                 </li>
                 <li :class="myCenterNav==2?'active':''">
@@ -48,14 +48,14 @@
             element-loading-spinner="el-icon-loading"
             title="修改密码"
             :visible.sync="updatePwdForm_DP"
-            width="60%"
+            width="30%"
             >
             <el-form :model="updatePwd_phoneForm" label-position="right" :rules="updatePwd_phoneRules" ref="updatePwd_phoneForm" label-width="120px" class="demo-updatePwd_phoneForm">
-                <el-form-item label="原密码：" prop="OldPassword">
+                <el-form-item label="原密码" prop="OldPassword">
                     <el-input :type="this.ispassword3" placeholder="请输入原密码" v-model="updatePwd_phoneForm.OldPassword" auto-complete="off"></el-input>
                     <i :class="fa_eyes3" aria-hidden="true" @click="changeType3()" class="open_close"></i>
                 </el-form-item>
-                <el-form-item label="新密码：" prop="Password">
+                <el-form-item label="新密码" prop="Password">
                     <el-input :type="this.ispassword" placeholder="请输入新密码" v-model="updatePwd_phoneForm.Password" auto-complete="off"></el-input>
                     <i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
                 </el-form-item>
@@ -63,7 +63,7 @@
                     <el-input :type="this.ispassword2" placeholder="请确认新密码" v-model="updatePwd_phoneForm.confirm_pass" auto-complete="off"></el-input>
                     <i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
                 </el-form-item>
-                <el-form-item label="验证码：" prop="VerifyCode">
+                <el-form-item label="验证码" prop="VerifyCode">
                     <el-input style="width:190px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="updatePwd_phoneForm.VerifyCode" auto-complete="off"></el-input>
                     <input type="button"  @click="createCode" class="verification" v-model="checkCode" />
                 </el-form-item>

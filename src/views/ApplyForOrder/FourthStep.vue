@@ -11,7 +11,7 @@
                 <el-input v-model="step04_Form.CompanyName" placeholder="请填写营业执照上的单位名称全称" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
             </el-form-item>
             <el-form-item label="单位电话" prop="CompanyPhone">
-                <el-input v-model="step04_Form.CompanyPhone" placeholder="请输入单位电话" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyPhone" placeholder="请输入单位电话（输入固定电话号码时请在区号与号码之间加 ‘  -  ’）" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
             </el-form-item>
             <el-form-item label="单位地址" prop="CompanyAddress">
                 <el-input v-model="step04_Form.CompanyAddress" placeholder="请填写营业执照上的注册地址" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
@@ -32,7 +32,7 @@
             <el-form-item label="邮编" prop="CompanyPostalCode">
                 <el-input v-model="step04_Form.CompanyPostalCode" placeholder="请输入邮政编码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
             </el-form-item>
-            <el-form-item label="申请人与该单位签署已签订" label-width="190px" prop="SignYear">
+            <el-form-item label="申请人与该单位已签订" label-width="190px" prop="SignYear">
                 <el-radio-group v-model="step04_Form.SignYear" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
                     <el-radio label="1">一年</el-radio>
                     <el-radio label="2">两年以上劳动合同</el-radio>
@@ -54,12 +54,17 @@
     import { mapGetters } from 'vuex'
     import { unitType,AreaCode } from '../../../static/dataJson/dataJson'
     import { getApplyFor,getApplyForInfo } from '../../api/api.js'
+    import { setCookie } from '../../util/index.js'
     export default{
         data(){
             var validatePhoneNum = (rule, value, callback) => {
                 let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-                if (!reg.test(value)) {
-                    callback(new Error('请输入正确的手机号码'));
+                let fixTel = /^([0-9]{3,4}-)?[0-9]{7,8}$/;
+                // let fixTel = ^0\d{2,3}[- ]?\d{7,8};
+                if (!reg.test(value) && value.length == 11) {
+                    callback(new Error('请输入正确的手机号码或固话电话号码'));
+                }else if(!fixTel.test(value) && value.length != 11){
+                    callback(new Error('请输入正确的手机号码或固话电话号码'));
                 } else {
                     callback();
                 }
@@ -151,7 +156,9 @@
                             step : 4,
                             bill: {
                                 SignType: '1',
-                                code:this.$store.getters.applyForCode
+                                code:this.$store.getters.applyForCode,
+                                TelAddr:this.$store.getters.applyForData.bill.TelAddr,
+                                PostCode:this.$store.getters.applyForData.bill.PostCode,
                             },
                             member:this.$store.getters.applyForData.member,
                             filelist:this.$store.getters.applyForData.filelist,
@@ -168,22 +175,27 @@
                         getApplyFor(params).then(response => {
                             switch (response.StatusCode) {
                                 case 200:
-                                    this.$alert('申请资格提交中，请等待。。。', '提示', {
-                                        confirmButtonText: '确定',
-                                        callback: action => {
-                                            this.loading = false;
-                                            //更新个人数据
-                                            //重置cookie userinfo
-                                            var userInfo = JSON.parse(this.$cookie.get('userInfo'))
-                                            userInfo.State = '1003'
-                                            this.$store.dispatch('SET_USERINFO',userInfo)
-                                            this.$store.dispatch('SET_APPLYFORDATA',applyForData)
-                                            this.$store.commit('SET_STEPTIP','1003');
-                                            this.$cookie.set('userInfo',JSON.stringify(userInfo))
-                                            this.$cookie.set('applyForData',JSON.stringify(applyForData))
-                                            this.$router.push({path:'/'})
-                                        }
-                                    });
+                                    // this.$alert('申请资格提交中，请等待。。。', '提示', {
+                                    //     confirmButtonText: '确定',
+                                    //     callback: action => {
+                                    //
+                                    //     }
+                                    // });
+                                    this.$message.success('申请资格提交成功，请稍等！')
+                                    //更新个人数据
+                                    //重置cookie userinfo
+                                    var userInfo = JSON.parse(this.$cookie.get('userInfo'))
+                                    userInfo.State = '1003'
+                                    this.$store.dispatch('SET_USERINFO',userInfo)
+                                    this.$store.dispatch('SET_APPLYFORDATA',applyForData)
+                                    this.$store.commit('SET_STEPTIP','1003');
+                                    setCookie('userInfo',JSON.stringify(userInfo))
+                                    setCookie('applyForData',JSON.stringify(applyForData))
+                                    setTimeout(()=>{
+                                        this.loading = false;
+                                        this.$router.push({path:'/'})
+                                    },800)
+
                                 break;
                                 case 500:
                                     this.loading = false;

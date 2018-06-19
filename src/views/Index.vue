@@ -25,12 +25,29 @@
             </div>
         </div>
         <div class="container">
-            <div class="getApplyForComListsWrap rel" v-loading ='getApplyForComListsLoading'>
-                <div class="fast_IDCard_entry abs">
-                    <el-input v-model="inputIDCard" placeholder="请输入您的身份证号码" clearable></el-input>
-                    <el-button type="primary" @click="getIndexFastFunc()">查询</el-button>
+            <div classs="getApplyForComListsWrap" style="margin:40px 0 30px;" v-loading ='getApplyForComTitLoading'>
+                <div class="site-title clearfix rel" style="padding:20px 0;">
+                    <h2 class="fs30 c-3 fl">上周资格申请公告栏</h2>
+                    <div :style="{height:height*lineNum + 'px'}" class="rollScreen_container abs" id ="rollScreen_container">
+                        <ul class="rollScreen_list" :style = {transform:transform} :class="{rollScreen_list_unanim:num===0}">
+                            <li class="rollScreen_once" v-for="(item,index) in contentArr" :key=index :style="{height:height+'px','line-height':height+'px'}">
+                                <span>{{index+1}}</span>
+                                <span>{{item.Name}}</span>
+                                <span>{{item.Code}}</span>
+                                <el-tag type="success" v-if="item.State  == 6">通过</el-tag>
+                                <el-tag type="danger" v-if="item.state == -1">未通过</el-tag>
+                            </li>
+                        </ul>
+                    </div>
+                    <i class="fa fa-chevron-down abs  fa-lg indexShowBtn" aria-hidden="true" @click="indexShowFunc" v-show="!showApplyForComLists"></i>
+                    <i class="fa fa-chevron-up abs  fa-lg indexShowBtn" aria-hidden="true" @click="indexShowFunc" v-show="showApplyForComLists"></i>
+                    <div class="fast_IDCard_entry abs">
+                        <el-input v-model="inputIDCard" placeholder="请输入您的身份证号码" clearable></el-input>
+                        <el-button type="primary" @click="getIndexFastFunc()">查询</el-button>
+                    </div>
                 </div>
-                <h2 class="fs30 c-3 tc marB30">上周资格申请公告栏</h2>
+            </div>
+            <div class="getApplyForComListsWrap rel" style="margin-top:0;" v-show="showApplyForComLists" v-loading ='getApplyForComListsLoading'>
                 <el-table
                     :data="getApplyForComLists"
                     style="width: 60%;"
@@ -54,20 +71,42 @@
             </div>
             <ul class="fast_entry clearfix tc fs20 marB30">
                 <li>
-                    <h2>提交申请</h2>
-                    <img src="../assets/images/s_01.png">
-                    <el-button type="primary" v-show="stepTip >= 1003 && userInfo" @click="fastEnterApplyFor">提交申请</el-button>
+                    <router-link v-if="stepTip >= 1003 && userInfo" to="/applyFor">
+                        <h2>提交申请</h2>
+                        <img src="../assets/images/s_01.png">
+                    </router-link>
+                    <!-- <el-button type="primary" v-show="stepTip >= 1003 && userInfo" @click="fastEnterApplyFor">提交申请</el-button> -->
+                    <div v-else>
+                        <h2>提交申请</h2>
+                        <img src="../assets/images/s_01.png">
+                    </div>
                 </li>
                 <li>
-                    <h2>下载合同</h2>
-                    <img src="../assets/images/s_01.png">
-                    <el-button type="primary" v-show="stepTip >= 1010 && userInfo" @click="fastEnterUploadContract">下载合同</el-button>
+                    <router-link v-if="stepTip >= 1010 && userInfo" to="/myCenter/userContract">
+                        <h2>下载合同</h2>
+                        <img src="../assets/images/s_02.png">
+                    </router-link>
+                    <div v-else>
+                        <h2>下载合同</h2>
+                        <img src="../assets/images/s_02.png">
+                    </div>
+                    <!-- <el-button type="primary" v-show="stepTip >= 1010 && userInfo" @click="fastEnterUploadContract">下载合同</el-button> -->
                 </li>
                 <li>
-                    <h2>续租／退租</h2>
-                    <img src="../assets/images/s_01.png">
-                    <el-button type="primary" v-if="stepTip==1011 && userInfo" @click="fastEnterRelet">续租</el-button>
-                    <el-button type="primary" v-if="stepTip==1012 && userInfo" @click="fastEnterRetreat">退租</el-button>
+                    <router-link to="/relet" v-if="stepTip==1011 && userInfo">
+                        <h2>续租／退租</h2>
+                        <img src="../assets/images/s_03.png">
+                    </router-link>
+                    <router-link to="/retreat" v-if="stepTip==1012 && userInfo">
+                        <h2>续租／退租</h2>
+                        <img src="../assets/images/s_03.png">
+                    </router-link>
+                    <div v-else>
+                        <h2>续租／退租</h2>
+                        <img src="../assets/images/s_03.png">
+                    </div>
+                    <!-- <el-button type="primary" v-if="stepTip==1011 && userInfo" @click="fastEnterRelet">续租</el-button>
+                    <el-button type="primary" v-if="stepTip==1012 && userInfo" @click="fastEnterRetreat">退租</el-button> -->
                 </li>
             </ul>
             <div v-show='showHotHouseLists'>
@@ -95,7 +134,7 @@
                                     </span>
                                 </p>
                                 <p class="red">
-                                    <i class="fa fa-usd fa-lg"></i>
+                                    <i class="fa fa-jpy fa-lg"></i>
                                     <span>
                                         租金范围：
                                         <span>{{item.money}}</span>
@@ -118,7 +157,7 @@
                         <img v-lazy="newslists[0].MainPic == null ? defaultImg : newslists[0].MainPic">
                         <div class="abs">
                             <h4 class="fs18 white marB10">{{newslists[0].FullHead}}</h4>
-                            <div class="c-3" v-html="unescape(newslists[0].NewsContent)"></div>
+                            <div class="c-f0f0f0" v-html="unescape(newslists[0].NewsContent)"></div>
                         </div>
                     </router-link>
                     <div class="fl">
@@ -161,13 +200,29 @@ import { getMemberMSGList } from '../api/api.js'
 import { mapGetters } from 'vuex'
 import { isNull } from '../util/index.js'
 export default{
+    props: {
+        height: {
+            default: 40,
+            type: Number
+        },
+        lineNum: {
+            default: 2,
+            type: Number
+        }
+    },
     data(){
         return {
+            //上下轮播
+            contentArr: [],
+            num: 0  ,
+
             inputIDCard:'',
             messageLists:[],
             defaultImg,
             newsLoading:true,
             getApplyForComListsLoading:true,
+            getApplyForComTitLoading:true,
+            showApplyForComLists:false,
             indexBanner:[],
             search_text: '',
             swiperLists: [],
@@ -231,6 +286,10 @@ export default{
         setIsreadOrNot() {
             return this.$store.getters.isReadOrNot
         },
+        //上下轮播
+        transform: function () {
+            return 'translateY(-' + this.num * this.height + 'px)'
+        }
     },
     watch:{
         stepTip(val){
@@ -249,8 +308,21 @@ export default{
                 }
             })
         }
+        // 复制一份slot的节点，如果直接用同名slot会报错
+        if (this.dLength !== null) {
+            for (let i = 0; i < this.dLength; i++) {
+                this.$el.childNodes[0].appendChild(this.$slots.slide[i].elm.cloneNode(true))
+            }
+        }
     },
     methods:{
+        indexShowFunc(){
+            if(!this.showApplyForComLists){
+                this.showApplyForComLists = true
+            }else{
+                this.showApplyForComLists = false
+            }
+        },
         //快速入口
         fastEnterApplyFor(){
             this.$router.push({path:'/applyFor'})
@@ -309,7 +381,7 @@ export default{
             })
         },
         //申请公示改变当前页
-        handleCurrentChange(){
+        handleCurrentChange(val){
             this.page = val
             this.getApplyForComListsFunc()
         },
@@ -342,9 +414,27 @@ export default{
                 this.$message.error(error)
             })
         },
-
     },
     created(){
+        //上下轮播
+        this.getApplyForComTitLoading = true
+        getApplyForComLists({Rows: 10,Page: 1,}).then(response => {
+            this.contentArr = response.Data.Rows
+            let _this = this
+            setInterval(function () {
+                if (_this.num !== response.Data.Rows.length-2) {
+                    _this.num++
+                } else{
+                    _this.num =0
+                }
+            }, 3000)
+            setTimeout(()=>{
+                this.getApplyForComTitLoading = false
+            },800)
+
+        }).catch(error => {
+            this.$message.error(error)
+        });
         //获取轮播图
         getIndexBanner({"QueryJson":{"Category":1}}).then((response) => {
             switch(response.StatusCode){
@@ -457,9 +547,9 @@ export default{
 
 @media screen and (min-width: 450px) {
     .fast_IDCard_entry{
-        width:285px;
+        width:290px;
         top:20px;
-        right:20px;
+        right:0px;
         .el-input{
             display: inline-block;
             width:200px;
@@ -575,7 +665,7 @@ export default{
             }
             &.addr_btn{
                 margin-right:8px;
-                margin-left:28px;
+                margin-left:119px;
                 &:hover{
                     i{
                         background-position:-99px -58px;
@@ -650,8 +740,9 @@ export default{
         }
         /*更多房源*/
         .canSelHouseLists .swiper-slide{
-            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.12), 0 1px 6px 0 rgba(0, 0, 0, 0.12);
+            /*box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.12), 0 1px 6px 0 rgba(0, 0, 0, 0.12);*/
             margin:10px 0px 10px 0px;
+            background: #f4f4f4;
             a{
                 padding:15px;
                 display: block;
@@ -679,7 +770,7 @@ export default{
                         position: relative;
                         >i{
                             position: absolute;
-                            top:0;
+                            top:4px;
                             left:0;
                         }
                     }
@@ -917,5 +1008,54 @@ export default{
             }
         }
     }
+}
+.rollScreen_container{
+    display: block;
+    overflow: hidden;
+    width:400px;
+    text-align: center;
+    margin:0px auto;
+    top:0;
+    left:50%;
+    margin-left:-200px;
+}
+ul.rollScreen_list{
+    width:400px;
+    margin:0 auto;
+    transition: 1s linear;
+    li{
+        text-align:left;
+        >span{
+            display: inline-block;
+            font-size:14px!important;
+            &:nth-of-type(1){
+                width:30px;
+                text-align: center;
+                color:#009688;
+            }
+            &:nth-of-type(2){
+                width:100px;
+                color:#333;
+            }
+            &:nth-of-type(3){
+                width:180px;
+                color:#333;
+            }
+            &:nth-of-type(4){
+                line-height: 32px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+.rollScreen_list_unanim{
+    transition: none;
+}
+.indexShowBtn{
+    color:#009688;
+    top:35px;
+    left:800px;
+    cursor: pointer;
+    font-size: 22px!important;
 }
 </style>

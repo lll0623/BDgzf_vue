@@ -86,7 +86,7 @@
         </div>
         <h4 class="fs26 c-6 village-house-tit">共<span class="red">{{listsTotal}}</span>个房源：</h4>
         <div class="village-house-wrap" v-loading="loading">
-            <p class="noDataText padT20 padB20 tc fs16 green" v-show='villageLists.length == 0'>无数据!&nbsp;&nbsp;-_-!!!</p>
+            <p class="noDataText padT20 padB20 tc fs16 green" v-show='villageLists.length == 0'>无数据!</p>
             <ul class="village-house-lists">
                 <li v-for="(item,index) in villageLists" :key="index" class="clearfix rel">
                     <router-link :to="`/HouseDetails/${item.Id}`" class="clearfix">
@@ -189,31 +189,35 @@
                     },{
                         name:'1000以下',
                         isActive:false,
-                        Rental:'1'
+                        Rental:'a'
                     },{
                         name:'1000-1999',
                         isActive:false,
-                        Rental:'2'
+                        Rental:'b'
                     },{
                         name:'2000-2999',
                         isActive:false,
-                        Rental:'3'
+                        Rental:'c'
                     },{
                         name:'3000-3999',
                         isActive:false,
-                        Rental:'4'
+                        Rental:'d'
                     },{
                         name:'4000-4999',
                         isActive:false,
-                        Rental:'5'
+                        Rental:'e'
                     },{
                         name:'5000-5999',
                         isActive:false,
-                        Rental:'6'
+                        Rental:'f'
                     },{
-                        name:'6000以上',
+                        name:'6000-6999',
                         isActive:false,
-                        Rental:'7'
+                        Rental:'g'
+                    },{
+                        name:'7000-8000',
+                        isActive:false,
+                        Rental:'h'
                     }
                 ],
                 checkedScreenLists:[],
@@ -401,7 +405,7 @@
             },
             //获取区域筛选条件
             getScreenAreaFunc(){
-                getScreenArea().then(response => {
+                getScreenArea({CityCode:"310100",AreaCode:"310115"}).then(response => {
                     var data = [{
                         AreaName:'不限',
                         AreaId:null,
@@ -425,9 +429,9 @@
                 // url传id
                 if(this.$route.query.id){
                     for(var i =0;i<this.screenVillageLists.length;i++){
-                        if(this.$route.query.id == this.screenVillageLists[i].PropertyId){
+                        if(this.$route.query.id == this.screenVillageLists[i].PStructId){
                             this.checkedScreenLists.push({
-                                name:this.screenVillageLists[i].Name,
+                                name:this.screenVillageLists[i].villageName,
                                 type:2,
                                 index: i
                             })

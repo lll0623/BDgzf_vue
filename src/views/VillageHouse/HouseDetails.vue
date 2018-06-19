@@ -25,14 +25,14 @@
                 <div class="fl marR30 villageDetails-item-top-cont-fir rel">
 					<swiper :options="swiperOptionTop" class="gallery-top" ref="swiperTop">
 						<swiper-slide v-for="(banner,index) in banners" :key="index">
-							<img :src="banner">
+							<img :src="banner.Url">
 						</swiper-slide>
 						<div class="swiper-button-next swiper-button-white" slot="button-next"></div>
 						<div class="swiper-button-prev swiper-button-white" slot="button-prev"></div>
 					</swiper>
 					<swiper :options="swiperOptionThumbs" class="gallery-thumbs" ref="swiperThumbs">
 						<swiper-slide v-for="(banner,index) in banners" :key="index">
-							<img :src="banner">
+							<img :src="banner.Url">
 						</swiper-slide>
 					</swiper>
 				</div>
@@ -116,7 +116,7 @@
 			<div class="col-xs-3" v-for="(item,index) in similarityLists">
 				<a @click="reloadFunc(item.Id)" class="panel panel-default block">
 					<div class="panel-body">
-						<img v-lazy="(item.mainpic == null || item.mainpic == '') ? defaultImg : item.mainpic "  data-error="../../assets/images/default.jpg" class="fl block DetailsFilter__OthersHouse__media" :alt="item.allname">
+						<img v-lazy="(item.MainPic == null || item.MainPic == '') ? defaultImg : item.MainPic "  data-error="../../assets/images/default.jpg" class="fl block DetailsFilter__OthersHouse__media" :alt="item.allname">
 						<p class="text-warning marB10">{{item.AllName}}</p>
 						<p>{{item.RoomTypeName | filterRoomTypeName}}</p>
 						<!-- <p><span class='text-warning'>{{item.MonthlyRent}}</span>元／月</p> -->
@@ -1018,9 +1018,9 @@ export default {
 						this.SecSpan = data.BaseInfo.SecSpan//可选房时间
 						this.isCollected = data.IsCollection //判断是否已关注 0 否 1是
 						if(data.ImageList.length == 0){
-							this.banners.push(defaultImg)
+							this.banners.push({Url:defaultImg})
 						}else{
-							this.banners = data.FileList
+							this.banners = data.ImageList
 						}
 						//相似的房源
 						//按钮状态的判断
@@ -1128,6 +1128,7 @@ export default {
     font-weight: 300;
 }
 .DetailsFilter__OthersHouse {
+	width:100%;
     position: relative;
     box-sizing: border-box;
     display: inline-block;
