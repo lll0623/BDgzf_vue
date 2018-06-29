@@ -18,7 +18,7 @@
             </ul>
         </div>
         <div class="applyFor-content bg-white marB20">
-            <div v-show="userInfo.State == '1001'||userInfo.State=='1002'">
+            <div v-show="(userInfo.State == '1001'||userInfo.State=='1002') && isUserEnter != '1'">
                 <ul class="clearfix">
                     <li :class="applyForTab>=1?'active':''">1.完善申请人信息</li>
                     <li :class="applyForTab>=2?'active':''">2.共同申请人</li>
@@ -26,7 +26,7 @@
                     <li :class="applyForTab>=4?'active':''">4.申请人单位信息</li>
                 </ul>
             </div>
-            <div v-show="userInfo.State != '1001' && userInfo.State !='1002'">
+            <div v-show="(userInfo.State != '1001' && userInfo.State !='1002') || isUserEnter == '1'">
                 <el-popover
                     placement="top-start"
                     width="200"
@@ -68,7 +68,7 @@
             }
         },
         computed:{
-            ...mapGetters(['applyForTab','userInfo'])
+            ...mapGetters(['applyForTab','userInfo','isUserEnter'])
         },
         beforeRouteEnter (to,from,next) {
             next(vm =>{
@@ -183,13 +183,13 @@
                 .el-form-item{
                     padding-bottom: 10px;
                     &:nth-of-type(1),&:nth-of-type(2),&:nth-of-type(3),&:nth-of-type(4){
-                        width:265px;
+                        width:270px;
                         .el-form-item__content{
                             width:155px;
                         }
                     }
                     &:nth-of-type(1) .el-form-item__content{
-                        width:108px;
+                        width:125px;
                     }
                     &:nth-of-type(2),&:nth-of-type(3),&:nth-of-type(4){
                         label{
@@ -197,7 +197,7 @@
                         }
                     }
                     &:nth-of-type(5),&:nth-of-type(7){
-                        width:817px;
+                        width:838px;
                         .el-form-item__content{
                             width:676px;
                         }

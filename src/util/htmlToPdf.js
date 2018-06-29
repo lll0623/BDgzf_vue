@@ -5,7 +5,8 @@ export default{
     install (Vue, options) {
         Vue.prototype.getPdf = function () {
             var title = this.htmlTitle
-            html2Canvas(document.querySelector('#pdfDom'), {
+            var pdfDom = this.pdfDom
+            html2Canvas(document.querySelector('#'+pdfDom+''), {
                 // allowTaint: true,
                 scale:1.411,
             }).then(function (canvas) {

@@ -38,6 +38,7 @@
                                 <el-tag type="danger" v-if="item.state == -1">未通过</el-tag>
                             </li>
                         </ul>
+                        <p class="green tc" style="line-height:80px;" v-if="contentArr.length == 0"> 暂无数据！</p>
                     </div>
                     <i class="fa fa-chevron-down abs  fa-lg indexShowBtn" aria-hidden="true" @click="indexShowFunc" v-show="!showApplyForComLists"></i>
                     <i class="fa fa-chevron-up abs  fa-lg indexShowBtn" aria-hidden="true" @click="indexShowFunc" v-show="showApplyForComLists"></i>
@@ -93,14 +94,10 @@
                     <!-- <el-button type="primary" v-show="stepTip >= 1010 && userInfo" @click="fastEnterUploadContract">下载合同</el-button> -->
                 </li>
                 <li>
-                    <router-link to="/relet" v-if="stepTip==1011 && userInfo">
+                    <div @click="dialogVisibleRelet == true" v-if="stepTip==1010 && userInfo"><!-- 续租 -->
                         <h2>续租／退租</h2>
                         <img src="../assets/images/s_03.png">
-                    </router-link>
-                    <router-link to="/retreat" v-if="stepTip==1012 && userInfo">
-                        <h2>续租／退租</h2>
-                        <img src="../assets/images/s_03.png">
-                    </router-link>
+                    </div>
                     <div v-else>
                         <h2>续租／退租</h2>
                         <img src="../assets/images/s_03.png">
@@ -120,16 +117,16 @@
                         <router-link :to="`/villageDetails/${item.Id}`" class="clearfix">
                             <img v-lazy="item.img == null ? defaultImg : item.img"  onerror="javascript:this.src='../assets/images/defined.png';" :alt="item.tit" class="fl">
                             <div class="fl">
-                                <h4 class="ellipsis">{{item.FullName}}</h4>
+                                <h4 class="ellipsis">{{item.AllName}}</h4>
                                 <p class="c-7">
                                     <i class="fa fa-map-marker fa-lg"></i>
-                                    <span>{{item.Address}}</span>
+                                    <span>{{item.RentTitle}}</span>
                                 </p>
                                 <p class="c-7">
                                     <i class="fa fa-home fa-lg"></i>
                                     <span>
                                         剩余房源
-                                        <span>{{item.RoomCount}}</span>
+                                        <span>{{item.RoomNum}}</span>
                                         套
                                     </span>
                                 </p>
@@ -137,7 +134,7 @@
                                     <i class="fa fa-jpy fa-lg"></i>
                                     <span>
                                         租金范围：
-                                        <span>{{item.money}}</span>
+                                        <span>{{item.MonthlyRent}}</span>
                                         元／月
                                     </span>
                                 </p>
@@ -153,21 +150,21 @@
                     <router-link class="fr fs14 c-8" to="/news">查看更多&gt;&gt;</router-link>
                 </div>
                 <div class="index_news_lists clearfix marB30" >
-                    <router-link :to="`/newsview/${newslists[0].Id}`">
+                    <router-link :to="`/newsview/${newslists[0].Id}`" :class="{newslists_0:newslists[1].Id ==null}">
                         <img v-lazy="newslists[0].MainPic == null ? defaultImg : newslists[0].MainPic">
                         <div class="abs">
                             <h4 class="fs18 white marB10">{{newslists[0].FullHead}}</h4>
                             <div class="c-f0f0f0" v-html="unescape(newslists[0].NewsContent)"></div>
                         </div>
                     </router-link>
-                    <div class="fl">
-                        <router-link :to="`/newsview/${newslists[1].Id}`">
+                    <div class="fl"  v-if="newslists[1].Id !=null">
+                        <router-link :to="`/newsview/${newslists[1].Id}`" :class="{newslists_1:newslists[1].Id != null}">
                             <img v-lazy="newslists[1].MainPic == null ? defaultImg : newslists[1].MainPic">
                             <div class="abs">
                                 <h4 class="fs18 white">{{newslists[1].FullHead}}</h4>
                             </div>
                         </router-link>
-                        <router-link :to="`/newsview/${newslists[2].Id}`">
+                        <router-link :to="`/newsview/${newslists[2].Id}`" v-if="newslists[2].Id != null">
                             <img v-lazy="newslists[0].MainPic == null ? defaultImg : newslists[0].MainPic">
                             <div class="abs">
                                 <h4 class="fs18 white">{{newslists[2].FullHead}}</h4>
@@ -191,6 +188,34 @@
                 </ul>
             </div>
         </div>
+        <!-- 提交申请查询 -->
+        <el-dialog
+            title="提示"
+            :visible.sync="dialogVisibleApplyForSearch"
+            width="30%">
+            <span>{{dialogVisibleApplyForSearchText}}</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialogVisibleApplyForSearch = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 判断续租退租入口 -->
+        <el-dialog
+            title="提示"
+            :visible.sync="dialogVisibleRelet"
+            width="400px"
+            class="dialogVisibleRelet">
+            <div class="clearfix">
+                <router-link to="/relet"><!-- 续租 -->
+                    续租
+                </router-link>
+                <router-link to="/retreat">
+                    退租
+                </router-link>
+            </div>
+            <!-- <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialogVisibleRelet = false">确 定</el-button>
+            </span> -->
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -212,9 +237,16 @@ export default{
     },
     data(){
         return {
+            //续租退租弹框
+            dialogVisibleRelet:false,
+
             //上下轮播
             contentArr: [],
             num: 0  ,
+
+            //提交申请查询
+            dialogVisibleApplyForSearch : false,
+            dialogVisibleApplyForSearchText:'',
 
             inputIDCard:'',
             messageLists:[],
@@ -281,6 +313,7 @@ export default{
             vm.$store.commit('SET_HEADTOGGLE',0)
         })
     },
+
     computed:{
         ...mapGetters(['isReadOrNot','stepTip','userInfo']),
         setIsreadOrNot() {
@@ -401,12 +434,14 @@ export default{
             }
             getIndexFast(params).then(response => {
                 if(response.StatusCode == 200){
-                    this.$notify({
-                        title: '',
-                        message: response.Data,
-                        offset: 100,
-                        type: 'info',
-                    });
+                    // this.$notify({
+                    //     title: '',
+                    //     message: response.Data,
+                    //     offset: 100,
+                    //     type: 'info',
+                    // });
+                    this.dialogVisibleApplyForSearchText = response.Data
+                    this.dialogVisibleApplyForSearch = true
                 }else{
                     this.$message.error(response.Info)
                 }
@@ -455,7 +490,7 @@ export default{
             })
         })
         //获取房源
-        getHotHouseLists({Rows:5,Type:2}).then(response => {
+        getHotHouseLists({Rows:5,Type:1}).then(response => {
             switch(response.StatusCode){
                 case 500 :
                     this.$message.error('房源数据请求失败'+response.Info)
@@ -467,7 +502,6 @@ export default{
                         this.showHotHouseLists = true
                         this.swiperLists =response.Data
                     }
-
                 break;
             }
         }).catch(error =>{
@@ -529,7 +563,7 @@ export default{
                 break;
                 case 200 :
                     if(response.Data.Rows&&response.Data.Rows.length !=0){
-                        this.guide_listst = response.Data.Row
+                        this.guide_listst = response.Data.Rows
                     }else{
                         this.ShowGuide_listst = false
                     }
@@ -546,6 +580,25 @@ export default{
 }
 
 @media screen and (min-width: 450px) {
+    //退租续租弹框
+    .dialogVisibleRelet{
+        a{
+            height:40px;
+            line-height: 40px;
+            background-color: rgba(0, 150, 136, 0.2);
+            color:#009688;
+            display: block;
+            float: left;
+            width:40%;
+            text-align: center;
+            font-size:18px;
+            margin:0 5%;
+            &:hover{
+                color:#fff;
+                background-color:#009688;
+            }
+        }
+    }
     .fast_IDCard_entry{
         width:290px;
         top:20px;
@@ -785,6 +838,12 @@ export default{
     }
     /*新闻*/
     .index_news_lists{
+        .newslists_0{
+            width:100%!important;
+        }
+        .newslists_1{
+            height:100%!important;
+        }
         >a,>div{
             display: block;
             overflow: hidden;

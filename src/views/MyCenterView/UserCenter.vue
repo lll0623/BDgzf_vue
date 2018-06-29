@@ -324,6 +324,9 @@ export default {
 			mostMessage: false, // 个人信息loading
 			allMessage: false, // 全部个人信息loading
 			Sexs: [{
+				value: -1,
+				label: '请选择'
+			},{
 				value: 1,
 				label: '男'
 			}, {
@@ -332,6 +335,9 @@ export default {
 			}],
 			valueSex: '',
 			Culturals: [{
+				value: -1,
+				label: '请选择'
+			},{
 				value: 0,
 				label: '博士'
 			}, {
@@ -528,11 +534,19 @@ export default {
 		},
 		//手机号码修改按钮
 		updatePhone(type) {
+			this.updatePhone_phoneForm.ValidateCode_phone = "";
+			this.updatePhone_phoneForm.NewPhoneNum = "";
+			this.updatePhone_emailForm.ValidateCode_email = "";
+			this.updatePhone_emailForm.NewPhoneNum = "";
 			this.dialogPhoneOrEmail = true;
 			this.updateType = type;
 		},
 		//邮箱修改按钮
 		updateEmail(type) {
+			this.updateEmail_phoneForm.ValidateCode_phone = "";
+			this.updateEmail_phoneForm.NewEmailNum = "";
+			this.updateEmail_emailForm.ValidateCode_email = "";
+			this.updateEmail_emailForm.NewEmailNum = "";
 			this.dialogPhoneOrEmail = true;
 			this.updateType = type;
 		},
@@ -889,10 +903,12 @@ export default {
 		isShowEditBtn() {
 			this.isShowView = false;
 			this.isShowEdit = true;
-			this.valueSex = this.PersonalInformation.Sex; //性别多选框 特殊处理
-			this.valueCultural = parseInt((this.PersonalInformation.Cultural == '' || this.PersonalInformation.Cultural == 0) ? 0 : this.PersonalInformation.Cultural);
-			console.log(parseInt(this.PersonalInformation.MarryInfo));
-			this.valueMarryInfo = parseInt((this.PersonalInformation.MarryInfo == '' || this.PersonalInformation.MarryInfo == 0) ? 0 : this.PersonalInformation.MarryInfo);
+			this.valueSex = parseInt((this.PersonalInformation.Sex == '' || this.PersonalInformation.Sex == null) ? -1 : this.PersonalInformation.Sex); //性别多选框 特殊处理
+			console.log(parseInt(this.valueSex));
+			console.log(parseInt(this.PersonalInformation.Cultural));
+			this.valueCultural = parseInt(( this.PersonalInformation.Cultural == null) ? -1 : this.PersonalInformation.Cultural);
+			console.log(parseInt(this.valueCultural));
+			this.valueMarryInfo = parseInt((this.PersonalInformation.MarryInfo == '' || this.PersonalInformation.MarryInfo == 0 || this.PersonalInformation.MarryInfo == null) ? 0 : this.PersonalInformation.MarryInfo);
 		},
 		choosenSex() {
 			this.PersonalInformation.Sex = this.valueSex;
@@ -1006,21 +1022,6 @@ export default {
 }
 .yanzhengma_input {
     width: 190px;
-}
-.verification {
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: #053d84;
-    background: #f2f2f5 !important;
-    margin-left: 30px;
-    line-height: 37px;
-    height: 40px;
-    margin-top: -3px;
-    width: 100px;
-    border-radius: 3px;
-    vertical-align: middle;
-    transform: translate(-15px,0);
-    width: 102px;
 }
 .qrcode-img {
     height: auto;

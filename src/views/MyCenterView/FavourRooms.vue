@@ -122,7 +122,11 @@
                         switch(response.StatusCode){
                             case 200 :
                                 this.listsTotal = response.Data.Records
-                                this.FavourRooms = response.Data.Rows
+                                if(response.Data.Rows!=null && response.Data.Rows != ''){
+                                    this.FavourRooms = response.Data.Rows
+                                }else{
+                                    this.FavourRooms = []
+                                }
                                 setTimeout(()=>{
                                     this.loading = false
                                 },1000)

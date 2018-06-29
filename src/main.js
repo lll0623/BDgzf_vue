@@ -63,3 +63,6 @@ router.beforeEach((to,from,next) => {
         from.name ? next({ name:from.name }) : next('/');                                                                             //如果匹配到正确跳转
     }
 })
+router.afterEach((to,from,next) => {
+    window.scrollTo(0,0);
+})

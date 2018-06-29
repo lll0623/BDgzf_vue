@@ -9,10 +9,10 @@
 		</div>
 		<el-form :model="ruleForm" label-position="right" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
 			<el-form-item label="账户" prop="Account">
-				<el-input type="text" placeholder="请输入手机号或邮箱号" v-model="ruleForm.Account" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
+				<el-input type="tel" maxlength="11" placeholder="请输入手机号或邮箱号" v-model="ruleForm.Account" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
 			</el-form-item>
 			<el-form-item label="密码" prop="Password">
-				<el-input :type="this.ispassword" placeholder="请输入密码" v-model="ruleForm.Password" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
+				<el-input :type="this.ispassword" placeholder="请输入密码" v-model="ruleForm.Password" @keyup.32.native="inputFunc" auto-complete="off" @keyup.enter.native="submitForm('ruleForm')"></el-input>
 				<i :class="fa_eyes" aria-hidden="true" @keyup.enter.native="submitForm('ruleForm')" @click="changeType()" class="open_close"></i>
 			</el-form-item>
 			<el-form-item label="验证码" prop="VerifyCode" class="clearfix">
@@ -127,7 +127,8 @@ export default {
 			},
 			checkCode: '',
 			ispassword: "password",
-			fa_eyes: 'fa fa-eye-slash'
+			fa_eyes: 'fa fa-eye-slash',
+			fullPasd:''
 		};
 	},
 	beforeRouteEnter(to, from, next) {
@@ -143,6 +144,10 @@ export default {
 		this.$refs.loginBox.style.minHeight = (document.documentElement.clientHeight - document.getElementById('header').offsetHeight) + 'px'
 	},
 	methods: {
+		inputFunc() {
+			this.ruleForm.Password = this.ruleForm.Password.replace(/[\u4e00-\u9fa5]/g, '');
+			console.log(this.ruleForm.Password);
+		},
 		submitForm(formName) {
 			this.$refs[formName].validate((valid) => {
 				if (valid) {
@@ -162,7 +167,11 @@ export default {
 									message: '登录成功！'
 								});
 								// console.log(response.Data)
-								this.dialogVisible = true;
+								if(response.Data.OpenId == null || response.Data.OpenId == ''){
+									this.dialogVisible = true;
+								}else{
+									this.dialogVisible = false;
+								}
 								setCookie('userInfo',JSON.stringify(response.Data))
 								// this.$cookie.set('userInfo', JSON.stringify(response.Data))
 								this.$store.dispatch('SET_USERINFO', response.Data);
@@ -219,11 +228,16 @@ export default {
 }
 </script>
 <style lang="scss">
+.loginBackground {
+    display: flex;
+    background: url("http://tstres.lesoft.cn/menber/contents/images/userbg.jpg") no-repeat center;
+	background-size:cover;
+}
 #loginhEAD {
     .el-dialog__header {
         background: white !important;
     }
-}
+
 .box-card {
     width: 480px;
     margin: 60px auto;
@@ -281,11 +295,6 @@ export default {
     font-size: 20px;
     color: #009688;
 }
-.loginBackground {
-    display: flex;
-    background: url("http://tstres.lesoft.cn/menber/contents/images/userbg.jpg") no-repeat center;
-	background-size:cover;
-}
 .qrcode-img {
     height: auto;
     background: #fff;
@@ -342,5 +351,6 @@ export default {
 }
 .wapper {
     padding-bottom: 0!important;
+}
 }
 </style>

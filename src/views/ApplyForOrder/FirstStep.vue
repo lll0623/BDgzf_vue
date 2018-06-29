@@ -9,23 +9,23 @@
             label-width="140px"
             class="step01-ruleForm">
             <el-form-item label="性别" prop="sex">
-                <el-radio-group v-model="step01_Form.sex" :disabled = "userInfo.State != 1001 && userInfo.State != 1002" >
+                <el-radio-group v-model="step01_Form.sex" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1" >
                     <el-radio label="1">男</el-radio>
                     <el-radio label="2">女</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="民族" prop="nation">
-                <el-select v-model="step01_Form.nation" placeholder="请选择民族" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step01_Form.nation" placeholder="请选择民族" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option v-for="(item,index) in nationLists" :key="item.name"  :label="item.name" :value="item.name"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="文化程度" prop="culture">
-                <el-select v-model="step01_Form.culture" placeholder="请选择文化程度" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step01_Form.culture" placeholder="请选择文化程度" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option v-for="(item,index) in cultureLists" :key="item.name"  :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="婚姻状况" prop="marriage">
-                <el-select v-model="step01_Form.marriage" placeholder="请选择婚姻状况" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step01_Form.marriage" placeholder="请选择婚姻状况" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="未婚" value="1"></el-option>
                     <el-option label="已婚" value="2"></el-option>
                     <el-option label="离异" value="3"></el-option>
@@ -33,47 +33,47 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="户籍地址" prop="censusRegister">
-                <el-input v-model="step01_Form.censusRegister" placeholder="户籍地址请按照户口薄或户籍证明上面的地址填写" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step01_Form.censusRegister" maxLength="50" placeholder="户籍地址请按照户口薄或户籍证明上面的地址填写" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="固定电话" prop="fixTel">
-                <el-input v-model="step01_Form.fixTel"  placeholder="请输入固定电话" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step01_Form.fixTel"  placeholder="请输入固定电话" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="通讯地址" prop="telAddr">
-                <el-input v-model="step01_Form.telAddr" maxLength="11" placeholder="请输入通讯地址" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step01_Form.telAddr" maxLength="50" placeholder="请输入通讯地址" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="邮编" prop="postcode">
                 <el-input v-model="step01_Form.postcode" maxLength="11" placeholder="请输入邮编" clearable :disabled="userInfo.State != 1001 && userInfo.State != 1002"> </el-input>
             </el-form-item>
             <el-form-item label="社保信息" prop="socialInfo">
-                <el-checkbox-group v-model="step01_Form.socialInfo" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-checkbox-group v-model="step01_Form.socialInfo" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-checkbox label="已缴纳社保金" name="socialInfo"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item label="连续缴金是否满一年" prop="isOneYear" label-width="160">
-                <el-radio-group v-model="step01_Form.isOneYear" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step01_Form.isOneYear" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1" @change="isOneYearChange">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
                 <em class="fs12 red block">递送资料当月起前12个月连续缴纳，不得补交及暂停</em>
             </el-form-item>
             <el-form-item label="公积金信息" prop="localMoney">
-                <el-checkbox-group v-model="step01_Form.localMoney" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-checkbox-group v-model="step01_Form.localMoney" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-checkbox label="已缴纳本市公积金" name="localMoney"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item label="公积金账号" prop="localMoneyAccount">
-                <el-input v-model="step01_Form.localMoneyAccount" placeholder="请输入公积金账号" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step01_Form.localMoneyAccount" placeholder="请输入公积金账号" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1" @keyup.native="localMoneyAccountChange"></el-input>
             </el-form-item>
             <el-form-item label="居住证信息" prop="dwellInfo">
-                <el-checkbox-group v-model="step01_Form.dwellInfo" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-checkbox-group v-model="step01_Form.dwellInfo" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-checkbox label="已办理本市居住证" name="dwellInfo"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item label="居住证号码" prop="dwellCode">
-                <el-input v-model="step01_Form.dwellCode" placeholder="请输入居住证号码,多个居住证用逗号隔开" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step01_Form.dwellCode" placeholder="请输入居住证号码,多个居住证用逗号隔开" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1" @keyup.native="dwellCodeChange"></el-input>
             </el-form-item>
             <el-form-item label="居住证信息满两年" prop="isTwoYear" :label-width="formLabelWidth">
-                <el-radio-group v-model="step01_Form.isTwoYear" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step01_Form.isTwoYear" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1" @change="isisTwoYearChange">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
@@ -82,7 +82,7 @@
                 <el-upload class="upload-demo"
                     :class="{disabled:uploadDisabled}"
                     ref="upload"
-                    action="http://112.124.110.11:8043/api/Common/UploadFiles"
+                    action="http://112.124.110.11:8044/api/Common/UploadFiles"
                     :limit="2"
                     list-type="picture-card"
                     :on-remove="handleRemove"
@@ -91,7 +91,7 @@
                     :data="uploadIDCardImg"
                     :headers="headersData"
                     :on-success="uploadIDCardImgSuccess"
-                    :disabled = "userInfo.State != 1001 && userInfo.State != 1002"
+                    :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"
                     >
                     <i class="el-icon-plus"></i>
 
@@ -102,7 +102,7 @@
                 <el-upload class="upload-demo"
                     :class="{disabled:uploadDisabled2}"
                     ref="upload"
-                    action="http://112.124.110.11:8043/api/Common/UploadFiles"
+                    action="http://112.124.110.11:8044/api/Common/UploadFiles"
                     list-type="picture-card"
                     :on-remove="handleRemove"
                     :file-list="step01_Form.dwellImg"
@@ -110,14 +110,14 @@
                     :headers="headersData"
                     :data="uploadIDCardImg"
                     :on-success="uploadDwellImgSuccess"
-                    :disabled = "userInfo.State != 1001 && userInfo.State != 1002"
+                    :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"
                     >
                     <i class="el-icon-plus"></i>
                     <div slot="tip" class="fs12 red">注：《上海市居住证》持证年限包括之前持有《上海市临时居住证》年限（正反面），只能上传jpg/png文件，且不超过200kb</div>
                 </el-upload>
             </el-form-item>
             <!-- 下一步 -->
-            <el-form-item pro=agree v-show="userInfo.State ==1001 || userInfo.State==1002">
+            <el-form-item pro= 'agree' v-show="(userInfo.State ==1001 || userInfo.State==1002) && isUserEnter !=1">
                 <el-checkbox-group v-model="step01_Form.agree">
                     <el-checkbox label=""></el-checkbox>
                 </el-checkbox-group>
@@ -210,7 +210,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import { nationLists,cultureLists } from '../../../static/dataJson/dataJson'
-    import { generateMixed,setCookie } from '../../util'
+    import { generateMixed,setCookie,getCookie } from '../../util'
     import { getApplyFor,getApplyForInfo } from '../../api/api.js'
     export default{
         data(){
@@ -256,6 +256,7 @@
                     dwellImg:[],//居住证正反面
                     agree:'',//同意协议
                 },
+
                 uploadImg_all : [],
                 //表单验证
                 stepfir_rules : {
@@ -307,7 +308,7 @@
             }
         },
         computed:{
-            ...mapGetters(['applyForTab','userInfo']),
+            ...mapGetters(['applyForTab','userInfo','isUserEnter']),
             uploadIDCardImg(){
                 return {
                     'IsZip' : '0',
@@ -340,6 +341,37 @@
         },
 
         methods:{
+            //连续缴金是否满一年联动
+            isOneYearChange(){
+                this.step01_Form.socialInfo = ['已缴纳社保金']
+            },
+            //输入公积金联动
+            localMoneyAccountChange(){
+                if(this.step01_Form.localMoneyAccount != ''){
+                    this.step01_Form.localMoney = ['已缴纳本市公积金']
+                }
+                else{
+                    this.step01_Form.localMoney = []
+                }
+            },
+            //居住证信息联动
+            dwellCodeChange(){
+                if(this.step01_Form.dwellCode != ''){
+                    this.step01_Form.dwellInfo = ['已办理本市居住证']
+                    if(this.step01_Form.isTwoYear == '1'){
+                        this.step01_Form.isTwoYear = '1'
+                    }else{
+                        this.step01_Form.isTwoYear = '0'
+                    }
+
+                }else{
+                    this.step01_Form.dwellInfo = ['']
+                    this.step01_Form.isTwoYear = ''
+                }
+            },
+            isisTwoYearChange(){
+                this.step01_Form.dwellInfo = ['已办理本市居住证']
+            },
             handleRemove(file, fileList) {
                 this.step01_Form.IDCardImg = this.step01_Form.IDCardImg.filter(u => file.uid != u.uid)
                 this.step01_Form.dwellImg = this.step01_Form.dwellImg.filter(u => file.uid != u.uid)
@@ -381,7 +413,6 @@
                 if(this.step01_Form.IDCardImg.length >=2){
                     this.uploadDisabled = true
                 }
-                console.log(this.step01_Form.IDCardImg)
             },
             uploadDwellImgSuccess(file,fileList){
                 file.Data[0].FileName = '居住证'
@@ -397,7 +428,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                             //新增判断条件
-                            if((this.step01_Form.socialInfo.length == 0&&(this.step01_Form.isOneYear != '' && this.step01_Form.isOneYear != 0)) || (this.step01_Form.socialInfo.length != 0 && (this.step01_Form.isOneYear == '' || this.step01_Form.isOneYear == 0))){
+                            if((this.step01_Form.socialInfo.length == 0&&(this.step01_Form.isOneYear != '' && this.step01_Form.isOneYear != 0)) || (this.step01_Form.socialInfo.length != 0 && (this.step01_Form.isOneYear == ''))){
                                 this.$message.error('请完善社保信息')
                                 return false
                             }
@@ -436,7 +467,7 @@
                                 return false
                             }
                             if(!this.step01_Form.agree){
-                                this.$message.error('必须先同意申请须知')
+                                this.$message.error('请了解并同意申请须知')
                                 return false
                             }
                             this.dialogVisible = true
@@ -458,7 +489,7 @@
                 var params = {
                     step : 1,
                     bill: {
-                        SignType: '1',
+                        SignType: (this.step01_Form.isOneYear == 1 || this.step01_Form.censusRegister.indexOf('上海') != -1) ? '2' : '1',//按单位默认单位 （1单位，2个人）（1、上海户籍  2、居住证卡面上到申请之日已满2年，社保从申请当月倒推连续满12个月（补缴不算））,
                         code:this.$store.getters.applyForCode || '',
                         TelAddr:this.step01_Form.telAddr,
                         PostCode:this.step01_Form.postcode,
@@ -491,6 +522,7 @@
                     member:params.member,
                     filelist:params.filelist
                 }
+                // console.log(applyForData)
                 getApplyFor(params).then(response => {
                     switch (response.StatusCode) {
                         case 200:
@@ -526,7 +558,6 @@
             getApplyForInfoFunc(val){
                 this.loading = true
                 getApplyForInfo({Id:val}).then((response) =>{
-                    console.log(JSON.parse(response.Data))
                         if(response.StatusCode == 200) {
                             const member = JSON.parse(response.Data).member
                             const filelist = JSON.parse(response.Data).filelist
@@ -560,7 +591,7 @@
                             this.loading = false
                             //身份证按钮
                             this.uploadDisabled = true
-                            if(this.$store.getters.userInfo.State>=1003){
+                            if(this.$store.getters.userInfo.State>=1003 || this.$store.getters.isUserEnter ==1){
                                 this.uploadDisabled2 = true
                             }
                         }else if(response.StatusCode == 403){

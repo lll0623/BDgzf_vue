@@ -90,6 +90,7 @@ export default{
                 }
             });//滚动事件监听
         });
+        //获取消息
         if(this.$store.getters.userInfo){
             this.$store.dispatch('SET_ISREADORNOT', {
                 QueryJson:{

@@ -215,7 +215,11 @@
                             this.$message.error('小区列表请求失败'+response.Info)
                             break;
                         case 200:
-                            this.villageLists = response.Data.Rows
+                            if(response.Data.Rows == null || response.Data.Rows==[]){
+                                this.villageLists = []
+                            }else{
+                                this.villageLists= response.Data.Rows
+                            }
                             this.listsTotal = response.Data.Records
 
                     }

@@ -35,7 +35,7 @@
 							<p>
 								<span>{{item.Schedule | filterSchedule}}</span>
 								<el-tag v-if="item.State == 1">已通过</el-tag>
-								<el-tag type="warning" v-if="item.State == 0">审核中</el-tag>
+								<el-tag type="warning" v-if="item.State == 0">不通过</el-tag>
 								<el-tag type="danger" v-if="item.State == 2">已拒绝</el-tag>
 							</p>
 							<h5 :class="!isShowMore ? 'fold' : 'unfold'">{{item.Content}}</h5>

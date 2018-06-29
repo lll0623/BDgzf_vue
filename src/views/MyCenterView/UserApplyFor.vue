@@ -25,7 +25,7 @@
                 >
                 <el-table-column prop="SignType" header-align="center" align="center" label="申请类型" width="120" :formatter="formatSignType"></el-table-column>
                 <el-table-column prop="Code" header-align="center" align="center" label="申请单号" width="190"></el-table-column>
-                <el-table-column prop="Data" header-align="center" align="center" label="提交时间" width="190"></el-table-column>
+                <el-table-column prop="Data" header-align="center" align="center" sortable label="提交时间" width="190" :formatter="resetData"></el-table-column>
                 <el-table-column prop="State" header-align="center" align="center" label="审批结果" width="120">
                     <template slot-scope="scope">
                         <el-tag :type="filterFunc(scope.row)" disable-transitions>
@@ -706,7 +706,7 @@
 <script>
     import { getApplyForLists,getApplyForInfo,getContractDetail } from '../../api/api.js'
 	import moment from 'moment'
-    import { IEVersion } from '../../util'
+    import { IEVersion,formatDate } from '../../util'
     export default{
         data(){
             return {
@@ -731,6 +731,7 @@
 			pageSize: 1,
 
 			htmlTitle: '提交申请pdf',
+			pdfDom:'pdfDom', // pdf ID
 			//pdf表格
 			//个人情况
 			name: '',
@@ -890,6 +891,9 @@
 		}
 	},
 	methods: {
+		resetData(row,column){
+			return formatDate(new Date(row.Data),"yyyy-MM-dd hh:mm:ss")
+		},
 		filterFunc(val) {
 			if (val.State == '1') {
 				return 'primary'
@@ -1223,538 +1227,540 @@
     }
 </script>
 <style lang="scss">
-.download_pdf_wrapper {
-    position: fixed!important;
-    left: 50%;
-    top: 0;
-    margin-left: -585px;
-    opacity: 0!important;
-    z-index: -1;
-    filter:alpha(opacity=0);
-    .el-radio__input.is-disabled .el-radio__inner {
-        border-color: #333!important;
-    }
-    .el-radio__input.is-disabled.is-checked .el-radio__inner::after {
-        background-color: #333;
-    }
-    .el-radio__label {
-        color: #333!important;
-    }
-    .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
-        border-color: #333;
-    }
-    .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
-        background-color: #fff;
-        border-color: #333;
-    }
-    .el-checkbox__input.is-disabled .el-checkbox__inner {
-        background-color: #fff;
-        border-color: #333;
-        cursor: not-allowed;
-    }
-    .el-checkbox__input.is-disabled + span.el-checkbox__label {
-        font-size: 16px;
-        color: #333;
-        cursor: not-allowed;
-    }
-    .el-checkbox-group {
-        display: inline-block;
-    }
-    .el-checkbox__inner::after {
-        -webkit-box-sizing: content-box;
-        box-sizing: content-box;
-        content: "";
-        border: 6px solid #fff;
-        border-left: 0;
-        border-top: 0;
-        height: 13px;
-        left: 7px;
-        position: absolute;
-        top: -13px;
-        -webkit-transform: rotate(45deg) scaleY(0);
-        transform: rotate(45deg) scaleY(0);
-        width: 3px;
-        -webkit-transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
-        transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
-        transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
-        transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s, -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
-        -webkit-transform-origin: center;
-        transform-origin: center;
-    }
-    padding: 20px 0;
-    .download_pdf {
-        margin: 0 auto;
-        width: 1170px;
-        background: url("../../assets/images/shuiyin.png") #fff;
-        background-size: 80% auto;
-        > div {
-            > h6 {
-                bottom: 20px;
-                left: 50%;
-                margin-left: -19px;
-                font-size: 16px;
-            }
-        }
-    }
-    .first_page_wrapper {
-        height: 1636px;
-        padding: 20px 0 0;
-        > h4 {
-            padding: 10px 0 20px;
-        }
-        > .first_page {
-            width: 1100px;
-            margin: 0 auto;
-            border: 1px solid #333;
-            > .first_page_1 {
-                > h4 {
-                    padding: 50px 4px;
-                    writing-mode: tb-rl;
-                    font-size: 16px;
-                }
-                > div {
-                    width: 1067px;
-                    ul {
-                        border-left: 1px solid #333;
-                        border-bottom: 1px solid #333;
-                        li {
-                            font-size: 16px;
-                            text-align: center;
-                            border-right: 1px solid #333;
-                            width: 172px;
-                            min-height: 22px;
-                            padding: 22px 0;
-                            &.last_child {
-                                border-right: none;
-                            }
-                        }
-                    }
-                    ul.fir_row {
-                        }
-                    ul.sec_row {
-                        border-bottom: 1px solid #333;
-                        li {
-                            &:last-child {
-                                width: 800px;
-                            }
-                        }
-                    }
-                    ul.thi_row {
-                        border-bottom: 1px solid #333;
-                        li {
-                            &:first-child {
-                                width: 172px;
-                            }
-                            &:nth-of-type(19) {
-                                border-right: 0;
-                            }
-                            width: 48.5px;
-                            height: 20px;
-                            font-size: 18px;
-                        }
-                    }
-                    ul.four_row {
-                        li {
-                            &:nth-of-type(2) {
-                                width: 850px;
-                                .el-checkbox-group {
-                                    width: 650px;
-                                    label {
-                                        margin-left: 12px;
-                                    }
-                                }
-                                .other {
-                                    input {
-                                        border-bottom: 1px solid #333;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    ul.fif_row {
-                        li {
-                            height: 36px;
-                            &:nth-of-type(2) {
-                                margin-right: 0;
-                                width: 850px;
-                                .el-radio-group {
-                                    .el-radio {
-                                        margin-bottom: 4px;
-                                    }
-                                }
-                                .other {
-                                    display: inline-block;
-                                    width: 200px;
-                                }
-                            }
-                        }
-                    }
-                    ul.six_row {
-                        li {
-                            height: 44px;
-                            line-height: 44px;
-                            &:nth-of-type(2n) {
-                                width: 300px;
-                            }
-                            &:nth-of-type(1) {
-                                line-height: normal;
-                            }
-                        }
-                    }
-                    ul.sev_row {
-                        border-bottom: none;
-                        li {
-                            padding: 0;
-                            height: 80px;
-                            text-align: justify;
-                            &:nth-of-type(1) {
-                                line-height: 80px;
-                                text-align: center;
-                            }
-                            &:nth-of-type(2),
-                            &:nth-of-type(3) {
-                                width: 445px;
-                                > div {
-                                    height: 40px;
-                                    line-height: 40px;
-                                    border-bottom: 1px solid #333;
-                                    > label {
-                                        text-align: center;
-                                        display: inline-block;
-                                        width: 120px;
-                                        height: 40px;
+.applyFor-wrap{
+	.download_pdf_wrapper {
+	    position: fixed!important;
+	    left: 50%;
+	    top: 0;
+	    margin-left: -585px;
+	    opacity: 0!important;
+	    z-index: -1;
+	    filter:alpha(opacity=0);
+	    .el-radio__input.is-disabled .el-radio__inner {
+	        border-color: #333!important;
+	    }
+	    .el-radio__input.is-disabled.is-checked .el-radio__inner::after {
+	        background-color: #333;
+	    }
+	    .el-radio__label {
+	        color: #333!important;
+	    }
+	    .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
+	        border-color: #333;
+	    }
+	    .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
+	        background-color: #fff;
+	        border-color: #333;
+	    }
+	    .el-checkbox__input.is-disabled .el-checkbox__inner {
+	        background-color: #fff;
+	        border-color: #333;
+	        cursor: not-allowed;
+	    }
+	    .el-checkbox__input.is-disabled + span.el-checkbox__label {
+	        font-size: 16px;
+	        color: #333;
+	        cursor: not-allowed;
+	    }
+	    .el-checkbox-group {
+	        display: inline-block;
+	    }
+	    .el-checkbox__inner::after {
+	        -webkit-box-sizing: content-box;
+	        box-sizing: content-box;
+	        content: "";
+	        border: 6px solid #fff;
+	        border-left: 0;
+	        border-top: 0;
+	        height: 13px;
+	        left: 7px;
+	        position: absolute;
+	        top: -13px;
+	        -webkit-transform: rotate(45deg) scaleY(0);
+	        transform: rotate(45deg) scaleY(0);
+	        width: 3px;
+	        -webkit-transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+	        transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+	        transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+	        transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s, -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+	        -webkit-transform-origin: center;
+	        transform-origin: center;
+	    }
+	    padding: 20px 0;
+	    .download_pdf {
+	        margin: 0 auto;
+	        width: 1170px;
+	        background: url("../../assets/images/shuiyin.png") #fff;
+	        background-size: 80% auto;
+	        > div {
+	            > h6 {
+	                bottom: 20px;
+	                left: 50%;
+	                margin-left: -19px;
+	                font-size: 16px;
+	            }
+	        }
+	    }
+	    .first_page_wrapper {
+	        height: 1636px;
+	        padding: 20px 0 0;
+	        > h4 {
+	            padding: 10px 0 20px;
+	        }
+	        > .first_page {
+	            width: 1100px;
+	            margin: 0 auto;
+	            border: 1px solid #333;
+	            > .first_page_1 {
+	                > h4 {
+	                    padding: 50px 4px;
+	                    writing-mode: tb-rl;
+	                    font-size: 16px;
+	                }
+	                > div {
+	                    width: 1067px;
+	                    ul {
+	                        border-left: 1px solid #333;
+	                        border-bottom: 1px solid #333;
+	                        li {
+	                            font-size: 16px;
+	                            text-align: center;
+	                            border-right: 1px solid #333;
+	                            width: 172px;
+	                            min-height: 22px;
+	                            padding: 22px 0;
+	                            &.last_child {
+	                                border-right: none;
+	                            }
+	                        }
+	                    }
+	                    ul.fir_row {
+	                        }
+	                    ul.sec_row {
+	                        border-bottom: 1px solid #333;
+	                        li {
+	                            &:last-child {
+	                                width: 800px;
+	                            }
+	                        }
+	                    }
+	                    ul.thi_row {
+	                        border-bottom: 1px solid #333;
+	                        li {
+	                            &:first-child {
+	                                width: 172px;
+	                            }
+	                            &:nth-of-type(19) {
+	                                border-right: 0;
+	                            }
+	                            width: 48.5px;
+	                            height: 20px;
+	                            font-size: 18px;
+	                        }
+	                    }
+	                    ul.four_row {
+	                        li {
+	                            &:nth-of-type(2) {
+	                                width: 850px;
+	                                .el-checkbox-group {
+	                                    width: 650px;
+	                                    label {
+	                                        margin-left: 12px;
+	                                    }
+	                                }
+	                                .other {
+	                                    input {
+	                                        border-bottom: 1px solid #333;
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    }
+	                    ul.fif_row {
+	                        li {
+	                            height: 36px;
+	                            &:nth-of-type(2) {
+	                                margin-right: 0;
+	                                width: 850px;
+	                                .el-radio-group {
+	                                    .el-radio {
+	                                        margin-bottom: 4px;
+	                                    }
+	                                }
+	                                .other {
+	                                    display: inline-block;
+	                                    width: 200px;
+	                                }
+	                            }
+	                        }
+	                    }
+	                    ul.six_row {
+	                        li {
+	                            height: 44px;
+	                            line-height: 44px;
+	                            &:nth-of-type(2n) {
+	                                width: 300px;
+	                            }
+	                            &:nth-of-type(1) {
+	                                line-height: normal;
+	                            }
+	                        }
+	                    }
+	                    ul.sev_row {
+	                        border-bottom: none;
+	                        li {
+	                            padding: 0;
+	                            height: 80px;
+	                            text-align: justify;
+	                            &:nth-of-type(1) {
+	                                line-height: 80px;
+	                                text-align: center;
+	                            }
+	                            &:nth-of-type(2),
+	                            &:nth-of-type(3) {
+	                                width: 445px;
+	                                > div {
+	                                    height: 40px;
+	                                    line-height: 40px;
+	                                    border-bottom: 1px solid #333;
+	                                    > label {
+	                                        text-align: center;
+	                                        display: inline-block;
+	                                        width: 120px;
+	                                        height: 40px;
 
-                                        border-right: 1px solid #333;
-                                    }
-                                    > span {
-                                        text-align: center;
-                                        width: 270px;
-                                        height: 40px;
-                                        display: inline-block;
-                                    }
-                                }
-                            }
-                            &:nth-of-type(3) {
-                                > div {
-                                    > label {
-                                        line-height: normal;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            > .first_page_2 {
-                > h4 {
-                    padding: 21px 4px;
-                }
-                border-top: 1px solid #333;
-                ul.sec_row {
-                    li {
-                        &:last-child {
-                            width: 480px!important;
-                        }
-                    }
-                }
-                ul.thi_row {
-                    border-bottom: none!important;
-                }
-            }
-            > .first_page_3 {
-                border-top: 1px solid #333;
-                padding: 20px 40px;
-                font-size: 16px;
-                > p {
-                    text-indent: 2em;
-                    line-height: 48px;
-                    font-size: 16px;
-                    > span {
-                        display: inline-block;
-                        width: auto;
-                        height: 32px;
-                        border-bottom: 1px solid #333;
-                    }
-                    .el-checkbox-group {
-                        display: inline-block;
-                        border-bottom: 1px solid #333;
-                        height: 28px;
-                        > .el-checkbox {
-                            height: 28px;
-                            line-height: 28px;
-                            width: 100px;
-                            .el-checkbox__input {
-                                position: relative;
-                                left: -54px;
-                                width: 30px;
-                            }
-                            .el-checkbox__label {
-                                width: 65px;
-                                position: relative;
-                                left: -65px;
-                            }
-                        }
-                    }
-                }
-                h5 {
-                    width: 80%;
-                    font-size: 16px;
-                }
-            }
-        }
-    }
-    .tip {
-        padding: 20px 60px;
-        p {
-            font-size: 16px;
-        }
-    }
-    .second_page_wrapper {
-        height: 1656px;
-        > h4 {
-            padding: 20px;
-        }
-        .second_page {
-            width: 1100px;
-            margin: 0 auto;
-            border: 1px solid #333;
-            .section_one {
-                > h4 {
-                    padding: 20px 0;
-                    border-bottom: 1px solid #333;
-                }
-                > ul {
-                    border-bottom: 1px solid #333;
-                    li {
-                        font-size: 16px;
-                        float: left;
-                        padding: 20px 0;
-                        min-height: 22px;
-                        width: 190px;
-                        text-align: center;
-                        border-right: 1px solid #333;
-                        &.nth_1 {
-                            height: 54px;
-                            line-height: 54px;
-                        }
-                        &.nth_2 {
-                            width: 386px;
-                        }
-                        &.nth_3 {
-                            width: 330px;
-                        }
-                        &.last_child {
-                            border-right: none;
-                        }
-                    }
-                    &.last_child {
-                        border-bottom: none;
-                    }
-                    &.fir_ul {
-                        li {
-                            &.last_child {
-                                > span {
-                                    display: inline-block;
-                                    width: 100px;
-                                    border-bottom: 1px solid #333;
-                                    bottom: -4px;
-                                    position: relative;
-                                }
-                            }
-                        }
-                    }
-                    &.sec_ul {
-                        li {
-                            &.nth_2 {
-                                width: 600px;
-                            }
-                        }
-                    }
-                    &.thi_ul {
-                        li {
-                            &.nth_2 {
-                                text-align: left;
-                                width: 900px;
-                                > div {
-                                    width: 648px;
-                                    margin-left: 40px;
-                                    .el-checkbox {
-                                        margin-bottom: 8px;
-                                    }
-                                    &.remark {
-                                        width: 140px;
-                                        display: inline-block;
-                                        span {
-                                            display: inline-block;
-                                            width: 80px;
-                                            border-bottom: 1px solid #333;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    .third_page_wrapper {
-        height: 1656px;
-        > h4 {
-            padding: 40px 0;
-        }
-        .third_page {
-            width: 900px;
-            margin: 0 auto;
-            > p {
-                text-indent: 2em;
-                font-size: 26px;
-                line-height: 50px;
-                margin-bottom: 20px;
-            }
-            > ul {
-                border: 1px solid #333;
-                text-align: center;
-                li {
-                    height: 50px;
-                    line-height: 50px;
-                    border: 1px solid #333;
-                    span {
-                        display: block;
-                        float: left;
-                        width: 297px;
-                        height: 50px;
-                        font-size: 24px;
-                        border-right: 1px solid #333;
-                        &.last_child {
-                            border-right: none;
-                        }
-                    }
-                }
-            }
-            &.chengnuoshu {
-                > p {
-                    > span {
-                        display: inline-block;
-                        position: relative;
-                    }
-                    &.nth_3 {
-                        padding-top: 120px;
-                        > span {
-                            width: 200px;
-                            border-bottom: 1px solid #333;
-                            height: 20px;
-                            top: 6px;
-                        }
-                    }
-                    &.nth_4 {
-                        > span {
-                            width: 90px;
-                            height: 20px;
-                        }
-                    }
-                    &.nth_5 {
-                        padding: 60px 0;
-                        margin-bottom: 0;
-                        font-size: 22px;
-                    }
-                }
-            }
-        }
-    }
-    .fourth_page_wrapper {
-        height: 1656px;
-        .fourth_page {
-            width: 900px;
-            margin: 0 auto;
-            padding-top: 100px;
-            > h4 {
-                padding: 150px 0 220px;
-            }
-            p {
-                font-size: 26px;
-                &.nth_1 {
-                    > span {
-                        min-width: 180px;
-                        height: 20px;
-                    }
-                }
-                &.nth_2 {
-                    padding: 540px 0 20px;
-                }
-                &.nth_3 {
-                    padding: 0 0 60px;
-                }
-            }
-            ul {
-                li {
-                    font-size: 26px;
-                    margin-bottom: 30px;
-                    > span {
-                        display: inline-block;
-                        height: 32px;
-                        position: relative;
-                        top: 0;
-                        margin-right: 40px;
-                        border-bottom: 1px solid #333;
-                    }
-                    &.nth_1 {
-                        span {
-                            width: 490px;
-                        }
-                    }
-                    &.nth_2 {
-                        span {
-                            width: 698px;
-                        }
-                    }
-                    &.nth_3 {
-                        span {
-                            width: 688px;
-                            &.nth_1 {
-                                width: 490px;
-                            }
-                            &.nth_2 {
-                                width: 120px;
-                            }
-                        }
-                    }
-                    &.nth_4 {
-                        span {
-                            width: 688px;
-                            &.nth_1 {
-                                width: 280px;
-                            }
-                            &.nth_2 {
-                                width: 280px;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-#applynoHead .el-dialog .el-dialog__header {
-    background: white !important;
-}
-.applyBody {
-    width: 960px;
-    padding: 0px 30px;
-    margin: -25px auto -10px;
-}
-.retreatTable tbody td {
-    border: 1px solid rgb(219, 219, 219);
-    padding: 8px;
-}
-.primary-button {
-    background: #009688 !important;
-    border-color: #009688 !important;
-    color: white !important;
-    &:hover {
-        background: #18ab9d !important;
-        border-color: #18ab9d !important;
-        color: white !important;
-    }
+	                                        border-right: 1px solid #333;
+	                                    }
+	                                    > span {
+	                                        text-align: center;
+	                                        width: 270px;
+	                                        height: 40px;
+	                                        display: inline-block;
+	                                    }
+	                                }
+	                            }
+	                            &:nth-of-type(3) {
+	                                > div {
+	                                    > label {
+	                                        line-height: normal;
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	            > .first_page_2 {
+	                > h4 {
+	                    padding: 21px 4px;
+	                }
+	                border-top: 1px solid #333;
+	                ul.sec_row {
+	                    li {
+	                        &:last-child {
+	                            width: 480px!important;
+	                        }
+	                    }
+	                }
+	                ul.thi_row {
+	                    border-bottom: none!important;
+	                }
+	            }
+	            > .first_page_3 {
+	                border-top: 1px solid #333;
+	                padding: 20px 40px;
+	                font-size: 16px;
+	                > p {
+	                    text-indent: 2em;
+	                    line-height: 48px;
+	                    font-size: 16px;
+	                    > span {
+	                        display: inline-block;
+	                        width: auto;
+	                        height: 32px;
+	                        border-bottom: 1px solid #333;
+	                    }
+	                    .el-checkbox-group {
+	                        display: inline-block;
+	                        border-bottom: 1px solid #333;
+	                        height: 28px;
+	                        > .el-checkbox {
+	                            height: 28px;
+	                            line-height: 28px;
+	                            width: 100px;
+	                            .el-checkbox__input {
+	                                position: relative;
+	                                left: -54px;
+	                                width: 30px;
+	                            }
+	                            .el-checkbox__label {
+	                                width: 65px;
+	                                position: relative;
+	                                left: -65px;
+	                            }
+	                        }
+	                    }
+	                }
+	                h5 {
+	                    width: 80%;
+	                    font-size: 16px;
+	                }
+	            }
+	        }
+	    }
+	    .tip {
+	        padding: 20px 60px;
+	        p {
+	            font-size: 16px;
+	        }
+	    }
+	    .second_page_wrapper {
+	        height: 1656px;
+	        > h4 {
+	            padding: 20px;
+	        }
+	        .second_page {
+	            width: 1100px;
+	            margin: 0 auto;
+	            border: 1px solid #333;
+	            .section_one {
+	                > h4 {
+	                    padding: 20px 0;
+	                    border-bottom: 1px solid #333;
+	                }
+	                > ul {
+	                    border-bottom: 1px solid #333;
+	                    li {
+	                        font-size: 16px;
+	                        float: left;
+	                        padding: 20px 0;
+	                        min-height: 22px;
+	                        width: 190px;
+	                        text-align: center;
+	                        border-right: 1px solid #333;
+	                        &.nth_1 {
+	                            height: 54px;
+	                            line-height: 54px;
+	                        }
+	                        &.nth_2 {
+	                            width: 386px;
+	                        }
+	                        &.nth_3 {
+	                            width: 330px;
+	                        }
+	                        &.last_child {
+	                            border-right: none;
+	                        }
+	                    }
+	                    &.last_child {
+	                        border-bottom: none;
+	                    }
+	                    &.fir_ul {
+	                        li {
+	                            &.last_child {
+	                                > span {
+	                                    display: inline-block;
+	                                    width: 100px;
+	                                    border-bottom: 1px solid #333;
+	                                    bottom: -4px;
+	                                    position: relative;
+	                                }
+	                            }
+	                        }
+	                    }
+	                    &.sec_ul {
+	                        li {
+	                            &.nth_2 {
+	                                width: 600px;
+	                            }
+	                        }
+	                    }
+	                    &.thi_ul {
+	                        li {
+	                            &.nth_2 {
+	                                text-align: left;
+	                                width: 900px;
+	                                > div {
+	                                    width: 648px;
+	                                    margin-left: 40px;
+	                                    .el-checkbox {
+	                                        margin-bottom: 8px;
+	                                    }
+	                                    &.remark {
+	                                        width: 140px;
+	                                        display: inline-block;
+	                                        span {
+	                                            display: inline-block;
+	                                            width: 80px;
+	                                            border-bottom: 1px solid #333;
+	                                        }
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    .third_page_wrapper {
+	        height: 1656px;
+	        > h4 {
+	            padding: 40px 0;
+	        }
+	        .third_page {
+	            width: 900px;
+	            margin: 0 auto;
+	            > p {
+	                text-indent: 2em;
+	                font-size: 26px;
+	                line-height: 50px;
+	                margin-bottom: 20px;
+	            }
+	            > ul {
+	                border: 1px solid #333;
+	                text-align: center;
+	                li {
+	                    height: 50px;
+	                    line-height: 50px;
+	                    border: 1px solid #333;
+	                    span {
+	                        display: block;
+	                        float: left;
+	                        width: 297px;
+	                        height: 50px;
+	                        font-size: 24px;
+	                        border-right: 1px solid #333;
+	                        &.last_child {
+	                            border-right: none;
+	                        }
+	                    }
+	                }
+	            }
+	            &.chengnuoshu {
+	                > p {
+	                    > span {
+	                        display: inline-block;
+	                        position: relative;
+	                    }
+	                    &.nth_3 {
+	                        padding-top: 120px;
+	                        > span {
+	                            width: 200px;
+	                            border-bottom: 1px solid #333;
+	                            height: 20px;
+	                            top: 6px;
+	                        }
+	                    }
+	                    &.nth_4 {
+	                        > span {
+	                            width: 90px;
+	                            height: 20px;
+	                        }
+	                    }
+	                    &.nth_5 {
+	                        padding: 60px 0;
+	                        margin-bottom: 0;
+	                        font-size: 22px;
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    .fourth_page_wrapper {
+	        height: 1656px;
+	        .fourth_page {
+	            width: 900px;
+	            margin: 0 auto;
+	            padding-top: 100px;
+	            > h4 {
+	                padding: 150px 0 220px;
+	            }
+	            p {
+	                font-size: 26px;
+	                &.nth_1 {
+	                    > span {
+	                        min-width: 180px;
+	                        height: 20px;
+	                    }
+	                }
+	                &.nth_2 {
+	                    padding: 540px 0 20px;
+	                }
+	                &.nth_3 {
+	                    padding: 0 0 60px;
+	                }
+	            }
+	            ul {
+	                li {
+	                    font-size: 26px;
+	                    margin-bottom: 30px;
+	                    > span {
+	                        display: inline-block;
+	                        height: 32px;
+	                        position: relative;
+	                        top: 0;
+	                        margin-right: 40px;
+	                        border-bottom: 1px solid #333;
+	                    }
+	                    &.nth_1 {
+	                        span {
+	                            width: 490px;
+	                        }
+	                    }
+	                    &.nth_2 {
+	                        span {
+	                            width: 698px;
+	                        }
+	                    }
+	                    &.nth_3 {
+	                        span {
+	                            width: 688px;
+	                            &.nth_1 {
+	                                width: 490px;
+	                            }
+	                            &.nth_2 {
+	                                width: 120px;
+	                            }
+	                        }
+	                    }
+	                    &.nth_4 {
+	                        span {
+	                            width: 688px;
+	                            &.nth_1 {
+	                                width: 280px;
+	                            }
+	                            &.nth_2 {
+	                                width: 280px;
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+	#applynoHead .el-dialog .el-dialog__header {
+	    background: white !important;
+	}
+	.applyBody {
+	    width: 960px;
+	    padding: 0px 30px;
+	    margin: -25px auto -10px;
+	}
+	.retreatTable tbody td {
+	    border: 1px solid rgb(219, 219, 219);
+	    padding: 8px;
+	}
+	.primary-button {
+	    background: #009688 !important;
+	    border-color: #009688 !important;
+	    color: white !important;
+	    &:hover {
+	        background: #18ab9d !important;
+	        border-color: #18ab9d !important;
+	        color: white !important;
+	    }
+	}
 }
 </style>

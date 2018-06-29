@@ -183,75 +183,66 @@
             },
             //判断续租申请页面
             hasRelet(path) {
-                let State = this.$store.getters.userInfo.State;
-                if(State == 1011) {
-                    this.$alert('当前正在退租中，等待管理员审核！', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
-                if(State == 1012) {
-                    this.$alert('当前正在续租中，等待管理员审核！', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
-                let params = {
-                    Id:this.$store.getters.userInfo.AccountId
-                }
-                // 获取合同详情接口
-                let contractData;
-                getContractDetail(params).then((response) => {
-                    contractData =  response.Data; // 合同数据
-                })
-                // 判断否有合同
-                if(contractData == null || contractData == "") {
-                    this.$alert('当前暂无租赁合同', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
+                if(this.$store.getters.userInfo){
+                    // 获取合同详情接口
+                    let contractData;
+                    let params = {
+                        Id:this.$store.getters.userInfo.AccountId
+                    }
+                    getContractDetail(params).then((response) => {
+                        contractData =  response.Data; // 合同数据
+                        let State = this.$store.getters.userInfo.State;
+                        if(State == 1011) {
+                            this.$alert('当前正在续租中，等待管理员审核！', '提示', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                              }
+                            });
+                            return;
+                        }
+                        if(State == 1012) {
+                            this.$alert('当前正在退租中，等待管理员审核！', '提示', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                              }
+                            });
+                            return;
+                        }
+
+                        // 判断否有合同
+                        if(State !== 1010) {
+                            this.$alert('当前暂无有效租赁合同', '提示', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                              }
+                            });
+                            return;
+                        }
+
+                        // 判断时间范围
+                        let diffMonth = this.monthDiff (JSON.parse(contractData).cdw.EndDate);
+                        moment.locale('zh-cn'); //日期格式汉化
+                        this.relet_s = moment(new Date(JSON.parse(contractData).cdw.EndDate)).subtract(4, 'months').format("LL");
+                        this.relet_e = moment(new Date(JSON.parse(contractData).cdw.EndDate)).subtract(2, 'months').format("LL");
+                        if(diffMonth >4 || diffMonth<2){  //relet昨34完改成4
+                            this.$alert('只能在 '+this.relet_s+' 和 '+this.relet_e+' 之间才能申请续租！', '提示', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                              }
+                            });
+                            return;
+                        }
+                        this.$router.push({path:'/relet'})
+                    })
+                }else {
+                    this.$router.push("/login");
                 }
 
-                // 判断时间范围
-                let diffMonth = this.monthDiff (JSON.parse(contractData).cdw.EndDate);
-                moment.locale('zh-cn'); //日期格式汉化
-                this.relet_s = moment(new Date(JSON.parse(contractData).cdw.EndDate)).subtract(4, 'months').format("LL");
-                this.relet_e = moment(new Date(JSON.parse(contractData).cdw.EndDate)).subtract(2, 'months').format("LL");
-                if(diffMonth >4 || diffMonth<2){  //relet昨34完改成4
-                    this.$alert('只能在 '+this.relet_s+' 和 '+this.relet_e+' 之间才能申请续租！', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
-                this.$router.push({path:'/relet'})
+
             },
             // //判断退租申请页面
             hasRetreat(path) {
-                let State = this.$store.getters.userInfo.State;
-                if(State == 1011) {
-                    this.$alert('当前正在退租中，等待管理员审核！', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
-                if(State == 1012) {
-                    this.$alert('当前正在续租中，等待管理员审核！', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
+                if(this.$store.getters.userInfo){
                 let params = {
                     Id:this.$store.getters.userInfo.AccountId
                 }
@@ -259,17 +250,38 @@
                 let contractData;
                 getContractDetail(params).then((response) => {
                     contractData = response.Data; // 合同数据
+                    let State = this.$store.getters.userInfo.State;
+                    if(State == 1011) {
+                        this.$alert('当前正在退租中，等待管理员审核！', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                          }
+                        });
+                        return;
+                    }
+                    if(State == 1012) {
+                        this.$alert('当前正在续租中，等待管理员审核！', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                          }
+                        });
+                        return;
+                    }
+
+                    // 判断否有合同
+                    if(contractData == null || contractData == "") {
+                        this.$alert('当前暂无租赁合同', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                          }
+                        });
+                        return;
+                    }
+                    this.$router.push({path:'/retreat'})
                 })
-                // 判断否有合同
-                if(contractData == null || contractData == "") {
-                    this.$alert('当前暂无租赁合同', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                      }
-                    });
-                    return;
-                }
-                this.$router.push({path:'/retreat'})
+            }else{
+                this.$router.push("/login");
+            }
             },
             dateDiff (sDate1) {
                 var date2 = new Date();
@@ -285,7 +297,7 @@
             },
             //身份证补全
             submit_IDCard(){
-                var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
                 if(this.input_IDCard == ''){
                     this.$message.warning('请输入您的身份证号码！')
                     return false

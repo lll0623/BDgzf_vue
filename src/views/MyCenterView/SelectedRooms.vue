@@ -141,34 +141,46 @@
             },
             //网签合同
             getSignContractFunc(index,row){
-                var params = {
-                    AccountId: this.$store.getters.userInfo.AccountId,
-                    RoomId : row.roomid,
-                    SelectId : row.id,
-                }
-                getSignContract(params).then(response=>{
-                    console.log(response.Data)
-                    switch(response.StatusCode){
-                        case 200 :
-                            this.$store.commit('SET_STEPTIP','1009');
-                            this.getChooseRoomListsFunc()
-                            this.$message({
-                                type: 'success',
-                                message: '签约成功'
-                            });
-                            setTimeout(()=>{
-                                this.loading = false
-                            },1000)
-                        break;
-                        case 500 :
-                            this.$message.error(response.Info)
-                        break;
-                        default:
-                            this.$message.error(response.Info)
+                this.$confirm('是否确定签约?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    debugger
+                    var params = {
+                        AccountId: this.$store.getters.userInfo.AccountId,
+                        RoomId : row.roomid,
+                        SelectId : row.id,
                     }
-                }).catch(error => {
-                    this.$message.error(erro)
-                })
+                    getSignContract(params).then(response=>{
+                        // console.log(response.Data)
+                        switch(response.StatusCode){
+                            case 200 :
+                                this.$store.commit('SET_STEPTIP','1009');
+                                this.getChooseRoomListsFunc()
+                                this.$message({
+                                    type: 'success',
+                                    message: '签约成功'
+                                });
+                                setTimeout(()=>{
+                                    this.loading = false
+                                },1000)
+                            break;
+                            case 500 :
+                                this.$message.error(response.Info)
+                            break;
+                            default:
+                                this.$message.error(response.Info)
+                        }
+                    }).catch(error => {
+                        this.$message.error(erro)
+                    })
+                }).catch(() => {
+                    // this.$message({
+                    //     type: 'info',
+                    //     message: '已取消删除'
+                    // });
+                });
             },
         },
         created(){

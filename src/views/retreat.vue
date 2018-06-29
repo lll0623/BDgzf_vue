@@ -17,7 +17,7 @@
                     <h2 class="tc" style="margin-bottom:10px;">退租申请</h2>
                     <div class="clearfix" style="margin-bottom:10px;">
                         <div class="clearfix">
-                            <el-tag v-show="this.Category = 0" type="danger">即将到期</el-tag>
+                            <el-tag v-show="this.Category == 0" type="danger">即将到期</el-tag>
                             <div class="pull-right" style="margin-top:15px">
                                 <p class="pull-left" style="margin-right:20px;margin-left:20px;">
                                     <span>合同编号：</span>
@@ -61,7 +61,7 @@
                         <td>{{ dialogInfo_cpi.RoomArea }}</td>
 
                         <td>户型：</td>
-                        <td>{{ dialogInfo_cpi.RoomType }}</td>
+                        <td>{{ dialogInfo_cpi.RoomType | RoomTypeFunc }}</td>
 
                         <td>每月租金：</td>
                         <td>{{ dialogInfo_cdw.MontylyRent }}</td>
@@ -84,8 +84,8 @@
                       <tr>
                         <td style="width: 15%;">退租类型：</td>
                         <td style="width: 35%;">
-                          <span v-if="this.Category = 0">到期退租</span>
-                          <span v-if="this.Category = 1">提前退租</span>
+                          <span v-if="this.Category == 0">到期退租</span>
+                          <span v-if="this.Category == 1">提前退租</span>
                         </td>
                         <td style="width: 15%;">
                           租赁终止日期：
@@ -95,6 +95,7 @@
                             v-model="ReLeaseDate"
                             :default-value="timeDefaultShow"
                             type="date"
+                            :disabled="(this.Category == 0) ? true : false"
                             :picker-options="pickerOptions0"
                             format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -170,6 +171,9 @@ data() {
         ContractId:''
 	}
 },
+computed:{
+    ...mapGetters(['userInfo'])
+},
 counted() {
 
 },
@@ -220,19 +224,25 @@ methods: {
                 setTimeout(()=>{
                     this.loading = false
                 },1000)
-                retreatStartTime = this.dialogInfo_cdw.BeginDate;
+                retreatStartTime = moment(new Date()).format('L');
+                console.log(retreatStartTime);
+                // retreatStartTime = this.dialogInfo_cdw.BeginDate;
                 retreatEndTime = this.dialogInfo_cdw.EndDate;
                 //日期控件默认聚焦时间
-                this.timeDefaultShow = moment(new Date(JSON.parse(response.Data).cdw.BeginDate)).add(1, 'months');
+                this.timeDefaultShow = moment(new Date()).add(1, 'months');
                 this.ContractId = this.dialogInfo_cdw.Id; //合同id
 
                 var endTime = moment(this.dialogInfo_cdw.EndDate).format('L');
+                console.log(endTime);
                 this.daysRange = this.dateDiff(endTime);
+                console.log(this.daysRange);
                 if(this.daysRange>60){
                     this.Category = 1;
                 }else if (this.daysRange>30 && this.daysRange<60) {
                     this.Category = 0;
+                    this.ReLeaseDate = this.dialogInfo_cdw.EndDate
                 }
+                console.log(this.Category);
                 this.bodyView = true;
                 break;
                 case 500:
@@ -294,6 +304,7 @@ methods: {
                         confirmButtonText: '确定',
                         callback: action => {
                         this.$router.push({path:'/'})
+                        this.$store.commit('SET_STEPTIP','1012');
                       }
                     });
                 break;
@@ -319,6 +330,28 @@ filters:{
            return "";
         }
         return moment(date).format("YYYY-MM-DD");
+    },
+    //户型
+    RoomTypeFunc(val){
+        if(val == 1){
+            return '一室'
+        }else if(val == 2){
+            return '一室一厅'
+        }else if(val == 3){
+            return '两室'
+        }else if(val == 4){
+            return '两室一厅'
+        }else if(val == 5){
+            return '三室'
+        }else if(val == 6){
+            return '三室一厅'
+        }else if(val == 7){
+            return '四室'
+        }else if(val == 8){
+            return '五室'
+        }else{
+            return val
+        }
     }
 }
 }

@@ -8,6 +8,7 @@ import store from '../store'
 //axios 配置
 axios.default.timeout = 500
 axios.defaults.baseURL = 'http://112.124.110.11:8044'
+// axios.defaults.baseURL = 'http://127.0.0.1:8044'
 
 //axios httpHeader固定参数
 axios.interceptors.request.use(
@@ -205,7 +206,7 @@ export const getApplyForLookRoom = params => {
 }
 //看房列表
 export const getApplyForLookRoomLists = params => {
-    return axios.post('/api/PStruct/QueryProspectiveapplication',params).then(response => response.data)
+    return axios.post('/api/PStruct/QueryProspectiveapplicationGZF',params).then(response => response.data)
 }
 //用户选房
 export const getChooseRoom = params => {
@@ -247,4 +248,16 @@ return axios.post('/api/Member/FindPassword',params).then(response => response.d
 //邮箱接口
 export const getEmailUtil = params => {
 return axios.post('/api/Common/EmailUtil',params).then(response => response.data)
+}
+// 判断手机号是否注册
+export const getIsExistPhone = params => {
+return axios.post('/api/Member/IsExistPhone',params).then(response => response.data)
+}
+// 判断邮箱号是否注册
+export const getIsExistEmail = params => {
+return axios.post('/api/Member/IsExistEmail',params).then(response => response.data)
+}
+// 判断身份证号是否注册
+export const getIsExistIDCard = params => {
+return axios.post('/api/Member/IsExistIDCard',params).then(response => response.data)
 }

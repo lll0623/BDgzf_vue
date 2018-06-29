@@ -1,5 +1,5 @@
 <template>
-<div class="registerBackground" ref='loginBox'>
+<div class="registerBackground" id="registerBox" ref='loginBox'>
 	<el-card class="box-card" v-show="card1">
 		<div slot="header" class="clearfix">
 			<span style="font-size:28px">注册账号</span>
@@ -9,7 +9,7 @@
 		</div>
 		<el-form :model="registerForm" label-position="right" :rules="rules" ref="registerForm" label-width="120px" class="demo-registerForm">
 			<el-form-item label="手机号码" prop="PhoneNum">
-				<el-input type="text" v-model="registerForm.PhoneNum" auto-complete="off" placeholder="请输入您的手机号码"></el-input>
+				<el-input type="tel" maxlength="11" v-on:input="funcSendcode" v-model="registerForm.PhoneNum" auto-complete="off" placeholder="请输入您的手机号码"></el-input>
 			</el-form-item>
 			<el-form-item label="手机验证码" prop="ValidateCode">
 				<el-input style="width:120px;" type="text" v-model="registerForm.ValidateCode" auto-complete="off" placeholder="请输入验证码"></el-input>
@@ -26,15 +26,18 @@
 			<el-form-item label="真实姓名" prop="RealName">
 				<el-input type="text" v-model="registerForm2.RealName" auto-complete="off" placeholder="请输入您的真实姓名"></el-input>
 			</el-form-item>
+			<el-form-item label="身份证号码" prop="IDCard">
+				<el-input type="text" v-model="registerForm2.IDCard" auto-complete="off" placeholder="请输入您的身份证号码"></el-input>
+			</el-form-item>
 			<el-form-item label="邮箱" prop="Email">
 				<el-input type="text" v-model="registerForm2.Email" auto-complete="off" placeholder="请输您的邮箱"></el-input>
 			</el-form-item>
 			<el-form-item label="密码" prop="Password">
-				<el-input :type="this.ispassword" v-model="registerForm2.Password" auto-complete="off" placeholder="请输入您的密码"></el-input>
+				<el-input :type="this.ispassword" @keyup.32.native="inputFunc(1)" v-model="registerForm2.Password" auto-complete="off" placeholder="请输入您的密码"></el-input>
 				<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
 			</el-form-item>
 			<el-form-item label="确定密码" prop="confirm_pass">
-				<el-input :type="this.ispassword2" v-model="registerForm2.confirm_pass" auto-complete="off" placeholder="请确认密码"></el-input>
+				<el-input :type="this.ispassword2" @keyup.32.native="inputFunc(2)" v-model="registerForm2.confirm_pass" auto-complete="off" placeholder="请确认密码"></el-input>
 				<i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
 			</el-form-item>
 			<el-form-item prop="agree" label-width="40px">
@@ -50,11 +53,7 @@
 		</el-form>
 	</el-card>
 	<!-- 申请须知 -->
-	<el-dialog
-		title="浦东新区公共租赁住房申请须知"
-		:visible.sync="serverDialogVisible"
-		width="60%"
-		>
+	<el-dialog title="浦东新区公共租赁住房申请须知" :visible.sync="serverDialogVisible" width="60%">
 		<div class="defined_server_content">
 			<h4 class="bold c-3 marB10">《须知》以《浦府<2014>9号文》为依据，未尽事宜，按市、区公租房相关文件执行：</h4>
 			<h4 class="bold c-3 marB10">一、申请地点、接待时间：</h4>
@@ -119,7 +118,11 @@
 
 <script>
 import {
-	getRegister,getSMSHelper
+	getRegister,
+	getSMSHelper,
+	getIsExistPhone,
+	getIsExistEmail,
+	getIsExistIDCard
 } from '../api/api.js'
 import md5 from 'js-md5';
 
@@ -134,23 +137,45 @@ export default {
 				callback();
 			}
 		};
-		// var validateIDCard = (rule, value, callback) => {
-		//   let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-		//   if (value === '') {
-		//     callback(new Error('身份证号码必须填写'));
-		//   } else if (!reg.test(value)) {
-		//     callback(new Error('请输入正确的身份证号'));
-		//   } else {
-		//     callback();
-		//   }
-		// };
+		var validateIDCard = (rule, value, callback) => {
+			let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
+			let params = {
+				IDCard :value
+			}
+			getIsExistIDCard(params).then((response) => {
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						if (response.Data == true) {
+							this.isIDCard = true;
+						}else if(response.Data == false){
+							this.isIDCard = false;
+						}
+						break;
+					case 500:
+						break;
+					default:
+						break;
+
+				}
+				if (value === '') {
+					callback(new Error('身份证号码必须填写'));
+				} else if (reg.test(value) === false) {
+					callback(new Error('请输入正确的身份证号'));
+				} else if (this.isIDCard) {
+					callback(new Error('该身份证号已注册'));
+				} else {
+					callback();
+				}
+			})
+		};
 		var validatePhoneNum = (rule, value, callback) => {
 			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
 			if (value === '') {
 				callback(new Error('手机号码不能为空'));
 			} else if (!reg.test(value)) {
 				callback(new Error('请输入正确的手机号码'));
-			}else if (this.sidePhone!= ''&& value!= this.sidePhone) {
+			} else if (this.sidePhone != '' && value != this.sidePhone) {
 				callback(new Error('请输入正确的手机号码'));
 			} else {
 				callback();
@@ -163,29 +188,58 @@ export default {
 				callback(new Error('手机验证码不能为空'));
 			} else if (!reg.test(PhoneNum)) {
 				callback(new Error('请输入正确的手机号码'));
-			} else if(md5(value) !== this.SMCode){
+			} else if (md5(value) !== this.SMCode) {
 				callback(new Error('短信验证码不正确'));
-			}else {
+			} else {
 				callback();
 			}
 		};
 		var validateEmail = (rule, value, callback) => {
 			let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-			if (value !== '') {
-				if (!reg.test(value)) {
-					callback(new Error('请输入正确格式的邮箱'));
+			let params = {
+				Email :value
+			}
+			getIsExistEmail(params).then((response) => {
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						if (response.Data == true) {
+							this.isEmail = true;
+						}else if(response.Data == false){
+							this.isEmail = false;
+						}
+						break;
+					case 500:
+						break;
+					default:
+						break;
+
+				}
+				if (value !== '') {
+					if (!reg.test(value)) {
+						callback(new Error('请输入正确格式的邮箱'));
+					} else if (this.isEmail) {
+						callback(new Error('该邮箱已注册'));
+					}else {
+						callback();
+					}
 				} else {
 					callback();
 				}
-			} else {
-				callback();
-			}
+			})
+
 		};
 		var validatePassword = (rule, value, callback) => {
+			let reg = /^[1-9]\d*$|^0$/;
+			let patrn = /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
 			if (value === '') {
 				callback(new Error('请输入密码'));
 			} else if (value.length < 6) {
-			callback(new Error("密码长度必须大于六位！"));
+				callback(new Error("密码长度必须大于六位！"));
+			} else if (reg.test(value) == true) {
+				callback(new Error("密码不能为纯数字！"));
+			} else if (patrn.exec(value)) {
+				callback(new Error("密码不能有汉字！！"));
 			} else {
 				callback();
 			}
@@ -202,17 +256,17 @@ export default {
 		return {
 			card1: true,
 			card2: false,
-			disabled: false,
-			serverDialogVisible:false,
+			disabled: true,
+			serverDialogVisible: false,
 			time: 0,
 			getBtnTxt: "免费获取验证码",
-			SMCode:'',//短信接口返回的验证码
+			SMCode: '', //短信接口返回的验证码
 			checkCode: '',
 			ispassword: "password",
 			fa_eyes: 'fa fa-eye-slash',
 			ispassword2: "password",
 			fa_eyes2: 'fa fa-eye-slash',
-			sidePhone:'',
+			sidePhone: '',
 			registerForm: {
 				PhoneNum: '',
 				ValidateCode: '',
@@ -229,6 +283,7 @@ export default {
 			},
 			registerForm2: {
 				RealName: '',
+				IDCard: '',
 				Email: '',
 				Password: '',
 				confirm_pass: '',
@@ -239,9 +294,13 @@ export default {
 					validator: validateRealName,
 					trigger: 'blur'
 				}],
+				IDCard: [{
+					validator: validateIDCard,
+					trigger: 'blur'
+				}],
 				Email: [{
-				  validator: validateEmail,
-				  trigger: 'blur'
+					validator: validateEmail,
+					trigger: 'blur'
 				}],
 				Password: [{
 					validator: validatePassword,
@@ -253,6 +312,9 @@ export default {
 				}]
 			},
 			showCheckbox: false,
+			isPhone: false,
+			isEmail: false,
+			isIDCard: false
 
 		};
 	},
@@ -267,29 +329,74 @@ export default {
 		next()
 	},
 	methods: {
-		sendcode() {
-			var reg = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-			//var url="/nptOfficialWebsite/apply/sendSms?mobile="+this.registerForm.phone;
+		funcSendcode() {
 			if (this.registerForm.PhoneNum == '') {
-				this.$message({
-					type: 'error',
-					message: '请输入手机号码'
-				});
-			} else if (!reg.test(this.registerForm.PhoneNum)) {
-				this.$message({
-					type: 'error',
-					message: '手机格式不正确'
-				});
+				this.disabled = true;
 			} else {
-				/*axios.post(url).then(
-				    res=>{
-				    this.phonedata=res.data;
-				})*/
-				let params = {
+				this.disabled = false;
+			}
+		},
+		inputFunc(type) {
+			switch (type) {
+				case 1:
+					this.registerForm2.Password = this.registerForm2.Password.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				case 2:
+					this.registerForm2.confirm_pass = this.registerForm2.confirm_pass.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				default:
+			}
+		},
+		sendcode() {
+			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
+			if (this.registerForm.PhoneNum === '') {
+				return;
+			}
+			if (!reg.test(this.registerForm.PhoneNum)) {
+				return
+			}
+			let params = {
+				PhoneNum: this.registerForm.PhoneNum
+			}
+			getIsExistPhone(params).then((response) => {
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						if (response.Data == true) {
+							this.isPhone = true;
+						} else if (response.Data == false) {
+							this.isPhone = false;
+						}
+						break;
+					case 500:
+						this.$message({
+							type: 'error',
+							message: errorText
+						});
+						break;
+					default:
+						this.$message({
+							type: 'error',
+							message: errorText
+						});
+						break;
+
+				}
+			})
+			setTimeout(() => {
+				if (this.isPhone) {
+					this.$message({
+						type: 'error',
+						message: '该手机号已注册！'
+					});
+					this.registerForm.PhoneNum = "";
+					return;
+				}
+				let paramss = {
 					Type: 1, //注册类型
 					PhoneNum: this.registerForm.PhoneNum
 				}
-				getSMSHelper(params).then((response) => {
+				getSMSHelper(paramss).then((response) => {
 					var errorText = response.Info;
 					switch (response.StatusCode) {
 						case 200:
@@ -322,7 +429,7 @@ export default {
 							this.disabled = false;
 					}
 				})
-			}
+			}, 1000)
 		},
 		timer() {
 			if (this.time > 0) {
@@ -336,14 +443,14 @@ export default {
 			}
 		},
 		submitForm(formName) {
-				this.$refs[formName].validate((valid) => {
-					if (valid) {
-						this.card1 = false;
-						this.card2 = true;
-					} else {
-						return false;
-					}
-				});
+			this.$refs[formName].validate((valid) => {
+				if (valid) {
+					this.card1 = false;
+					this.card2 = true;
+				} else {
+					return false;
+				}
+			});
 
 		},
 		submitForm2(formName) {
@@ -357,9 +464,11 @@ export default {
 					if (valid) {
 						let dataArry = {
 							"RealName": this.registerForm2.RealName,
+							"IDCard": this.registerForm2.IDCard,
 							"PhoneNum": this.registerForm.PhoneNum,
 							"Email": this.registerForm2.Email,
-							"Password": md5(this.registerForm2.Password)
+							"Password": md5(this.registerForm2.Password),
+							"Type": '2',
 						}
 						getRegister(dataArry)
 							.then((response) => {
@@ -379,20 +488,20 @@ export default {
 											type: 'error',
 											message: errorText
 										});
-										setTimeout(() => {
-											this.$router.push({
-												path: `/login`,
-											})
-										}, 1000)
+										// setTimeout(() => {
+										// 	this.$router.push({
+										// 		path: `/login`,
+										// 	})
+										// }, 1000)
 										break;
 									default:
 										this.$message({
 											type: 'error',
 											message: '注册失败！'
 										});
-										setTimeout(() => {
-											this.$router.push("/login");
-										}, 1000)
+										// setTimeout(() => {
+										// 	this.$router.push("/login");
+										// }, 1000)
 								}
 							})
 					} else {
@@ -416,83 +525,85 @@ export default {
 	},
 	mounted() {
 		this.$refs.loginBox.style.minHeight = (document.documentElement.clientHeight - document.getElementById('header').offsetHeight) + 'px'
-		this.$refs.dialogBox.style.minHeight = (document.documentElement.clientHeight - document.getElementById('header').offsetHeight) + 'px'
 	},
 	created() {}
 }
 </script>
 
 <style lang="scss">
-.box-card {
-    width: 480px;
-    margin: 60px auto;
-    display: inline-table;
-}
-.verification {
-    vertical-align: middle;
-    transform: translate(-15px,0);
-    width: 102px;
-}
-#code {
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: #053d84;
-    background: #f2f2f5;
-    margin-left: 30px;
-    line-height: 37px;
-    height: 40px;
-    margin-top: -3px;
-    width: 100px;
-    border-radius: 3px;
-}
-.linkBtn {
-    float: right;
-    padding: 3px 0;
-    color: #009688 !important;
-    &:hover {
-        text-decoration: underline;
-        color: #009688;
-    }
-}
-.loginBtn {
-    background: #009688 !important;
-    border-color: #009688 !important;
-    color: white !important;
-    width: 100%;
-    &:hover {
-        background: #18ab9d !important;
-        border-color: #18ab9d !important;
-        color: white !important;
-    }
-}
-.open_close {
-    position: absolute;
-    right: -3px;
-    top: 9px;
-    width: 30px;
-    height: 20px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #009688;
-}
-.tishixiaoxi {
-    margin-top: -7px;
-    color: #f56c6c;
-    font-size: 12px;
-    line-height: 1;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    font-weight: 500;
-}
 .registerBackground {
     display: flex;
     background: url("http://tstres.lesoft.cn/menber/contents/images/userbg.jpg");
-	background-repeat: no-repeat;
+    background-repeat: no-repeat;
     background-size: cover;
 }
-.defined_server_content p,.defined_server_content h5{
-	line-height:26px;
-	text-indent: 2em;
+#registerBox {
+    .box-card {
+        width: 480px;
+        margin: 60px auto;
+        display: inline-table;
+    }
+    .verification {
+        vertical-align: middle;
+        transform: translate(-15px,0);
+        width: 102px;
+    }
+    #code {
+        font-size: 18px;
+        letter-spacing: 3px;
+        color: #053d84;
+        background: #f2f2f5;
+        margin-left: 30px;
+        line-height: 37px;
+        height: 40px;
+        margin-top: -3px;
+        width: 100px;
+        border-radius: 3px;
+    }
+    .linkBtn {
+        float: right;
+        padding: 3px 0;
+        color: #009688 !important;
+        &:hover {
+            text-decoration: underline;
+            color: #009688;
+        }
+    }
+    .loginBtn {
+        background: #009688 !important;
+        border-color: #009688 !important;
+        color: white !important;
+        width: 100%;
+        &:hover {
+            background: #18ab9d !important;
+            border-color: #18ab9d !important;
+            color: white !important;
+        }
+    }
+    .open_close {
+        position: absolute;
+        right: -3px;
+        top: 9px;
+        width: 30px;
+        height: 20px;
+        cursor: pointer;
+        font-size: 20px;
+        color: #009688;
+    }
+    .tishixiaoxi {
+        margin-top: -7px;
+        color: #f56c6c;
+        font-size: 12px;
+        line-height: 1;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        font-weight: 500;
+    }
+    .defined_server_content h5,
+    .defined_server_content p {
+        line-height: 26px;
+        text-indent: 2em;
+    }
 }
 </style>

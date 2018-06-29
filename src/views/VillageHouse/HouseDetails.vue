@@ -48,7 +48,7 @@
 					<div class="mian_info clearfix marT20">
 						<p class="fl fs20 c-3">
 							<label>户型：</label>
-							<span>{{houseType}}</span>
+							<span>{{houseType | filterRoomTypeName}}</span>
 						</p>
 						<p class="fl fs20 c-3 marL20">
 							<label>面积：</label>
@@ -125,11 +125,11 @@
 			</div>
 		</div>
 	</div>
-	 <!-- 看房申请dialog -->
+	<!-- 看房申请dialog -->
 	<el-dialog
 		title="看房申请"
 		:visible.sync="dialogVisible"
-		width="45%">
+		width="750px">
 		<div class="applyForLookRoom_wrapper">
 			<ul class="applyForLookRoom_info marB20">
 				<li class="clearfix"><label>申请人：</label><span>{{applyForLookRoom_info.name}}</span></li>
@@ -140,6 +140,7 @@
 			<div class="clearfix lookRoomTime">
 				<p class="fl">请选择预约看房时间：</p>
 				<el-date-picker
+					:picker-options="pickerOptions"
 					v-model="lookRoomTime"
 					type="datetime"
 					placeholder="请选择预约看房时间"
@@ -177,6 +178,21 @@
 		<el-button type="primary" @click="submit_IDCard" :loading="btnLoading">确 定</el-button>
 		</span>
 	</el-dialog>
+	<!-- 选房验证 -->
+	<el-dialog
+		title="请输入验证码"
+		:visible.sync="inputSelHouseCodeDialog"
+		append-to-body
+		width="400px">
+		<div class="clearfix">
+			<el-input v-model="input_sel_house_code" placeholder="请输入验证码" style="width:230px;"></el-input>
+			<input type="button" id="code" @click="createCode" class="verification fr" v-model="checkCode" />
+		</div>
+		<span slot="footer" class="dialog-footer">
+		<el-button @click="inputSelHouseCodeDialog = false">取 消</el-button>
+		<el-button type="primary" @click="inputSelHouseCode()" :loading="btnLoading">确 定</el-button>
+		</span>
+	</el-dialog>
 </div>
 </template>
 <script>
@@ -189,7 +205,7 @@ import defaultImg from '../../assets/images/default.jpg'
 import dwImg from '../../assets/images/dw.png'
 import aroundPos from '../../assets/images/aroundPos.png'
 import aroundPosActive from '../../assets/images/aroundPosActive.png'
-var mapVillage;
+var mapVillage, code; //在全局定义验证码;
 export default {
 	beforeRouteEnter(to, from, next) {
 		next(vm => {
@@ -202,6 +218,15 @@ export default {
 	},
 	data() {
 		return {
+			pickerOptions: {
+                disabledDate(time) {
+                    return time.getTime() < Date.now() - 8.64e7;
+                }
+            },
+			//输入选房验证码
+			inputSelHouseCodeDialog : false,
+			checkCode: '',
+			input_sel_house_code:'',
 			//补全身份证信息
 			complementDialogVisible:false,
 			btnLoading:false,
@@ -357,6 +382,8 @@ export default {
 				return '四室'
 			}else if(val == 8){
 				return '五室'
+			}else{
+				return val
 			}
 		},
 		// 根据金纬度距离计算
@@ -419,6 +446,18 @@ export default {
 		}, 1000)
 	},
 	methods: {
+		// 图片验证码
+		createCode() {
+			code = "";
+			var codeLength = 6; //验证码的长度
+			var random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+				'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'); //随机数
+			for (var i = 0; i < codeLength; i++) { //循环操作
+				var index = Math.floor(Math.random() * 36); //取得随机数的索引（0~35）
+				code += random[index]; //根据索引取得随机数加到code上
+			}
+			this.checkCode = code; //把code值赋给验证码
+		},
 		reloadFunc(id){
 			this.$router.push({
 				path: `/houseDetails/${id}`,
@@ -543,11 +582,12 @@ export default {
 	            });
 	            _this.listMessage = arryList;
 	          },
-	          pageCapacity: 100
+	          pageCapacity: 50
 	        };
 
 	        var local2 = new BMap.LocalSearch(map, options);
 	        local2.searchNearby(this.villageAreaList[this.tabIndex].keyWOrd[i], mPoint, this.distence);
+			console.log(local2);
 	      }
 	    },
 		addClickHandler(address, points, title) {
@@ -706,7 +746,8 @@ export default {
 				if(this.$store.getters.userInfo.State == 1001 || this.$store.getters.userInfo.State == 1002){
 					this.$router.push({path:'/applyFor'})
 				}else if(this.$store.getters.userInfo.State == 1007){
-					this.getChooseRoomFunc(this.$store.getters.userInfo.AccountId,this.roomId)
+					this.inputSelHouseCodeDialog = true
+					// this.getChooseRoomFunc(this.$store.getters.userInfo.AccountId,this.roomId)
 				}else if(this.$store.getters.userInfo.State == 0 || this.$store.getters.userInfo.State == ''){
 					this.complementDialogVisible = true
 				}
@@ -714,9 +755,25 @@ export default {
 				this.$router.push({path:'/login'})
 			}
 		},
+		//输入验证码确认选房
+		inputSelHouseCode(){
+			if(this.input_sel_house_code == ''){
+				this.$message.error('请输入验证码！')
+				this.createCode() //刷新验证码
+				return false
+			}
+			if(this.input_sel_house_code.toUpperCase() != this.checkCode){
+				this.$message.error('请输入正确的验证码！')
+				this.createCode() //刷新验证码
+				this.input_sel_house_code = ''
+				return false
+			}
+			this.btnLoading = true
+			this.getChooseRoomFunc(this.$store.getters.userInfo.AccountId,this.roomId)
+		},
 		//用户选房
 		getChooseRoomFunc(AccountId,RoomId){
-			console.log(AccountId);
+			// console.log(AccountId);
 			getChooseRoom({AccountId:AccountId,RoomId:RoomId}).then(response => {
 				switch(response.StatusCode){
 					case 200 :
@@ -734,6 +791,8 @@ export default {
 			}).catch(error => {
 				this.$message.error(error)
 			})
+			this.btnLoading = false
+			this.inputSelHouseCodeDialog = false
 		},
 		//看房申请
 		getApplyForLookRoomFunc(){
@@ -741,11 +800,11 @@ export default {
 				this.$message.error('请选择预约看房的时间')
 			}else{
 				var nowTime = formatDate(new Date(),"yyyy-MM-dd hh:mm:ss")//本地当前时间
-				nowTime = Date.parse(nowTime.replace(/-/,"/"))
+				nowTime = Date.parse(nowTime.replace(/-/,"/"))-5000
 				var selTime = formatDate(new Date(this.lookRoomTime),"yyyy-MM-dd hh:mm:ss")//选房的时间
 				selTime = Date.parse(selTime.replace(/-/,"/"))
-				if(nowTime>=selTime){
-					this.$message.error('请选择预约看房的时间')
+				if(nowTime>selTime){
+					this.$message.error('请重新选择预约看房的时间')
 				}else{
 					getApplyForLookRoom(
 						{
@@ -1078,10 +1137,23 @@ export default {
 	},
 	created() {
 		this.geHouseDetails()
+		this.createCode()
 	}
 }
 </script>
 <style lang="scss">
+#code {
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: #053d84;
+    background: #f2f2f5;
+    margin-left: 10px;
+    line-height: 37px;
+    height: 40px;
+
+    width: 120px;
+    border-radius: 3px;
+}
 .DetailsFilter__Map__Panel {
     .el-tabs__item {
         padding: 0 15px;
