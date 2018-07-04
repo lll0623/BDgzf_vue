@@ -303,7 +303,7 @@ methods: {
                         confirmButtonText: '确定',
                         callback: action => {
                         this.$router.push({path:'/'})
-                        this.$store.commit('SET_STEPTIP','1011');
+                        this.$store.commit('SET_STEPTIP','1012');
                       }
                     });
                     break;

@@ -142,8 +142,12 @@ export default {
 			}
 		};
 		var validateValidateCode = (rule, value, callback) => {
+			let PhoneNum = this.twoForm.inputTel
+			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
 			if (value === '') {
 				callback(new Error('手机验证码不能为空'));
+			} else if (!reg.test(PhoneNum)) {
+				callback(new Error('请输入正确的手机号码'));
 			} else if (md5(value) != this.SMCode_phone) {
 				callback(new Error('短信验证码不正确'));
 			} else {
@@ -354,7 +358,7 @@ export default {
 	},
 	methods: {
 		funcSendcode() {
-			if(this.twoForm.inputTel == '' ){
+			if(this.twoForm.inputTel == ''){
 				this.disabled = true;
 			}else {
 				this.disabled = false;
@@ -406,9 +410,6 @@ export default {
 			} if (!reg.test(this.twoForm.inputTel)) {
 				return
 			}
-			this.time = 60;
-			this.disabled = true;
-			this.timer();
 			let params = {
 				PhoneNum: this.twoForm.inputTel
 			}
@@ -421,54 +422,6 @@ export default {
 						}else if(response.Data == false){
 							this.isPhone = false;
 						}
-						if (!this.isPhone) {
-							this.$message({
-								type: 'error',
-								message: '该手机号未注册！'
-							});
-							this.time = 0;
-							this.getBtnTxt = "免费获取验证码";
-							this.disabled = false;
-							return;
-						}
-						this.load_p = true;
-						let paramss = {
-							Type: 2, //找回密码
-							PhoneNum: this.twoForm.inputTel
-						}
-						getSMSHelper(paramss).then((response) => {
-							var errorText = response.Info;
-							switch (response.StatusCode) {
-								case 200:
-									this.$message({
-										type: 'success',
-										message: '短信验证码发送成功，请注意查收！'
-									});
-									this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
-									this.sidePhone = response.Data.PhoneNum;
-									this.load_p = false;
-									break;
-								case 500:
-									this.$message({
-										type: 'error',
-										message: errorText
-									});
-									this.load_p = false;
-									this.time = 0;
-									this.getBtnTxt = "免费获取验证码";
-									this.disabled = false;
-									break;
-								default:
-									this.$message({
-										type: 'error',
-										message: '短信验证码发送失败！'
-									});
-									this.load_p = false;
-									this.time = 0;
-									this.getBtnTxt = "免费获取验证码";
-									this.disabled = false;
-							}
-						})
 						break;
 					case 500:
 						this.$message({
@@ -485,6 +438,56 @@ export default {
 
 				}
 			})
+			setTimeout(() => {
+				if (!this.isPhone) {
+					this.$message({
+						type: 'error',
+						message: '该手机号未注册！'
+					});
+					return;
+				}
+				this.load_p = true;
+				let paramss = {
+					Type: 2, //找回密码
+					PhoneNum: this.twoForm.inputTel
+				}
+				getSMSHelper(paramss).then((response) => {
+					var errorText = response.Info;
+					switch (response.StatusCode) {
+						case 200:
+							this.$message({
+								type: 'success',
+								message: '短信验证码发送成功，请注意查收！'
+							});
+							this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
+							this.sidePhone = response.Data.PhoneNum;
+							this.load_p = false;
+							this.time = 60;
+							this.disabled = true;
+							this.timer();
+							break;
+						case 500:
+							this.$message({
+								type: 'error',
+								message: errorText
+							});
+							this.load_p = false;
+							this.time = 0;
+							this.getBtnTxt = "免费获取验证码";
+							this.disabled = false;
+							break;
+						default:
+							this.$message({
+								type: 'error',
+								message: '短信验证码发送失败！'
+							});
+							this.load_p = false;
+							this.time = 0;
+							this.getBtnTxt = "免费获取验证码";
+							this.disabled = false;
+					}
+				})
+			}, 1000)
 		},
 		sendcode_E() {
 			let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -494,9 +497,6 @@ export default {
 			if (!reg.test(this.threeForm.email)) {
 				return;
 			}
-			this.time2 = 60;
-			this.disabled2 = true;
-			this.timer2();
 			let params = {
 				Email: this.threeForm.email
 			}
@@ -509,51 +509,6 @@ export default {
 						}else if(response.Data == false){
 							this.isEmail = false;
 						}
-						if (!this.isEmail) {
-							this.$message({
-								type: 'error',
-								message: '该邮箱号未注册！'
-							});
-							return;
-						}
-						this.load_e = true;
-						let paramss = {
-							Type: 2, //找回密码
-							Email: this.threeForm.email
-						}
-						getEmailUtil(paramss).then((response) => {
-							var errorText = response.Info;
-							switch (response.StatusCode) {
-								case 200:
-									this.$message({
-										type: 'success',
-										message: '邮箱验证码发送成功，请注意查收！'
-									});
-									this.SMCode_email = response.Data.RegisterCode.toLowerCase();
-									this.sideEmail = response.Data.Email;
-									this.load_e = false;
-									break;
-								case 500:
-									this.$message({
-										type: 'error',
-										message: errorText
-									});
-									this.time2 = 0;
-									this.getBtnTxt_E = "免费获取验证码";
-									this.disabled2 = false;
-									this.load_e = false;
-									break;
-								default:
-									this.$message({
-										type: 'error',
-										message: '邮箱验证码发送失败！'
-									});
-									this.time2 = 0;
-									this.getBtnTxt_E = "免费获取验证码";
-									this.disabled2 = false;
-									this.load_e = false;
-							}
-						})
 						break;
 					case 500:
 						this.$message({
@@ -570,6 +525,57 @@ export default {
 
 				}
 			})
+			setTimeout(() => {
+				if (!this.isEmail) {
+					this.$message({
+						type: 'error',
+						message: '该邮箱号未注册！'
+					});
+					return;
+				}
+				this.load_e = true;
+				let paramss = {
+					Type: 2, //找回密码
+					Email: this.threeForm.email
+				}
+				getEmailUtil(paramss).then((response) => {
+					var errorText = response.Info;
+					switch (response.StatusCode) {
+						case 200:
+							this.$message({
+								type: 'success',
+								message: '邮箱验证码发送成功，请注意查收！'
+							});
+							this.SMCode_email = response.Data.RegisterCode.toLowerCase();
+							this.sideEmail = response.Data.Email;
+							this.load_e = false;
+							this.time2 = 60;
+							this.disabled2 = true;
+							this.timer2();
+							break;
+						case 500:
+							this.$message({
+								type: 'error',
+								message: errorText
+							});
+							this.time2 = 0;
+							this.getBtnTxt_E = "免费获取验证码";
+							this.disabled2 = false;
+							this.load_e = false;
+							break;
+						default:
+							this.$message({
+								type: 'error',
+								message: '邮箱验证码发送失败！'
+							});
+							this.time2 = 0;
+							this.getBtnTxt_E = "免费获取验证码";
+							this.disabled2 = false;
+							this.load_e = false;
+					}
+				})
+			},1000)
+
 		},
 		timer() {
 			if (this.time > 0) {

@@ -114,19 +114,19 @@
 
                 <swiper :options="swiperOption" class="canSelHouseLists">
                     <swiper-slide v-for="(item,index) in swiperLists" :key="index">
-                        <router-link :to="`/villageDetails/${item.PropertyId}`" class="clearfix">
-                            <img v-lazy="(item.MainPic == null || item.MainPic == '') ? defaultImg : item.MainPic"  onerror="javascript:this.src='../assets/images/defined.png';" :alt="item.Name" class="fl">
+                        <router-link :to="`/villageDetails/${item.Id}`" class="clearfix">
+                            <img v-lazy="item.img == null ? defaultImg : item.img"  onerror="javascript:this.src='../assets/images/defined.png';" :alt="item.tit" class="fl">
                             <div class="fl">
-                                <h4 class="ellipsis">{{item.Name}}</h4>
+                                <h4 class="ellipsis">{{item.AllName}}</h4>
                                 <p class="c-7">
                                     <i class="fa fa-map-marker fa-lg"></i>
-                                    <span>{{item.RegionName}}</span>
+                                    <span>{{item.RentTitle}}</span>
                                 </p>
                                 <p class="c-7">
                                     <i class="fa fa-home fa-lg"></i>
                                     <span>
                                         剩余房源
-                                        <span>{{item.RoomCount}}</span>
+                                        <span>{{item.RoomNum}}</span>
                                         套
                                     </span>
                                 </p>
@@ -154,7 +154,7 @@
                         <img v-lazy="newslists[0].MainPic == null ? defaultImg : newslists[0].MainPic">
                         <div class="abs">
                             <h4 class="fs18 white marB10">{{newslists[0].FullHead}}</h4>
-                            <div class="c-f0f0f0" v-html="unescape((newslists[0].NewsContent == null || newslists[0].NewsContent == '') ? '' : newslists[0].NewsContent)"></div>
+                            <div class="c-f0f0f0" v-html="unescape(newslists[0].NewsContent)"></div>
                         </div>
                     </router-link>
                     <div class="fl"  v-if="newslists[1].Id !=null">
@@ -182,7 +182,7 @@
                     <li v-for="(item,index) in guide_listst" :key="index">
                         <router-link :to="`/guideview/${item.Id}`">
                             <h4 class="fs18 c-6 bold marB10">{{item.FullHead}}</h4>
-                            <div class="c-3" v-html="unescape((item.NewsContent == null || item.NewsContent == '') ? '' : item.NewsContent)"></div>
+                            <div class="c-3" v-html="unescape(item.NewsContent)"></div>
                         </router-link>
                     </li>
                 </ul>
@@ -219,8 +219,9 @@
     </div>
 </template>
 <script>
-import { getIndexBanner,getVillageHouseLists,getNews,getApplyForComLists,getHotHouseLists,getIndexFast,getIDCard,getMemberMSGList} from '../api/api.js'
+import { getIndexBanner,getVillageHouseLists,getNews,getApplyForComLists,getHotHouseLists,getIndexFast,getIDCard} from '../api/api.js'
 import defaultImg from '../assets/images/default.jpg'
+import { getMemberMSGList } from '../api/api.js'
 import { mapGetters } from 'vuex'
 import { isNull } from '../util/index.js'
 export default{
@@ -489,7 +490,7 @@ export default{
             })
         })
         //获取房源
-        getVillageHouseLists({QueryJson:{Type: '1',},Rows:5,Type:1}).then(response => {
+        getHotHouseLists({Rows:5,Type:1}).then(response => {
             switch(response.StatusCode){
                 case 500 :
                     this.$message.error('房源数据请求失败'+response.Info)
@@ -498,14 +499,8 @@ export default{
                     if(response.Data == null || response.Data.length == 0){
                         this.showHotHouseLists = false
                     }else{
-                        if(response.Data.Rows == null || response.Data.Rows == [] || response.Data.Rows == ''){
-                            this.showHotHouseLists = false
-                            this.swiperLists =[]
-                        }else{
-                            this.showHotHouseLists = true
-                            this.swiperLists =response.Data.Rows
-                        }
-
+                        this.showHotHouseLists = true
+                        this.swiperLists =response.Data
                     }
                 break;
             }

@@ -210,7 +210,7 @@
                         }
 
                         // 判断否有合同
-                        if(State !== 1010 || contractData == null || contractData == "") {
+                        if(State !== 1010) {
                             this.$alert('当前暂无有效租赁合同', '提示', {
                                 confirmButtonText: '确定',
                                 callback: action => {
@@ -252,14 +252,6 @@
                     contractData = response.Data; // 合同数据
                     let State = this.$store.getters.userInfo.State;
                     if(State == 1011) {
-                        this.$alert('当前正在续租中，等待管理员审核！', '提示', {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                          }
-                        });
-                        return;
-                    }
-                    if(State == 1012) {
                         this.$alert('当前正在退租中，等待管理员审核！', '提示', {
                             confirmButtonText: '确定',
                             callback: action => {
@@ -267,9 +259,18 @@
                         });
                         return;
                     }
+                    if(State == 1012) {
+                        this.$alert('当前正在续租中，等待管理员审核！', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                          }
+                        });
+                        return;
+                    }
+
                     // 判断否有合同
-                    if(State !== 1010 || contractData == null || contractData == "") {
-                        this.$alert('当前暂无有效租赁合同', '提示', {
+                    if(contractData == null || contractData == "") {
+                        this.$alert('当前暂无租赁合同', '提示', {
                             confirmButtonText: '确定',
                             callback: action => {
                           }
