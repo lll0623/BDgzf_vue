@@ -82,7 +82,7 @@
                 <td>{{ dialogInfo_cpi.RoomArea }}</td>
 
                 <td>户型：</td>
-                <td>{{ dialogInfo_cpi.RoomType }}</td>
+                <td>{{ dialogInfo_cpi.RoomType | RoomTypeFunc }}</td>
 
                 <td>每月租金：</td>
                 <td>{{ dialogInfo_cdw.MontylyRent }}</td>
@@ -108,17 +108,18 @@
                   无
                 </td>
                 <td style="width: 15%;">
-                  意向续租结束日期：
+                  意向续租年限（年）：
                 </td>
                 <td style="width: 35%;">
-                    <el-date-picker
+                    2
+                    <!-- <el-date-picker
                       v-model="ReLeaseDate"
                       :default-value="timeDefaultShow"
                       type="date"
                       :picker-options="pickerOptions0"
                       format="yyyy-MM-dd"
                       placeholder="选择日期">
-                    </el-date-picker>
+                    </el-date-picker> -->
                 </td>
               </tr>
               <tr>
@@ -191,6 +192,9 @@ data() {
 		retreatForm:'',
         ContractId:''
 	}
+},
+computed:{
+    ...mapGetters(['userInfo'])
 },
 created() {
     // var State = this.$store.getters.userInfo.State
@@ -299,6 +303,7 @@ methods: {
                         confirmButtonText: '确定',
                         callback: action => {
                         this.$router.push({path:'/'})
+                        this.$store.commit('SET_STEPTIP','1011');
                       }
                     });
                     break;
@@ -325,6 +330,28 @@ filters:{
            return "";
         }
         return moment(date).format("YYYY-MM-DD");
+    },
+    //户型
+    RoomTypeFunc(val){
+        if(val == 1){
+            return '一室'
+        }else if(val == 2){
+            return '一室一厅'
+        }else if(val == 3){
+            return '两室'
+        }else if(val == 4){
+            return '两室一厅'
+        }else if(val == 5){
+            return '三室'
+        }else if(val == 6){
+            return '三室一厅'
+        }else if(val == 7){
+            return '四室'
+        }else if(val == 8){
+            return '五室'
+        }else{
+            return val
+        }
     }
 },
 mounted() {

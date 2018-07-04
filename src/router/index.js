@@ -113,7 +113,7 @@ const ContractPdf= resolve => {
 }
 
 const router= new Router({
-    // mode:'history',
+    mode:'history',
     base: __dirname,
     routes: [
         {
@@ -349,7 +349,6 @@ const router= new Router({
                     routerName: 'my_center',
                     component: MyCenter,
                     name: '个人中心',
-                    hidden : false,
                     meta: {
         	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
                         keepAlive: false,
@@ -507,6 +506,24 @@ const router= new Router({
             component:ContractPdf,
             name: '下载',
             iconCls:'',
+            hidden:true,
+            meta: {
+                keepAlive: false,
+            },
+        },
+        {
+            mode: 'history',
+            path: '/index.html',
+            component:Index,
+            hidden:true,
+            meta: {
+                keepAlive: false,
+            },
+        },
+        {
+            mode: 'history',
+            path: '*',
+            component:Index,
             hidden:true,
             meta: {
                 keepAlive: false,

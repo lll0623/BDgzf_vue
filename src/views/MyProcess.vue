@@ -23,7 +23,7 @@
 				<li class="fl" :class="isActive == 2?'active':''" @click="checkTab('2')">续租</li>
 			</ul>
 			<div class="" v-show="isActive == 1">
-				<p class="tc error_text"  v-if="processLists1.length == 0">没有数据，-__-!!!</p>
+				<p class="tc error_text"  v-if="processLists1.length == 0">暂无数据!</p>
 				<ul class="myProcessCont"  v-if="processLists1.length != 0"><!-- 1非续租、2续租 -->
 					<li v-for="(item,index) in processLists1" :key="index" class="clearfix">
 						<i></i>
@@ -35,7 +35,7 @@
 							<p>
 								<span>{{item.Schedule | filterSchedule}}</span>
 								<el-tag v-if="item.State == 1">已通过</el-tag>
-								<el-tag type="warning" v-if="item.State == 0">审核中</el-tag>
+								<el-tag type="warning" v-if="item.State == 0">不通过</el-tag>
 								<el-tag type="danger" v-if="item.State == 2">已拒绝</el-tag>
 							</p>
 							<h5 :class="!isShowMore ? 'fold' : 'unfold'">{{item.Content}}</h5>
@@ -46,11 +46,13 @@
 				</ul>
 			</div>
 			<div class="" v-show="isActive == 2">
-				<p class="tc error_text" v-if="processLists2.length == 0">没有数据，-__-!!!</p>
+				<p class="tc error_text" v-if="processLists2.length == 0">暂无数据!</p>
 				<ul class="myProcessCont" v-if="processLists2.length != 0"><!-- 1非续租、2续租 -->
 					<li v-for="(item,index) in processLists2" :key="index" class="clearfix">
 						<i></i>
-						<label>{{index+1}}</label>
+						<label class="el-icon-success bg-green" v-if="item.State == 1"></label>
+						<label class="el-icon-error bg-red" v-if="item.State == 2"></label>
+						<label class="el-icon-info bg-info" v-if="item.State == 0"></label>
 						<div>
 							<h4>{{item.Time | resetData}}</h4>
 							<p>

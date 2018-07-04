@@ -42,14 +42,14 @@
         </div>
         <h4 class="fs26 c-6 village-house-tit">共<span class="red">{{listsTotal}}</span>个小区：</h4>
         <div class="village-house-wrap" v-loading="loading">
-            <p class="noDataText padT20 padB20 tc fs16 green" v-show='villageLists.length == 0'>无数据!&nbsp;&nbsp;-_-!!!</p>
+            <p class="noDataText padT20 padB20 tc fs16 green" v-show='villageLists.length == 0'>无数据!</p>
             <ul class="village-house-lists">
                 <li v-for="(item,index) in villageLists" :key="index" class="clearfix rel">
                     <router-link :to="`/villageDetails/${item.PropertyId}`" class="clearfix">
                         <img v-lazy="(item.MainPic == null || item.MainPic == '') ? defaultImg : item.MainPic " class="fl" :alt="item.FullHead">
                         <div class="fl marL30">
                             <h4 class="c-6 fs26">{{item.FullName}}</h4>
-                            <p class="c-6 marT10"><span class="bold">所属区域：</span><span class="c-7">{{item.AreaName}}</span></p>
+                            <p class="c-6 marT10"><span class="bold">所属区域：</span><span class="c-7">{{item.RegionName}}／{{item.TownshipName}}</span></p>
                             <p class="c-6 marT10"><span class="bold">地址：</span><span class="c-7">{{item.Address}}</span></p>
                             <p class="c-6 marT10"><span class="bold">小区简介：</span><span class="c-7">{{item.Memo}}</span></p>
                         </div>
@@ -203,7 +203,7 @@
                     QueryJson:{
                         Type: '1',
                         KeyWord : this.search_input,
-                        Area:this.AreaId,
+                        AreaId:this.AreaId,
                         RoomState:1,
                     },
                     Page:this.page,
@@ -215,7 +215,11 @@
                             this.$message.error('小区列表请求失败'+response.Info)
                             break;
                         case 200:
-                            this.villageLists = response.Data.Rows
+                            if(response.Data.Rows == null || response.Data.Rows==[]){
+                                this.villageLists = []
+                            }else{
+                                this.villageLists= response.Data.Rows
+                            }
                             this.listsTotal = response.Data.Records
 
                     }

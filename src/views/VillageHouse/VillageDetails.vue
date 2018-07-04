@@ -14,7 +14,7 @@
 		<div class="villageDetails-item-top pad15" id="anchor-0">
 			<h4 class="bold fs30 c-3 marB20">{{title}}</h4>
 			<ul class="villageDetails-item-nav clearfix" :class="IsFixed? 'fix' : ''">
-				<li v-for="(item,index) in navData" :key="index" :class="{'active':item.isactive===true}" @click="tabActive(item)">
+				<li v-for="(item,index) in navData" :key="index" :class="{'active':item.isActive===true}" @click="tabActive(item)">
 					<a href="javascript:void(0)" @click="goAnchor('#anchor-'+index)">{{item.name}}</a>
 				</li>
 			</ul>
@@ -22,14 +22,14 @@
 				<div class="fl marR30 villageDetails-item-top-cont-fir rel">
 					<swiper :options="swiperOptionTop" class="gallery-top" ref="swiperTop">
 						<swiper-slide v-for="(banner,index) in banners" :key="index">
-							<img :src="banner">
+							<img :src="banner.Url">
 						</swiper-slide>
 						<div class="swiper-button-next swiper-button-white" slot="button-next"></div>
 						<div class="swiper-button-prev swiper-button-white" slot="button-prev"></div>
 					</swiper>
 					<swiper :options="swiperOptionThumbs" class="gallery-thumbs" ref="swiperThumbs">
 						<swiper-slide v-for="(banner,index) in banners" :key="index">
-							<img :src="banner">
+							<img :src="banner.Url">
 						</swiper-slide>
 					</swiper>
 				</div>
@@ -92,11 +92,11 @@
 		<h2 class="site-title">该小区房源</h2>
 		<div class="DetailsFilter__OthersHouse">
 			<div class="col-xs-3" v-for="(item,index) in similarityLists">
-				<router-link :to="`/houseDetails/${item.id}`" class="panel panel-default block">
+				<router-link :to="`/houseDetails/${item.Id}`" class="panel panel-default block">
 					<div class="panel-body">
-						<img v-lazy="(item.mainpic == null || item.mainpic == '') ? defaultImg : item.mainpic " data-error="../../assets/images/default.jpg" class="fl block DetailsFilter__OthersHouse__media" :alt="item.allname">
-						<p class="text-warning marB10">{{item.allname}}</p>
-						<p>{{item.housetypename}}</p>
+						<img v-lazy="(item.MainPic == null || item.MainPic == '') ? defaultImg : item.MainPic " data-error="../../assets/images/default.jpg" class="fl block DetailsFilter__OthersHouse__media" :alt="item.allname">
+						<p class="text-warning marB10">{{item.RentTitle}}</p>
+						<p>{{item.RoomTypeName}}</p>
 					</div>
 				</router-link>
 			</div>
@@ -148,11 +148,13 @@ export default {
 			swiperOptionTop: {
 				spaceBetween: 10,
 				loop: true,
-				loopedSlides: 5, //looped slides should be the same
+				loopedSlides: 3, //looped slides should be the same
 				navigation: {
 					nextEl: '.swiper-button-next',
 					prevEl: '.swiper-button-prev'
-				}
+				},
+				observer:true,//修改swiper自己或子元素时，自动初始化swiper
+				observeParents:true,//修改swiper的父元素时，自动初始化swiper
 			},
 			swiperOptionThumbs: {
 				spaceBetween: 10,
@@ -161,6 +163,8 @@ export default {
 				loop: true,
 				loopedSlides: 5, //looped slides should be the same
 				slideToClickedSlide: true,
+				observer:true,//修改swiper自己或子元素时，自动初始化swiper
+				observeParents:true,//修改swiper的父元素时，自动初始化swiper
 			},
 			//details
 			villageId: '',
@@ -259,9 +263,9 @@ export default {
 		this.$nextTick(() => {
 			var _this = this
 			const swiperTop = this.$refs.swiperTop.swiper
-			const swiperThumbs = this.$refs.swiperThumbs.swiper
-			swiperTop.controller.control = swiperThumbs
-			swiperThumbs.controller.control = swiperTop
+	        const swiperThumbs = this.$refs.swiperThumbs.swiper
+	        swiperTop.controller.control = swiperThumbs
+	        swiperThumbs.controller.control = swiperTop
 			//监听滚动条
 			window.addEventListener("scroll", function() {
 				if (getScrollTop() >= 160) {
@@ -481,6 +485,9 @@ export default {
 		handleClick(tab, event) {
 			this.creatChangeMap(tab.index); //检索的函数 this.creatChangeMap()
 		},
+		swiper() {
+			return this.$refs.mySwiper.swiper;
+		},
         geVillageDetails() {
             this.loading = true
     		//获取小区详情
@@ -494,7 +501,7 @@ export default {
     					this.address = response.Data.BaseInfo.Address //地址
     					this.residueHouse = response.Data.BaseInfo.RentableRoomNums == null ? '0' : response.Data.BaseInfo.RentableRoomNums //房源剩余数量
     					this.wuyeType = response.Data.BaseInfo.Memo //小区简介
-    					this.region = response.Data.BaseInfo.RegionName //所属区域
+    					this.region = response.Data.BaseInfo.RegionName+'／'+response.Data.BaseInfo.TownshipName //所属区域
     					this.lat = response.Data.BaseInfo.LAT //经度
     					this.lng = response.Data.BaseInfo.LNG //纬度
     					this.totalHouse = response.Data.BaseInfo.Count == null ? '0' : response.Data.BaseInfo.Count //房间总数
@@ -507,9 +514,10 @@ export default {
     					}
 
     					if (response.Data.ImageList.length == 0) {
-    						this.banners.push(defaultImg)
+    						this.banners.push({Url:defaultImg})
     					} else {
-    						this.banners = response.Data.ImageList
+    						// this.banners = response.Data.ImageList.concat(response.Data.ImageList[0]).concat(response.Data.ImageList[1])
+							this.banners = response.Data.ImageList
     					}
     					setTimeout(() => {
     						this.loading =false
@@ -640,4 +648,5 @@ ul.villageDetails-item-nav {
         background: #fff;
     }
 }
+
 </style>

@@ -10,13 +10,13 @@
             ref="step02_Form01">
             <el-form-item label="1" class="abs"></el-form-item>
             <el-form-item label="姓名">
-                <el-input v-model="step02_Form01.Name" placeholder="请输入姓名" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form01.Name" placeholder="请输入姓名" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="身份证号码" prop="IDCard">
-                <el-input v-model="step02_Form01.IDCard	" placeholder="请输入身份证号码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form01.IDCard	" placeholder="请输入身份证号码" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="婚姻状况">
-                <el-select v-model="step02_Form01.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step02_Form01.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="未婚" value="1"></el-option>
                     <el-option label="已婚" value="2"></el-option>
                     <el-option label="离异" value="3"></el-option>
@@ -24,20 +24,21 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="与申请人关系">
-                <el-select v-model="step02_Form01.Relation" placeholder="请选择" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
-                    <el-option label="子女" value="子女"></el-option>
+                <el-select v-model="step02_Form01.Relation" placeholder="请选择" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
+                    <el-option label="配偶" value="0" v-if="applyForData && applyForData.member.MarryInfo ==2"></el-option>
+                    <el-option label="子女" value="1"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="本市常住人口">
-                <el-radio-group v-model="step02_Form01.IsPermanent" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form01.IsPermanent" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="step02_Form01.Sex" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form01.Sex" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">男</el-radio>
-                    <el-radio label="0">女</el-radio>
+                    <el-radio label="2">女</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
@@ -50,13 +51,13 @@
             ref="step02_Form02">
             <el-form-item label="2" class="abs"></el-form-item>
             <el-form-item label="姓名">
-                <el-input v-model="step02_Form02.Name" placeholder="请输入姓名" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form02.Name" placeholder="请输入姓名" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="身份证号码" prop="IDCard">
-                <el-input v-model="step02_Form02.IDCard" placeholder="请输入身份证号码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form02.IDCard" placeholder="请输入身份证号码" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="婚姻状况">
-                <el-select v-model="step02_Form02.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step02_Form02.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="未婚" value="1"></el-option>
                     <el-option label="已婚" value="2"></el-option>
                     <el-option label="离异" value="3"></el-option>
@@ -64,20 +65,20 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="与申请人关系">
-                <el-select v-model="step02_Form02.Relation" placeholder="请选择" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step02_Form02.Relation" placeholder="请选择" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="子女" value="子女"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="本市常住人口">
-                <el-radio-group v-model="step02_Form02.IsPermanent" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form02.IsPermanent" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="step02_Form02.Sex" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form02.Sex" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">男</el-radio>
-                    <el-radio label="0">女</el-radio>
+                    <el-radio label="2">女</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
@@ -90,13 +91,13 @@
             ref="step02_Form03">
             <el-form-item label="3" class="abs"></el-form-item>
             <el-form-item label="姓名">
-                <el-input v-model="step02_Form03.Name" placeholder="请输入姓名" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form03.Name" placeholder="请输入姓名" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="身份证号码" prop="IDCard">
-                <el-input v-model="step02_Form03.IDCard" placeholder="请输入身份证号码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form03.IDCard" placeholder="请输入身份证号码" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="婚姻状况">
-                <el-select v-model="step02_Form03.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step02_Form03.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="未婚" value="1"></el-option>
                     <el-option label="已婚" value="2"></el-option>
                     <el-option label="离异" value="3"></el-option>
@@ -104,20 +105,21 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="与申请人关系">
-                <el-select v-model="step02_Form03.Relation" placeholder="请选择" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
-                    <el-option label="子女" value="子女"></el-option>
+                <el-select v-model="step02_Form03.Relation" placeholder="请选择" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
+                    <el-option label="配偶" value="0" v-if="applyForData && applyForData.member.MarryInfo ==2"></el-option>
+                    <el-option label="子女" value="1"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="本市常住人口">
-                <el-radio-group v-model="step02_Form03.IsPermanent" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form03.IsPermanent" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="step02_Form03.Sex" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form03.Sex" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">男</el-radio>
-                    <el-radio label="0">女</el-radio>
+                    <el-radio label="2">女</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
@@ -130,13 +132,13 @@
             ref="step02_Form04">
             <el-form-item label="4" class="abs"></el-form-item>
             <el-form-item label="姓名">
-                <el-input v-model="step02_Form04.Name" placeholder="请输入姓名" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form04.Name" placeholder="请输入姓名" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="身份证号码" prop="IDCard">
-                <el-input v-model="step02_Form04.IDCard" placeholder="请输入身份证号码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step02_Form04.IDCard" placeholder="请输入身份证号码" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="婚姻状况">
-                <el-select v-model="step02_Form04.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step02_Form04.MarryInfo" placeholder="请选择婚姻状况" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option label="未婚" value="1"></el-option>
                     <el-option label="已婚" value="2"></el-option>
                     <el-option label="离异" value="3"></el-option>
@@ -144,25 +146,26 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="与申请人关系">
-                <el-select v-model="step02_Form04.Relation" placeholder="请选择" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
-                    <el-option label="子女" value="子女"></el-option>
+                <el-select v-model="step02_Form04.Relation" placeholder="请选择" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
+                    <el-option label="配偶" value="0" v-if="applyForData && applyForData.member.MarryInfo ==2"></el-option>
+                    <el-option label="子女" value="1"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="本市常住人口">
-                <el-radio-group v-model="step02_Form04.IsPermanent" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form04.IsPermanent" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="step02_Form04.Sex" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-radio-group v-model="step02_Form04.Sex" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">男</el-radio>
-                    <el-radio label="0">女</el-radio>
+                    <el-radio label="2">女</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
         <p class="marT20 marB20">注： 16周岁以下不持有居民身份证的共同申请人，身份证号码按《居民户口簿》内的身份证编号填写。</p>
-        <div class="step02_btn_wrap tc padT10 padB20" v-show = "userInfo.State == 1001 || userInfo.State == 1002">
+        <div class="step02_btn_wrap tc padT10 padB20" v-show="(userInfo.State ==1001 || userInfo.State==1002) && isUserEnter !=1">
             <el-button @click="step02_prev()">上一步</el-button>
             <el-button type="primary" @click="step02_next('rules')">下一步</el-button>
         </div>
@@ -171,10 +174,11 @@
 <script>
     import { mapGetters } from 'vuex'
     import { getApplyFor,getApplyForInfo } from '../../api/api.js'
+    import { getCookie,setCookie } from '../../util/index.js'
     export default{
         data(){
             var validateIDCard = (rule, value, callback) => {
-                let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
                 if (!reg.test(value)) {
                     callback(new Error('请输入正确的身份证号'));
                 } else {
@@ -226,7 +230,7 @@
             }
         },
         computed:{
-            ...mapGetters(['applyForTab','userInfo']),
+            ...mapGetters(['applyForTab','userInfo','isUserEnter','applyForData']),
             getApplyForCode(){
                 return this.$store.getters.applyForCode
             },
@@ -253,7 +257,7 @@
                 },2000)
             },
             step02_next(){
-                let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;;
                 if(this.$route.query.id && this.$route.query.id ==2){
                     if(this.step02_Form01.Name == '' && this.step02_Form02.Name == '' && this.step02_Form03.Name == '' && this.step02_Form04.Name == ''){
                         this.$message.warning('您是已婚人士，请填写共同申请人')
@@ -300,28 +304,37 @@
                 if(this.step02_Form04.Name != ''){
                     this.residentlist.push(this.step02_Form04)
                 }
+                for(var i =0;i<this.residentlist.length;i++){
+                    if(this.residentlist[i].Sex == ''){
+                        this.residentlist[i].Sex = '1';
+                    }
+                }
                 this.loading = true;
                 var params = {
                     step : 2,
                     bill: {
-                        SignType: '1',
-                        code:this.$store.getters.applyForCode
+                        SignType: this.$store.getters.applyForData.bill.SignType,
+                        code:this.$store.getters.applyForCode,
+                        TelAddr:this.$store.getters.applyForData.bill.TelAddr,
+                        PostCode:this.$store.getters.applyForData.bill.PostCode,
                     },
                     member:this.$store.getters.applyForData.member,
                     filelist:this.$store.getters.applyForData.filelist,
                     residentlist:this.residentlist,
                 }
                 var applyForData = {
+                    bill:params.bill,
                     member:params.member,
                     filelist:params.filelist,
                     residentlist:params.residentlist,
                 }
+                // console.log(params)
                 getApplyFor(params).then(response => {
                     switch (response.StatusCode) {
                         case 200:
                             this.loading = false
                             this.$store.dispatch('SET_APPLYFORDATA',applyForData)
-                            this.$cookie.set('applyForData',JSON.stringify(applyForData))
+                            setCookie('applyForData',JSON.stringify(applyForData))
                             this.$router.push({path:'/applyFor/ThirdStep'})
                         break;
                         case 500:
@@ -346,11 +359,12 @@
                 this.loading = true
                 getApplyForInfo({Id:val}).then((response) =>{
                     var residentlist = JSON.parse(response.Data).residentlist
+                    // console.log(residentlist)
                     switch (response.StatusCode) {
                         case 200:
                         if(residentlist.length){
                             for(var i =0;i<residentlist.length;i++){
-                                residentlist[i].Sex = residentlist[i].Sex==1? "1" : "0"
+                                residentlist[i].Sex = residentlist[i].Sex==1? "1" : "2"
                                 residentlist[i].IsPermanent = residentlist[i].IsPermanent  == 1?"1":"0"
                             }
 
@@ -390,6 +404,7 @@
             }
         },
         created(){
+            // console.log(this.$store.getters.applyForData)
             if(this.$store.getters.applyForCode){
                 this.getApplyForInfoFunc(this.$store.getters.applyForCode)
             }

@@ -6,15 +6,15 @@
 			<span style="font-size:28px">填写新密码（手机验证方式）</span>
 		</div>
 		<el-form :model="fiveForm" label-position="right" :rules="fiveRules" ref="fiveForm" label-width="120px" class="demo-ruleForm">
-			<el-form-item label="新密码：" prop="Password">
-				<el-input :type="this.ispassword" v-model="fiveForm.Password" auto-complete="off"></el-input>
+			<el-form-item label="新密码" prop="Password">
+				<el-input :type="this.ispassword" @keyup.32.native="inputFunc(1)" v-model="fiveForm.Password" auto-complete="off"></el-input>
 				<i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
 			</el-form-item>
-			<el-form-item label="确定密码：" prop="confirm_pass">
-				<el-input :type="this.ispassword2" v-model="fiveForm.confirm_pass" auto-complete="off"></el-input>
+			<el-form-item label="确定密码" prop="confirm_pass">
+				<el-input :type="this.ispassword2" @keyup.32.native="inputFunc(2)" v-model="fiveForm.confirm_pass" auto-complete="off"></el-input>
 				<i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
 			</el-form-item>
-			<el-form-item label="图形验证码：" prop="yzm">
+			<el-form-item label="图形验证码" prop="yzm">
 				<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="fiveForm.yzm" auto-complete="off"></el-input>
 				<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
 			</el-form-item>
@@ -28,10 +28,10 @@
 			<el-tab-pane name="first">
 				<span slot="label" style="font-size:28px">手机找回密码</span>
 				<el-form :model="twoForm" label-position="right" :rules="twoRules" ref="twoForm" label-width="120px" class="demo-ruleForm">
-					<el-form-item label="手机号码：" prop="inputTel">
-						<el-input type="text" v-model="twoForm.inputTel" auto-complete="off"></el-input>
+					<el-form-item label="手机号码" prop="inputTel">
+						<el-input type="tel" maxlength="11" v-on:input="funcSendcode" v-model="twoForm.inputTel" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="手机验证码：" prop="ValidateCode">
+					<el-form-item label="手机验证码" prop="ValidateCode">
 						<el-input style="width:125px;" type="text" v-model="twoForm.ValidateCode" auto-complete="off"></el-input>
 						<el-button style="margin-left:20px;" v-loading="load_p" :disabled="disabled" @click="sendcode">{{ getBtnTxt }}</el-button>
 					</el-form-item>
@@ -41,10 +41,10 @@
 			<el-tab-pane name="second">
 				<span slot="label" style="font-size:28px">邮箱找回密码</span>
 				<el-form :model="threeForm" label-position="right" :rules="threeRules" ref="threeForm" label-width="120px">
-					<el-form-item label="邮箱：" prop="email">
-						<el-input type="text" v-model="threeForm.email" auto-complete="off"></el-input>
+					<el-form-item label="邮箱" prop="email">
+						<el-input type="text" v-on:input="funcSendcode_E" v-model="threeForm.email" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="邮箱验证码：" prop="ValidateCode_E">
+					<el-form-item label="邮箱验证码" prop="ValidateCode_E">
 						<el-input style="width:125px;" type="text" v-model="threeForm.ValidateCode_E" auto-complete="off"></el-input>
 						<el-button style="margin-left:20px;" v-loading="load_e" :disabled="disabled2" @click="sendcode_E">{{ getBtnTxt_E }}</el-button>
 					</el-form-item>
@@ -59,15 +59,15 @@
 			<span style="font-size:28px">填写新密码（邮箱验证方式）</span>
 		</div>
 		<el-form :model="sixForm" label-position="right" :rules="sixRules" ref="sixForm" label-width="120px" class="demo-ruleForm">
-			<el-form-item label="新密码：" prop="Password2">
-				<el-input :type="this.ispassword3" v-model="sixForm.Password2" auto-complete="off"></el-input>
+			<el-form-item label="新密码" prop="Password2">
+				<el-input :type="this.ispassword3" @keyup.32.native="inputFunc(3)" v-model="sixForm.Password2" auto-complete="off"></el-input>
 				<i :class="fa_eyes3" aria-hidden="true" @click="changeType3()" class="open_close"></i>
 			</el-form-item>
-			<el-form-item label="确定密码：" prop="confirm_pass2">
-				<el-input :type="this.ispassword4" v-model="sixForm.confirm_pass2" auto-complete="off"></el-input>
+			<el-form-item label="确定密码" prop="confirm_pass2">
+				<el-input :type="this.ispassword4" @keyup.32.native="inputFunc(4)" v-model="sixForm.confirm_pass2" auto-complete="off"></el-input>
 				<i :class="fa_eyes4" aria-hidden="true" @click="changeType4()" class="open_close"></i>
 			</el-form-item>
-			<el-form-item label="图形验证码：" prop="yzm2">
+			<el-form-item label="图形验证码" prop="yzm2">
 				<el-input style="width:170px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="sixForm.yzm2" auto-complete="off"></el-input>
 				<input type="button" @click="createCode" class="verification code" v-model="checkCode" />
 			</el-form-item>
@@ -97,7 +97,9 @@
 import {
 	getSMSHelper,
 	getFindPassword,
-	getEmailUtil
+	getEmailUtil,
+	getIsExistPhone,
+	getIsExistEmail
 } from '../api/api.js'
 import md5 from 'js-md5';
 var code; //在全局定义验证码
@@ -116,10 +118,16 @@ export default {
 			}
 		};
 		var validatePassword = (rule, value, callback) => {
+			let reg=/^[1-9]\d*$|^0$/;
+			let patrn=/[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
 			if (value === '') {
 				callback(new Error('请输入密码'));
 			} else if (value.length < 6) {
 				callback(new Error("密码长度必须大于六位！"));
+			} else if (reg.test(value)==true) {
+				callback(new Error("密码不能为纯数字！"));
+			} else if (patrn.exec(value)) {
+				callback(new Error("密码不能有汉字！！"));
 			} else {
 				callback();
 			}
@@ -134,12 +142,8 @@ export default {
 			}
 		};
 		var validateValidateCode = (rule, value, callback) => {
-			let PhoneNum = this.twoForm.inputTel
-			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
 			if (value === '') {
 				callback(new Error('手机验证码不能为空'));
-			} else if (!reg.test(PhoneNum)) {
-				callback(new Error('请输入正确的手机号码'));
 			} else if (md5(value) != this.SMCode_phone) {
 				callback(new Error('短信验证码不正确'));
 			} else {
@@ -184,10 +188,13 @@ export default {
 			}
 		};
 		var validatePassword2 = (rule, value, callback) => {
+			let reg=/^[1-9]\d*$|^0$/;
 			if (value === '') {
 				callback(new Error('请输入密码'));
 			} else if (value.length < 6) {
 				callback(new Error("密码长度必须大于六位！"));
+			} else if (reg.test(value)==true) {
+				callback(new Error("密码不能为纯数字！"));
 			} else {
 				callback();
 			}
@@ -222,8 +229,8 @@ export default {
 			card6: false,
 			activeName: 'first',
 			checkCode: '', //验证码value值
-			disabled: false,
-			disabled2: false,
+			disabled: true,
+			disabled2: true,
 			time: 0,
 			time2: 0,
 			getBtnTxt: "免费获取验证码",
@@ -331,7 +338,9 @@ export default {
 					validator: validateConfirm_pass2,
 					trigger: 'blur'
 				}]
-			}
+			},
+			isPhone: false,
+			isEmail: false
 		};
 	},
 	beforeRouteEnter(to, from, next) {
@@ -344,6 +353,37 @@ export default {
 		next()
 	},
 	methods: {
+		funcSendcode() {
+			if(this.twoForm.inputTel == '' ){
+				this.disabled = true;
+			}else {
+				this.disabled = false;
+			}
+		},
+		funcSendcode_E() {
+			if(this.threeForm.email == ''){
+				this.disabled2 = true;
+			}else {
+				this.disabled2 = false;
+			}
+		},
+		inputFunc(type) {
+			switch (type) {
+				case 1:
+					this.fiveForm.Password = this.fiveForm.Password.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				case 2:
+					this.fiveForm.confirm_pass = this.fiveForm.confirm_pass.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				case 3:
+					this.sixForm.Password2 = this.sixForm.Password2.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				case 4:
+					this.sixForm.confirm_pass2 = this.sixForm.confirm_pass2.replace(/[\u4e00-\u9fa5]/g, '');
+					break;
+				default:
+			}
+		},
 		handleClick(tab, event) {
 			// console.log(tab, event);
 		},
@@ -360,102 +400,174 @@ export default {
 			this.checkCode = code; //把code值赋给验证码
 		},
 		sendcode() {
-			if (this.twoForm.inputTel == '') {
-				this.$message({
-					type: 'error',
-					message: '请输入手机号！'
-				});
-				retur;
+			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
+			if (this.twoForm.inputTel === '') {
+				return;
+			} if (!reg.test(this.twoForm.inputTel)) {
+				return
 			}
-			this.load_p = true;
+			this.time = 60;
+			this.disabled = true;
+			this.timer();
 			let params = {
-				Type: 2, //找回密码
 				PhoneNum: this.twoForm.inputTel
 			}
-			getSMSHelper(params).then((response) => {
+			getIsExistPhone(params).then((response) => {
 				var errorText = response.Info;
 				switch (response.StatusCode) {
 					case 200:
-						this.$message({
-							type: 'success',
-							message: '短信验证码发送成功，请注意查收！'
-						});
-						this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
-						this.sidePhone = response.Data.PhoneNum;
-						this.load_p = false;
-						this.time = 60;
-						this.disabled = true;
-						this.timer();
+						if (response.Data == true) {
+							this.isPhone = true;
+						}else if(response.Data == false){
+							this.isPhone = false;
+						}
+						if (!this.isPhone) {
+							this.$message({
+								type: 'error',
+								message: '该手机号未注册！'
+							});
+							this.time = 0;
+							this.getBtnTxt = "免费获取验证码";
+							this.disabled = false;
+							return;
+						}
+						this.load_p = true;
+						let paramss = {
+							Type: 2, //找回密码
+							PhoneNum: this.twoForm.inputTel
+						}
+						getSMSHelper(paramss).then((response) => {
+							var errorText = response.Info;
+							switch (response.StatusCode) {
+								case 200:
+									this.$message({
+										type: 'success',
+										message: '短信验证码发送成功，请注意查收！'
+									});
+									this.SMCode_phone = response.Data.RegisterCode.toLowerCase();
+									this.sidePhone = response.Data.PhoneNum;
+									this.load_p = false;
+									break;
+								case 500:
+									this.$message({
+										type: 'error',
+										message: errorText
+									});
+									this.load_p = false;
+									this.time = 0;
+									this.getBtnTxt = "免费获取验证码";
+									this.disabled = false;
+									break;
+								default:
+									this.$message({
+										type: 'error',
+										message: '短信验证码发送失败！'
+									});
+									this.load_p = false;
+									this.time = 0;
+									this.getBtnTxt = "免费获取验证码";
+									this.disabled = false;
+							}
+						})
 						break;
 					case 500:
 						this.$message({
 							type: 'error',
 							message: errorText
 						});
-						this.load_p = false;
-						this.time = 0;
-						this.getBtnTxt = "免费获取验证码";
-						this.disabled = false;
 						break;
 					default:
 						this.$message({
 							type: 'error',
-							message: '短信验证码发送失败！'
+							message: errorText
 						});
-						this.load_p = false;
-						this.time = 0;
-						this.getBtnTxt = "免费获取验证码";
-						this.disabled = false;
+						break;
+
 				}
 			})
 		},
 		sendcode_E() {
+			let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 			if (this.threeForm.email == '') {
-				this.$message({
-					type: 'error',
-					message: '请输入邮箱！'
-				});
-				retur;
+				return;
 			}
-			this.load_e = true;
+			if (!reg.test(this.threeForm.email)) {
+				return;
+			}
+			this.time2 = 60;
+			this.disabled2 = true;
+			this.timer2();
 			let params = {
-				Type: 2, //找回密码
 				Email: this.threeForm.email
 			}
-			getEmailUtil(params).then((response) => {
+			getIsExistEmail(params).then((response) => {
 				var errorText = response.Info;
 				switch (response.StatusCode) {
 					case 200:
-						this.$message({
-							type: 'success',
-							message: '邮箱验证码发送成功，请注意查收！'
-						});
-						this.SMCode_email = response.Data.RegisterCode.toLowerCase();
-						this.sideEmail = response.Data.Email;
-						this.load_e = false;
-						this.time2 = 60;
-						this.disabled2 = true;
-						this.timer2();
+						if (response.Data == true) {
+							this.isEmail = true;
+						}else if(response.Data == false){
+							this.isEmail = false;
+						}
+						if (!this.isEmail) {
+							this.$message({
+								type: 'error',
+								message: '该邮箱号未注册！'
+							});
+							return;
+						}
+						this.load_e = true;
+						let paramss = {
+							Type: 2, //找回密码
+							Email: this.threeForm.email
+						}
+						getEmailUtil(paramss).then((response) => {
+							var errorText = response.Info;
+							switch (response.StatusCode) {
+								case 200:
+									this.$message({
+										type: 'success',
+										message: '邮箱验证码发送成功，请注意查收！'
+									});
+									this.SMCode_email = response.Data.RegisterCode.toLowerCase();
+									this.sideEmail = response.Data.Email;
+									this.load_e = false;
+									break;
+								case 500:
+									this.$message({
+										type: 'error',
+										message: errorText
+									});
+									this.time2 = 0;
+									this.getBtnTxt_E = "免费获取验证码";
+									this.disabled2 = false;
+									this.load_e = false;
+									break;
+								default:
+									this.$message({
+										type: 'error',
+										message: '邮箱验证码发送失败！'
+									});
+									this.time2 = 0;
+									this.getBtnTxt_E = "免费获取验证码";
+									this.disabled2 = false;
+									this.load_e = false;
+							}
+						})
 						break;
 					case 500:
 						this.$message({
 							type: 'error',
 							message: errorText
 						});
-						this.time2 = 0;
-						this.getBtnTxt_E = "免费获取验证码";
-						this.disabled2 = false;
-						this.load_e = false;
 						break;
 					default:
 						this.$message({
 							type: 'error',
-							message: '邮箱验证码发送失败！'
+							message: errorText
 						});
-						this.time2 = 0;
-						this.getBtnTxt_E = "免费获取验证码";
-						this.disabled2 = false;
-						this.load_e = false;
+						break;
+
 				}
 			})
 		},
@@ -521,8 +633,14 @@ export default {
 						switch (response.StatusCode) {
 							case 200:
 								this.card2 = false;
-								this.card3 = true;
-								this.card5 = false;
+								this.card3 = false;
+								this.$message({
+									type: 'success',
+									message: "密码找回成功"
+								});
+							setTimeout(() => {
+								this.$router.push("/login");
+							}, 1500)
 								break;
 							case 500:
 								this.$message({
@@ -558,8 +676,14 @@ export default {
 							case 200:
 								this.card2 = false;
 								this.card3 = false;
-								this.card6 = false;
-								this.card4 = true;
+								this.card4 = false;
+								this.$message({
+									type: 'success',
+									message: "密码找回成功"
+								});
+							setTimeout(() => {
+								this.$router.push("/login");
+							}, 1500)
 								break;
 							case 500:
 								this.$message({
@@ -576,9 +700,6 @@ export default {
 
 						}
 					})
-					this.card2 = false;
-					this.card3 = false;
-					this.card4 = true;
 				} else {
 					return false;
 				}

@@ -6,7 +6,7 @@
                 <el-breadcrumb-item>{{ typeText }}</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="main-content" v-loading="loading">
-                <p class="noDataText padT20 padB20 tc fs16 green" v-show='items.length == 0'>暂无数据!&nbsp;&nbsp;-_-!!!</p>
+                <p class="noDataText padT20 padB20 tc fs16 green" v-show='items.length == 0'>暂无数据!</p>
                 <ul class="entry-list" ref="entry">
                     <li class="list-item" v-for="(item, index) in items">
                         <router-link :to="`/guideview/${item.Id}`">
@@ -20,7 +20,7 @@
                                             <span class="title" :style="{color:'#'+item.FullheadColor}">{{ item.FullHead }}</span>
                                             <div class="date">{{ item.CreateDate }}</div>
                                         </div>
-                                        <div class="content-view" v-html="unescape(item.NewsContent)"></div>
+                                        <div class="content-view" v-html="unescape((item.NewsContent == null || item.NewsContent == '') ? '' : item.NewsContent)"></div>
                                     </div>
                                 </div>
                             </div>

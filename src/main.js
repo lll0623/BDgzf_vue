@@ -13,8 +13,12 @@ import 'swiper/dist/css/swiper.css'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 
 import 'font-awesome/css/font-awesome.min.css'
-
+//cookie
 var VueCookie = require('vue-cookie')
+
+//webWork
+import VueWorker from 'vue-worker'
+
 
 import 'element-ui/lib/theme-chalk/index.css';
 import ElementUI from 'element-ui'
@@ -36,6 +40,7 @@ Vue.use(ElementUI)
 Vue.use(VueAwesomeSwiper)
 Vue.use(VueCookie)
 Vue.use(VueLazyload)
+Vue.use(VueWorker)
 
 
 import htmlToPdf from '@/util/htmlToPdf'
@@ -62,4 +67,7 @@ router.beforeEach((to,from,next) => {
     }else {
         from.name ? next({ name:from.name }) : next('/');                                                                             //如果匹配到正确跳转
     }
+})
+router.afterEach((to,from,next) => {
+    window.scrollTo(0,0);
 })

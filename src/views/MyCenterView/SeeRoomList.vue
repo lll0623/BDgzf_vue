@@ -16,9 +16,11 @@
                 <el-table-column prop="ExpectTime" header-align="center" align="center" label="申请时间" width="180" :formatter="resetData"></el-table-column>
                 <el-table-column prop="ApproveTypeText" header-align="center" align="center" width="100" label="审批状态">
                     <template slot-scope="props">
-                        <el-tag type="success" v-if="props.row.state  == 0">未完成</el-tag>
-                        <el-tag type="danger" v-else="props.row.state == 1">已完成</el-tag>
-                        <el-tag type="danger" v-else="props.row.state == 2">已取消</el-tag>
+                        <el-tag type="success" v-if="props.row.State  == 1">审核中</el-tag>
+                        <el-tag type="success" v-if="props.row.State == 2">已通过</el-tag>
+                        <el-tag type="info" v-if="props.row.State == 3">已完成</el-tag>
+                        <el-tag type="warning" v-if="props.row.State == 4">已取消</el-tag>
+                        <el-tag type="danger" v-if="props.row.State == 5">未通过</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" header-align="center" align="center">
@@ -43,9 +45,11 @@
             <div class="SeeRoomList-wrap ">
                 <el-form :model="SeeRoomListViewForm" label-width="120px" ref="SeeRoomListViewForm">
                     <el-form-item label="审批状态：" prop="ApplyPeople">
-                        <el-tag type="success" v-if="SeeRoomListViewForm.state  == 0">未完成</el-tag>
-                        <el-tag type="danger" v-else="SeeRoomListViewForm.state == 1">已完成</el-tag>
-                        <el-tag type="danger" v-else="SeeRoomListViewForm.state == 2">已取消</el-tag>
+                        <el-tag type="success" v-if="SeeRoomListViewForm.State == 1">审核中</el-tag>
+                        <el-tag type="success" v-if="SeeRoomListViewForm.State == 2">已通过</el-tag>
+                        <el-tag type="info" v-if="SeeRoomListViewForm.State == 3">已完成</el-tag>
+                        <el-tag type="warning" v-if="SeeRoomListViewForm.State == 4">已取消</el-tag>
+                        <el-tag type="danger" v-if="SeeRoomListViewForm.State == 5">未通过</el-tag>
                     </el-form-item>
                     <el-form-item label="申请人：" prop="ApplyPeople">
                        <div>{{SeeRoomListViewForm.name}}</div>
@@ -129,7 +133,7 @@ import { formatDate } from '../../util/index.js'
                 this.SeeRoomListViewForm.VillageAddress = row.AllName
                 this.SeeRoomListViewForm.ExpectTime =formatDate(new Date(row.ExpectTime),"yyyy-MM-dd hh:mm:ss")
                 this.SeeRoomListViewForm.OtherDesc = row.Description
-                this.SeeRoomListViewForm.state = row.state
+                this.SeeRoomListViewForm.State = row.State
                 this.dialogSeeRoomList = true;
            },
            //分页

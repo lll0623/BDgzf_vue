@@ -8,16 +8,16 @@
         ref="step04_Form"
         class="step04-ruleForm">
             <el-form-item label="单位名称" prop="CompanyName">
-                <el-input v-model="step04_Form.CompanyName" placeholder="请填写营业执照上的单位名称全称" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyName" placeholder="请填写营业执照上的单位名称全称" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="单位电话" prop="CompanyPhone">
-                <el-input v-model="step04_Form.CompanyPhone" placeholder="请输入单位电话" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyPhone" placeholder="请输入单位电话（输入固定电话号码时请在区号与号码之间加 ‘  -  ’）" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="单位地址" prop="CompanyAddress">
-                <el-input v-model="step04_Form.CompanyAddress" placeholder="请填写营业执照上的注册地址" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyAddress" placeholder="请填写营业执照上的注册地址" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="单位类型" prop="CompanyType">
-                <el-select v-model="step04_Form.CompanyType" placeholder="请选择单位类型" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+                <el-select v-model="step04_Form.CompanyType" placeholder="请选择单位类型" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-option v-for="(item,index) in unitType" :key="item.name"  :label="item.name" :value="item.val"></el-option>
                 </el-select>
             </el-form-item>
@@ -27,24 +27,26 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="统一社会信用代码" prop="USCCode">
-                <el-input v-model="step04_Form.USCCode" placeholder="或组织机构代码证" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.USCCode" placeholder="或组织机构代码证" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
             <el-form-item label="邮编" prop="CompanyPostalCode">
-                <el-input v-model="step04_Form.CompanyPostalCode" placeholder="请输入邮政编码" clearable :disabled = "userInfo.State != 1001 && userInfo.State != 1002"></el-input>
+                <el-input v-model="step04_Form.CompanyPostalCode" placeholder="请输入邮政编码" clearable :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1"></el-input>
             </el-form-item>
-            <el-form-item label="申请人与该单位签署已签订" label-width="190px" prop="SignYear">
-                <el-radio-group v-model="step04_Form.SignYear" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
+
+            <el-form-item label="申请人与该单位已签订" label-width="190px" prop="SignYear">
+                <el-radio-group v-model="step04_Form.SignYear" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
                     <el-radio label="1">一年</el-radio>
                     <el-radio label="2">两年以上劳动合同</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="申请类型" prop="applyType">
-                <el-radio-group v-model="step04_Form.applyType" :disabled = "userInfo.State != 1001 && userInfo.State != 1002">
-                    <el-radio label="0">按单位</el-radio>
+            <el-form-item label="申请类型" prop="SignType">
+                <el-radio-group v-model="step04_Form.SignType" :disabled = "(userInfo.State != 1001 && userInfo.State != 1002) || isUserEnter == 1">
+                    <el-radio label="1">按单位</el-radio>
+                    <el-radio label="2" v-if="(applyForData && ((applyForData.member.LiveCardFull2Year == 1 && applyForData.member.SocialSecurityFullYear == 1)  || applyForData.member.HouseholdAddress.indexOf('上海') != -1)) || (step04_Form.SignType == 2)">按个人</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
-        <div class="step02_btn_wrap tc marT30 padB20" v-show="userInfo.State ==1001 || userInfo.State==1002">
+        <div class="step02_btn_wrap tc marT30 padB20" v-show="(userInfo.State ==1001 || userInfo.State==1002) && isUserEnter !=1">
             <el-button @click="step04_prev()">上一步</el-button>
             <el-button type="primary" @click="complete('step04_Form')">完成</el-button>
         </div>
@@ -54,12 +56,17 @@
     import { mapGetters } from 'vuex'
     import { unitType,AreaCode } from '../../../static/dataJson/dataJson'
     import { getApplyFor,getApplyForInfo } from '../../api/api.js'
+    import { setCookie,getCookie } from '../../util/index.js'
     export default{
         data(){
             var validatePhoneNum = (rule, value, callback) => {
                 let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-                if (!reg.test(value)) {
-                    callback(new Error('请输入正确的手机号码'));
+                let fixTel = /^([0-9]{3,4}-)?[0-9]{7,8}$/;
+                // let fixTel = ^0\d{2,3}[- ]?\d{7,8};
+                if (!reg.test(value) && value.length == 11) {
+                    callback(new Error('请输入正确的手机号码或固话电话号码'));
+                }else if(!fixTel.test(value) && value.length != 11){
+                    callback(new Error('请输入正确的手机号码或固话电话号码'));
                 } else {
                     callback();
                 }
@@ -79,7 +86,7 @@
                     USCCode:'',
                     CompanyPostalCode:'',
                     SignYear:'',
-                    applyType:'0',
+                    SignType:'1',
                     Region:'310115',
                 },
 
@@ -110,6 +117,9 @@
                     SignYear:[
                         { required: true, message: '请选择申请人与该单位签署已签订年限', trigger: 'change' }
                     ],
+                    SignType:[
+                        { required: true, message: '请选择申请类型', trigger: 'change' }
+                    ],
                     Region:[
                         { required: true, message: '请选择注册区域', trigger: 'change' }
                     ],
@@ -117,7 +127,7 @@
             }
         },
         computed:{
-            ...mapGetters(['applyForTab','userInfo']),
+            ...mapGetters(['applyForTab','userInfo','applyForData','isUserEnter']),
             getApplyForCode(){
                 return this.$store.getters.applyForCode
             },
@@ -150,8 +160,10 @@
                         var params ={
                             step : 4,
                             bill: {
-                                SignType: '1',
-                                code:this.$store.getters.applyForCode
+                                SignType: this.step04_Form.SignType,
+                                code:this.$store.getters.applyForCode,
+                                TelAddr:this.$store.getters.applyForData.bill.TelAddr,
+                                PostCode:this.$store.getters.applyForData.bill.PostCode,
                             },
                             member:this.$store.getters.applyForData.member,
                             filelist:this.$store.getters.applyForData.filelist,
@@ -160,6 +172,7 @@
                             companyinfo:this.step04_Form
                         }
                         var applyForData = {
+                            bill:params.bill,
                             member:params.member,
                             filelist:params.filelist,
                             residentlist:params.residentlist,
@@ -168,22 +181,26 @@
                         getApplyFor(params).then(response => {
                             switch (response.StatusCode) {
                                 case 200:
-                                    this.$alert('申请资格提交中，请等待。。。', '提示', {
-                                        confirmButtonText: '确定',
-                                        callback: action => {
-                                            this.loading = false;
-                                            //更新个人数据
-                                            //重置cookie userinfo
-                                            var userInfo = JSON.parse(this.$cookie.get('userInfo'))
-                                            userInfo.State = '1003'
-                                            this.$store.dispatch('SET_USERINFO',userInfo)
-                                            this.$store.dispatch('SET_APPLYFORDATA',applyForData)
-                                            this.$store.commit('SET_STEPTIP','1003');
-                                            this.$cookie.set('userInfo',JSON.stringify(userInfo))
-                                            this.$cookie.set('applyForData',JSON.stringify(applyForData))
-                                            this.$router.push({path:'/'})
-                                        }
-                                    });
+                                    // this.$alert('申请资格提交中，请等待。。。', '提示', {
+                                    //     confirmButtonText: '确定',
+                                    //     callback: action => {
+                                    //
+                                    //     }
+                                    // });
+                                    this.$message.success('申请资格提交成功，请稍等！')
+                                    //更新个人数据
+                                    //重置cookie userinfo
+                                    var userInfo = JSON.parse(getCookie('userInfo'))
+                                    userInfo.State = '1003'
+                                    this.$store.dispatch('SET_USERINFO',userInfo)
+                                    this.$store.dispatch('SET_APPLYFORDATA',applyForData)
+                                    this.$store.commit('SET_STEPTIP','1003');
+                                    setCookie('userInfo',JSON.stringify(userInfo))
+                                    setCookie('applyForData',JSON.stringify(applyForData))
+                                    setTimeout(()=>{
+                                        this.loading = false;
+                                        this.$router.push({path:'/'})
+                                    },800)
                                 break;
                                 case 500:
                                     this.loading = false;
@@ -215,12 +232,23 @@
             },
             getApplyForInfoFunc(val){
                 this.loading = true
-                getApplyForInfo({Id:val}).then((response) =>{
+                getApplyForInfo({Id:val}).then((response) =>{//GetBillInfo
+                    // console.log(JSON.parse(response.Data))
                     switch (response.StatusCode) {
                         case 200:
                             if(JSON.parse(response.Data).company){
-                                this.step04_Form = JSON.parse(response.Data).company
-                                this.step04_Form.applyType = '0'
+                                this.step04_Form.CompanyName=JSON.parse(response.Data).company.CompanyName
+                                this.step04_Form.CompanyPhone=JSON.parse(response.Data).company.CompanyPhone
+                                this.step04_Form.CompanyAddress=JSON.parse(response.Data).company.CompanyAddress
+                                this.step04_Form.CompanyType=JSON.parse(response.Data).company.CompanyType
+                                this.step04_Form.USCCode=JSON.parse(response.Data).company.USCCode
+                                this.step04_Form.CompanyPostalCode=JSON.parse(response.Data).company.CompanyPostalCode
+                                this.step04_Form.SignYear=JSON.parse(response.Data).company.SignYear
+
+                                this.step04_Form.SignType=JSON.parse(response.Data).bill.SignType == 2? "2" : "1"
+
+                                this.step04_Form.Region=JSON.parse(response.Data).company.Region
+                                // this.step04_Form = JSON.parse(response.Data).company
                             }
                             this.loading = false
                         break;
@@ -242,6 +270,7 @@
             },
         },
         created(){
+            // console.log(this.$store.getters.applyForData)
             if(this.$store.getters.applyForCode){
                 this.getApplyForInfoFunc(this.$store.getters.applyForCode)
             }

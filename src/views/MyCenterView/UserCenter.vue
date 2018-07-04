@@ -131,10 +131,10 @@
 
 	<!-- ###############修改手机号码 开始################## -->
 	<!-- 手机方式 修改手机号码 -->
-	<el-dialog title="修改手机号码" :visible.sync="updatePhoneForm_DP" width="60%">
+	<el-dialog title="修改手机号码" :visible.sync="updatePhoneForm_DP" width="550px">
 		<el-form :model="updatePhone_phoneForm" label-position="right" :rules="updatePhone_phoneRules" ref="updatePhone_phoneForm" label-width="120px" class="demo-updatePhone_phoneForm">
 			<el-form-item label="短信验证码：" prop="ValidateCode_phone">
-				<el-input style="width:120px;" placeholder="请输入短信验证码" type="text" v-model="updatePhone_phoneForm.ValidateCode_phone" auto-complete="off"></el-input>
+				<el-input style="width:150px;" placeholder="请输入短信验证码" type="text" v-model="updatePhone_phoneForm.ValidateCode_phone" auto-complete="off"></el-input>
 				<el-button style="margin-left:20px;" :disabled="disabled_phone" @click="sendcodePhone">{{ getBtnTxt_p }}</el-button>
 			</el-form-item>
 			<el-form-item label="新手机号码" prop="NewPhoneNum">
@@ -148,10 +148,10 @@
 	</el-dialog>
 
 	<!-- 邮箱方式 修改手机号码 -->
-	<el-dialog title="修改手机号码" :visible.sync="updatePhoneForm_DE" width="60%">
+	<el-dialog title="修改手机号码" :visible.sync="updatePhoneForm_DE" width="550px">
 		<el-form :model="updatePhone_emailForm" label-position="right" :rules="updatePhone_emailRules" ref="updatePhone_emailForm" label-width="120px" class="demo-updatePhone_emailForm">
 			<el-form-item label="邮箱验证码：" prop="ValidateCode_email">
-				<el-input style="width:120px;" placeholder="请输入邮箱验证码" type="text" v-model="updatePhone_emailForm.ValidateCode_email" auto-complete="off"></el-input>
+				<el-input style="width:150px;" placeholder="请输入邮箱验证码" type="text" v-model="updatePhone_emailForm.ValidateCode_email" auto-complete="off"></el-input>
 				<el-button style="margin-left:20px;" :disabled="disabled_email" @click="sendcodeEmail">{{ getBtnTxt_e }}</el-button>
 			</el-form-item>
 			<el-form-item label="新手机号码" prop="NewPhoneNum">
@@ -168,10 +168,10 @@
 
 	<!-- ###############修改邮箱 开始################## -->
 	<!-- 修改邮箱-手机方式 -->
-	<el-dialog title="修改电子邮箱" :visible.sync="updateEmailForm_DP" width="60%">
+	<el-dialog title="修改电子邮箱" :visible.sync="updateEmailForm_DP" width="550px">
 		<el-form :model="updateEmail_phoneForm" label-position="right" :rules="updateEmail_phoneRules" ref="updateEmail_phoneForm" label-width="120px" class="demo-updateEmail_phoneForm">
 			<el-form-item label="短信验证码：" prop="ValidateCode_phone">
-				<el-input style="width:120px;" placeholder="请输入短信验证码" type="text" v-model="updateEmail_phoneForm.ValidateCode_phone" auto-complete="off"></el-input>
+				<el-input style="width:150px;" placeholder="请输入短信验证码" type="text" v-model="updateEmail_phoneForm.ValidateCode_phone" auto-complete="off"></el-input>
 				<el-button style="margin-left:20px;" :disabled="disabled_phone" @click="sendcodePhone">{{ getBtnTxt_p }}</el-button>
 			</el-form-item>
 			<el-form-item label="新电子邮箱" prop="NewEmailNum">
@@ -185,10 +185,10 @@
 	</el-dialog>
 
 	<!-- 修改邮箱 邮箱方式 -->
-	<el-dialog title="修改电子邮箱" :visible.sync="updateEmailForm_DE" width="60%">
+	<el-dialog title="修改电子邮箱" :visible.sync="updateEmailForm_DE" width="550px">
 		<el-form :model="updateEmail_emailForm" label-position="right" :rules="updateEmail_emailRules" ref="updateEmail_emailForm" label-width="120px" class="demo-updateEmail_emailForm">
 			<el-form-item label="邮箱验证码：" prop="ValidateCode_email">
-				<el-input style="width:120px;" placeholder="请输入邮箱验证码" type="text" v-model="updateEmail_emailForm.ValidateCode_email" auto-complete="off"></el-input>
+				<el-input style="width:150px;" placeholder="请输入邮箱验证码" type="text" v-model="updateEmail_emailForm.ValidateCode_email" auto-complete="off"></el-input>
 				<el-button style="margin-left:20px;" :disabled="disabled_email" @click="sendcodeEmail">{{ getBtnTxt_e }}</el-button>
 			</el-form-item>
 			<el-form-item label="新电子邮箱" prop="NewEmailNum">
@@ -204,7 +204,7 @@
 </section>
 </template>
 <script>
-import { getUserInfo,getUpdatePwd,getUserCenterUpdate,getSMSHelper } from '../../api/api.js'
+import { getUserInfo,getUpdatePwd,getUserCenterUpdate,getSMSHelper,getIsExistPhone,getIsExistEmail } from '../../api/api.js'
 import { mapGetters } from 'vuex'
 import md5 from 'js-md5';
 var code; //在全局定义验证码
@@ -273,24 +273,69 @@ export default {
 		// 手机号验证
 		var validatePhoneNum = (rule, value, callback) => {
 			let reg = /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-			if (value === '') {
-				callback(new Error('手机号码不能为空'));
-			} else if (!reg.test(value)) {
-				callback(new Error('请输入正确的手机号码'));
-			} else {
-				callback();
+			let params = {
+				PhoneNum: value
 			}
+			getIsExistPhone(params).then((response) => {
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						if (response.Data == true) {
+							this.isPhone = true;
+						}else if(response.Data == false){
+							this.isPhone = false;
+						}
+						if (this.isPhone) {
+							callback(new Error('该手机号已注册！'));
+							return;
+						}
+						break;
+					case 500:
+						break;
+					default:
+						break;
+				}
+				if (value === '') {
+					callback(new Error('手机号码不能为空'));
+				} else if (!reg.test(value)) {
+					callback(new Error('请输入正确的手机号码'));
+				} else {
+					callback();
+				}
+			})
 		};
 		// 邮箱验证
 		var validateEmail = (rule, value, callback) => {
 			let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-			if (value == '') {
-				callback(new Error('电子邮箱不能为空'));
-			} else if (!reg.test(value)) {
-				callback(new Error('请输入正确格式的邮箱'));
-			} else {
-				callback();
+			let params = {
+				Email: value
 			}
+			getIsExistEmail(params).then((response) => {
+				var errorText = response.Info;
+				switch (response.StatusCode) {
+					case 200:
+						if (response.Data == true) {
+							this.isEmail = true;
+						} else if (response.Data == false) {
+							this.isEmail = false;
+						}
+						break;
+					case 500:
+						break;
+					default:
+						break;
+
+				}
+				if (value == '') {
+					callback(new Error('电子邮箱不能为空'));
+				} else if (!reg.test(value)) {
+					callback(new Error('请输入正确格式的邮箱'));
+				} else if (this.isEmail) {
+					callback(new Error('该邮箱已注册！'));
+				} else {
+					callback();
+				}
+			})
 		};
 		// 图形验证码校验
 		var validateVerifyCode = (rule, value, callback) => {
@@ -306,6 +351,8 @@ export default {
 			}
 		};
 		return {
+			isPhone: false,
+			isEmail: false,
 			loadingPassword: false,
 			PersonalInformation: { //个人信息展示
 				Name: '',
@@ -324,6 +371,9 @@ export default {
 			mostMessage: false, // 个人信息loading
 			allMessage: false, // 全部个人信息loading
 			Sexs: [{
+				value: -1,
+				label: '请选择'
+			},{
 				value: 1,
 				label: '男'
 			}, {
@@ -332,6 +382,9 @@ export default {
 			}],
 			valueSex: '',
 			Culturals: [{
+				value: -1,
+				label: '请选择'
+			},{
 				value: 0,
 				label: '博士'
 			}, {
@@ -358,6 +411,9 @@ export default {
 			}],
 			valueCultural: '',
 			MarryInfos: [{
+				value: 0,
+				label: '请选择'
+			},{
 				value: 1,
 				label: '未婚'
 			}, {
@@ -525,16 +581,27 @@ export default {
 		},
 		//手机号码修改按钮
 		updatePhone(type) {
+			this.updatePhone_phoneForm.ValidateCode_phone = "";
+			this.updatePhone_phoneForm.NewPhoneNum = "";
+			this.updatePhone_emailForm.ValidateCode_email = "";
+			this.updatePhone_emailForm.NewPhoneNum = "";
 			this.dialogPhoneOrEmail = true;
 			this.updateType = type;
 		},
 		//邮箱修改按钮
 		updateEmail(type) {
+			this.updateEmail_phoneForm.ValidateCode_phone = "";
+			this.updateEmail_phoneForm.NewEmailNum = "";
+			this.updateEmail_emailForm.ValidateCode_email = "";
+			this.updateEmail_emailForm.NewEmailNum = "";
 			this.dialogPhoneOrEmail = true;
 			this.updateType = type;
 		},
 		//手机方式验证-修改密码
 		changePhone() {
+			this.time = 0;
+			this.getBtnTxt_p = "获取验证码";
+			this.disabled_phone = false;
 			switch (this.updateType) {
 				case "updatePhone":
 					this.updatePhoneForm_DP = true;
@@ -550,6 +617,9 @@ export default {
 		},
 		//邮箱方式验证-修改密码
 		changeEmail() {
+			this.time = 0;
+			this.getBtnTxt_e = "获取验证码";
+			this.disabled_email = false;
 			switch (this.updateType) {
 				case "updatePhone":
 					this.updatePhoneForm_DE = true;
@@ -604,18 +674,8 @@ export default {
 								});
 								break;
 							default:
-								this.$message({
-									type: 'error',
-									message: '修改失败！'
-								});
 						}
 					})
-				} else {
-					this.$message({
-						type: 'error',
-						message: '修改失败！'
-					});
-					return false;
 				}
 			});
 		},
@@ -654,24 +714,14 @@ export default {
 								this.getUserInfoMessage(params);
 								break;
 							case 500:
-								this.$message({
-									type: 'error',
-									message: errorText
-								});
+							this.$message({
+								type: 'error',
+								message: errorText
+							});
 								break;
 							default:
-								this.$message({
-									type: 'error',
-									message: '修改失败！'
-								});
 						}
 					})
-				} else {
-					this.$message({
-						type: 'error',
-						message: '修改失败！'
-					});
-					return false;
 				}
 			});
 		},
@@ -716,18 +766,8 @@ export default {
 								});
 								break;
 							default:
-								this.$message({
-									type: 'error',
-									message: '修改失败！'
-								});
 						}
 					})
-				} else {
-					this.$message({
-						type: 'error',
-						message: '修改失败！'
-					});
-					return false;
 				}
 			});
 		},
@@ -772,18 +812,8 @@ export default {
 								});
 								break;
 							default:
-								this.$message({
-									type: 'error',
-									message: '修改失败！'
-								});
 						}
 					})
-				} else {
-					this.$message({
-						type: 'error',
-						message: '修改失败！'
-					});
-					return false;
 				}
 			});
 		},
@@ -886,9 +916,12 @@ export default {
 		isShowEditBtn() {
 			this.isShowView = false;
 			this.isShowEdit = true;
-			this.valueSex = this.PersonalInformation.Sex; //性别多选框 特殊处理
-			this.valueCultural = parseInt(this.PersonalInformation.Cultural);
-			this.valueMarryInfo = parseInt(this.PersonalInformation.MarryInfo);
+			this.valueSex = parseInt((this.PersonalInformation.Sex == '' || this.PersonalInformation.Sex == null) ? -1 : this.PersonalInformation.Sex); //性别多选框 特殊处理
+			console.log(parseInt(this.valueSex));
+			console.log(parseInt(this.PersonalInformation.Cultural));
+			this.valueCultural = parseInt(( this.PersonalInformation.Cultural == null) ? -1 : this.PersonalInformation.Cultural);
+			console.log(parseInt(this.valueCultural));
+			this.valueMarryInfo = parseInt((this.PersonalInformation.MarryInfo == '' || this.PersonalInformation.MarryInfo == 0 || this.PersonalInformation.MarryInfo == null) ? 0 : this.PersonalInformation.MarryInfo);
 		},
 		choosenSex() {
 			this.PersonalInformation.Sex = this.valueSex;
@@ -941,10 +974,6 @@ export default {
 						this.mostMessage = false;
 						break;
 					default:
-						this.$message({
-							type: 'error',
-							message: '修改失败！'
-						});
 						this.mostMessage = false;
 				}
 			})
@@ -1002,21 +1031,6 @@ export default {
 }
 .yanzhengma_input {
     width: 190px;
-}
-.verification {
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: #053d84;
-    background: #f2f2f5 !important;
-    margin-left: 30px;
-    line-height: 37px;
-    height: 40px;
-    margin-top: -3px;
-    width: 100px;
-    border-radius: 3px;
-    vertical-align: middle;
-    transform: translate(-15px,0);
-    width: 102px;
 }
 .qrcode-img {
     height: auto;

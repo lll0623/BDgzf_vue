@@ -155,7 +155,7 @@ import moment from 'moment'
                         case 200:
                             this.messageLists = (response.Data == null) ? [] : response.Data.Rows;
                             // this.checked(this.messageLists)
-                            this.listsTotal = (response.Data == null) ? 0 : response.Data.Rows.length;
+                                this.listsTotal = (response.Data == null) ? 0 : response.Data.Records;
                             if( this.filterCheck == 1 ){
                                 this.$store.commit('SET_ISREADORNOT',this.listsTotal); // 未读消息条数
                             }

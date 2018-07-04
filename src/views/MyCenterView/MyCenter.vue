@@ -8,7 +8,7 @@
             </div>
             <ul class="myCenter-nav marT30">
                 <li class="rel" :class="myCenterNav==1?'active':''">
-                    <span class="baged abs white fs12 block tc">{{ this.$store.getters.isReadOrNot }}</span>
+                    <span class="baged abs white fs12 block tc" v-if="userInfo && this.$store.getters.isReadOrNot > 0">{{ this.$store.getters.isReadOrNot }}</span>
                     <router-link to="/myCenter">我的消息</router-link>
                 </li>
                 <li :class="myCenterNav==2?'active':''">
@@ -48,23 +48,23 @@
             element-loading-spinner="el-icon-loading"
             title="修改密码"
             :visible.sync="updatePwdForm_DP"
-            width="60%"
+            width="435px"
             >
             <el-form :model="updatePwd_phoneForm" label-position="right" :rules="updatePwd_phoneRules" ref="updatePwd_phoneForm" label-width="120px" class="demo-updatePwd_phoneForm">
-                <el-form-item label="原密码：" prop="OldPassword">
-                    <el-input :type="this.ispassword3" placeholder="请输入原密码" v-model="updatePwd_phoneForm.OldPassword" auto-complete="off"></el-input>
+                <el-form-item label="原密码" prop="OldPassword">
+                    <el-input :type="this.ispassword3" @keyup.32.native="inputFunc(1)" placeholder="请输入原密码" v-model="updatePwd_phoneForm.OldPassword" auto-complete="off"></el-input>
                     <i :class="fa_eyes3" aria-hidden="true" @click="changeType3()" class="open_close"></i>
                 </el-form-item>
-                <el-form-item label="新密码：" prop="Password">
-                    <el-input :type="this.ispassword" placeholder="请输入新密码" v-model="updatePwd_phoneForm.Password" auto-complete="off"></el-input>
+                <el-form-item label="新密码" prop="Password">
+                    <el-input :type="this.ispassword" @keyup.32.native="inputFunc(2)" placeholder="请输入新密码" v-model="updatePwd_phoneForm.Password" auto-complete="off"></el-input>
                     <i :class="fa_eyes" aria-hidden="true" @click="changeType()" class="open_close"></i>
                 </el-form-item>
                 <el-form-item label="确认新密码" prop="confirm_pass">
-                    <el-input :type="this.ispassword2" placeholder="请确认新密码" v-model="updatePwd_phoneForm.confirm_pass" auto-complete="off"></el-input>
+                    <el-input :type="this.ispassword2" @keyup.32.native="inputFunc(3)" placeholder="请确认新密码" v-model="updatePwd_phoneForm.confirm_pass" auto-complete="off"></el-input>
                     <i :class="fa_eyes2" aria-hidden="true" @click="changeType2()" class="open_close"></i>
                 </el-form-item>
-                <el-form-item label="验证码：" prop="VerifyCode">
-                    <el-input style="width:190px;" type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="updatePwd_phoneForm.VerifyCode" auto-complete="off"></el-input>
+                <el-form-item label="验证码" prop="VerifyCode">
+                    <el-input type="text" placeholder="请输入验证码" class="yanzhengma_input" v-model="updatePwd_phoneForm.VerifyCode" auto-complete="off"></el-input>
                     <input type="button"  @click="createCode" class="verification" v-model="checkCode" />
                 </el-form-item>
             </el-form>
@@ -83,16 +83,16 @@
     var code; //在全局定义验证码
     export default{
         data() {
-            //确认密码 手机校验
-            var validateConfirm_pass_phone = (rule, value, callback) => {
-              if (value === '') {
-                callback(new Error('请输入确认密码'));
-              } else if (value !== this.updatePwd_phoneForm.Password) {
-                callback(new Error('两次输入密码不一致!'))
-              } else {
-                callback()
-              }
-            };
+            // //确认密码 手机校验
+            // var validateConfirm_pass_phone = (rule, value, callback) => {
+            //   if (value === '') {
+            //     callback(new Error('请输入确认密码'));
+            //   } else if (value !== this.updatePwd_phoneForm.Password) {
+            //     callback(new Error('两次输入密码不一致!'))
+            //   } else {
+            //     callback()
+            //   }
+            // };
             //原密码 校验
             var validateOldPassword = (rule, value, callback) => {
               if (value === '') {
@@ -107,11 +107,14 @@
             };
             //新密码 校验
             var validatePassword = (rule, value, callback) => {
+                let reg=/^[1-9]\d*$|^0$/;
               if (value === '') {
                 callback(new Error('密码不能为空'));
             } else if(value.length <6 ){
                 callback(new Error('密码长度不能小于六位'));
-            } else {
+            } else if (reg.test(value)==true) {
+				callback(new Error("密码不能为纯数字！"));
+			} else {
                 callback();
               }
             };
@@ -184,6 +187,21 @@
             ...mapGetters(['myCenterNav','userInfo'])
         },
         methods:{
+            inputFunc(type) {
+                switch (type) {
+                    case 1:
+                        this.updatePwd_phoneForm.OldPassword = this.updatePwd_phoneForm.OldPassword.replace(/[\u4e00-\u9fa5]/g, '');
+                        break;
+                    case 2:
+                        this.updatePwd_phoneForm.Password = this.updatePwd_phoneForm.Password.replace(/[\u4e00-\u9fa5]/g, '');
+                        break;
+                    case 3:
+                        this.updatePwd_phoneForm.confirm_pass = this.updatePwd_phoneForm.confirm_pass.replace(/[\u4e00-\u9fa5]/g, '');
+                        break;
+                    default:
+                }
+
+    		},
             //手机-修改密码-提交
             updatePwd_phoneSub(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -356,34 +374,33 @@
         width:850px;
         border-radius: 2px;
     }
+    .open_close {
+    position: absolute;
+    right: -3px;
+    top: 9px;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #009688;
+    }
+    .yanzhengma_input {
+        width: 145px;
+    }
+    .verification {
+        font-size: 18px;
+        letter-spacing: 3px;
+        color: #053d84;
+        background: #f2f2f5 !important;
+        margin-left: 30px;
+        line-height: 37px;
+        height: 40px;
+        float: right;
+        border-radius: 3px;
+        vertical-align: middle;
+        transform: translate(-15px,0);
+        width: 100px;
+    }
 }
-.open_close {
-position: absolute;
-right: -3px;
-top: 9px;
-width: 30px;
-height: 20px;
-cursor: pointer;
-font-size: 20px;
-color: #009688;
-}
-.yanzhengma_input {
-    width: 190px;
-}
-.verification {
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: #053d84;
-    background: #f2f2f5 !important;
-    margin-left: 30px;
-    line-height: 37px;
-    height: 40px;
-    margin-top: -3px;
-    width: 100px;
-    border-radius: 3px;
-    vertical-align: middle;
-    transform: translate(-15px,0);
-    width: 102px;
-}
+
 </style>
->>>>>>> be7ef2925f10ef2e31f711e279f9a7f860506d4e
